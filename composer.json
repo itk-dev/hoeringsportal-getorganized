@@ -1,4 +1,6 @@
 {
+    "name": "itk-dev/hoeringsportal-getorganized",
+    "description": "Archiving documents in GetOrganized",
     "type": "project",
     "license": "proprietary",
     "minimum-stability": "stable",
@@ -49,7 +51,8 @@
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.8",
-        "phpstan/phpstan": "^1.5"
+        "phpstan/phpstan": "^1.5",
+        "symfony/maker-bundle": "^1.38"
     },
     "config": {
         "allow-plugins": {
