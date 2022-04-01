@@ -15,6 +15,7 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerTrait;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ArchiveHelper
 {
@@ -36,6 +37,8 @@ class ArchiveHelper
 
     private MailerInterface $mailer;
 
+    private array $options;
+
     public function __construct(ShareFileService $shareFile, GetOrganizedService $getOrganized, DocumentRepository $documentRepository, EntityManagerInterface $entityManager, TemplateHelper $templateHelper, MailerInterface $mailer)
     {
         $this->shareFile = $shareFile;
@@ -46,9 +49,12 @@ class ArchiveHelper
         $this->mailer = $mailer;
     }
 
-    public function archive(Archiver $archiver, $hearingItemId = null)
+    public function archive(Archiver $archiver, $hearingItemId = null, array $options = [])
     {
         $this->setArchiver($archiver);
+        $resolver = new OptionsResolver();
+        $this->configureOptions($resolver);
+        $this->options = $resolver->resolve($options);
 
         try {
             $this->shareFile->setArchiver($archiver);
@@ -138,7 +144,6 @@ class ArchiveHelper
                     $this->info($shareFileResponse->name);
 
                     $files = $this->shareFile->getFiles($shareFileResponse);
-
                     $pattern = $this->archiver->getConfigurationValue('[getorganized][sharefile_file_name_pattern]');
                     $sourceFiles = array_filter(
                             $files,
@@ -276,7 +281,7 @@ class ArchiveHelper
         }
     }
 
-    private function archiveDocument(Item $sourceFile, CaseEntity $getOrganizedHearing, string $title = null)
+    private function archiveDocument(Item $sourceFile, CaseEntity $getOrganizedHearing, string $title = null, array $options = [])
     {
         if (null === $title) {
             $title = $sourceFile->name;
@@ -308,7 +313,7 @@ class ArchiveHelper
             $document = $this->getOrganized->createDocument($fileContents, $getOrganizedHearing, $sourceFile, $metadata);
         } else {
             $sourceFileCreatedAt = new \DateTimeImmutable($sourceFile->creationDate);
-            if ($document->getUpdatedAt() < $sourceFileCreatedAt) {
+            if ($this->force() || $document->getUpdatedAt() < $sourceFileCreatedAt) {
                 $this->info(sprintf('Updating document in GetOrganized (%s)', $title));
                 $document = $this->getOrganized->updateDocument(
                     $fileContents,
@@ -323,6 +328,18 @@ class ArchiveHelper
         if (null === $document) {
             throw new RuntimeException(sprintf('Error creating document in GetOrganized (%s; %s)', $title, $sourceFile->id));
         }
+    }
+
+    private function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults([
+            'force' => false,
+        ]);
+    }
+
+    private function force(): bool
+    {
+        return true === $this->options['force'];
     }
 
     private function logException(\Throwable $t, array $context = [])

@@ -25,7 +25,9 @@ class ArchiveCommand extends ArchiverCommand
 
     protected function doConfigure()
     {
-        $this->addOption('hearing-item-id', null, InputOption::VALUE_REQUIRED, 'Hearing item id to archive');
+        $this
+            ->addOption('hearing-item-id', null, InputOption::VALUE_REQUIRED, 'Hearing item id to archive')
+            ->addOption('force', null, InputOption::VALUE_NONE, 'Force archiving');
     }
 
     protected function doExecute(): int
@@ -33,7 +35,9 @@ class ArchiveCommand extends ArchiverCommand
         $hearingItemId = $this->input->getOption('hearing-item-id');
         $logger = new ConsoleLogger($this->output);
         $this->helper->setLogger($logger);
-        $this->helper->archive($this->archiver, $hearingItemId);
+        $this->helper->archive($this->archiver, $hearingItemId, [
+            'force' => $this->input->getOption('force'),
+        ]);
 
         return self::SUCCESS;
     }

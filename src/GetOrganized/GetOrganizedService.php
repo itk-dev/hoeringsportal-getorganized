@@ -5,10 +5,10 @@ namespace App\GetOrganized;
 use App\Entity\Archiver;
 use App\Repository\GetOrganized\DocumentRepository;
 use App\ShareFile\Item;
-use App\Util\TemplateHelper;
 use ItkDev\GetOrganized\Client;
 use ItkDev\GetOrganized\Service\Cases;
 use ItkDev\GetOrganized\Service\Documents;
+use Symfony\Component\Filesystem\Filesystem;
 
 class GetOrganizedService
 {
@@ -17,7 +17,7 @@ class GetOrganizedService
 
     private DocumentRepository $documentRepository;
 
-    private TemplateHelper $template;
+    private Filesystem $filesystem;
 
     private Archiver $archiver;
 
@@ -27,10 +27,10 @@ class GetOrganizedService
     private Cases $getOrganizedCases;
     private Documents $getOrganizedDocuments;
 
-    public function __construct(DocumentRepository $documentRepository, TemplateHelper $template)
+    public function __construct(DocumentRepository $documentRepository, Filesystem $filesystem)
     {
         $this->documentRepository = $documentRepository;
-        $this->template = $template;
+        $this->filesystem = $filesystem;
     }
 
     public function setArchiver(Archiver $archiver)
@@ -58,7 +58,7 @@ class GetOrganizedService
         $response = $this->getOrganizedDocuments()->AddToDocumentLibrary(
             $path,
             $case->id,
-            basename($path),
+            $item->name,
             $metadata
         );
 
@@ -73,7 +73,7 @@ class GetOrganizedService
         $response = $this->getOrganizedDocuments()->AddToDocumentLibrary(
             $path,
             $case->id,
-            basename($path),
+            $item->name,
             $metadata,
             true
         );
@@ -81,11 +81,10 @@ class GetOrganizedService
         return $this->documentRepository->updated(new Document($response), $item, $metadata, $this->archiver);
     }
 
-    private function writeFile(string $contents, Item $item): string
+    private function writeFile(string $content, Item $item): string
     {
-        $name = $this->getDocumentName($item);
-        $path = tempnam('/tmp', $name);
-        file_put_contents($path, $contents);
+        $path = $this->filesystem->tempnam('/tmp', $item->id);
+        $this->filesystem->dumpFile($path, $content);
 
         return $path;
     }
@@ -151,13 +150,6 @@ class GetOrganizedService
     public function getDocumentVersion(string $documentVersionIdentifier)
     {
         return $this->getOrganizedCases()->getDocumentVersion($documentVersionIdentifier);
-    }
-
-    private function getDocumentName(Item $item)
-    {
-        $template = $this->configuration['document']['name'] ?? '{{ item.name }}';
-
-        return $this->template->render($template, ['item' => ['name' => $item->name] + ($item->metadata ?? [])]);
     }
 
     private function validateConfiguration()

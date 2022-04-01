@@ -74,6 +74,6 @@ class DocumentRepository extends ServiceEntityRepository
 
     public function updated(GetOrganizedDocument $document, Item $item, array $metadata, Archiver $archiver)
     {
-        $this->created($document, $item, $metadata, $archiver);
+        return $this->created($document, $item, $metadata, $archiver);
     }
 }
