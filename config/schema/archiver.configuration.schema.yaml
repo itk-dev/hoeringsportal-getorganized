@@ -1,0 +1,26 @@
+type: object
+
+# properties:
+#     type:
+#         - type: integer
+#     name:
+#         - type: string
+#     orders:
+#         - type: array
+#           items:
+#             '$ref': '#/definitions/order'
+
+required: [type]
+
+# definitions:
+#     order:
+#         type: object
+#         properties:
+#             id:
+#                 - type: integer
+#             price:
+#                 - type: number
+#             updated:
+#                 - type: string
+#                   format: 'date-time'
+#         required: [id]

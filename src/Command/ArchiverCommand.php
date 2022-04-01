@@ -13,7 +13,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-abstract class AbstractCommand extends Command
+abstract class ArchiverCommand extends Command
 {
     protected string $archiverType;
 
@@ -21,13 +21,20 @@ abstract class AbstractCommand extends Command
 
     protected OutputInterface $output;
 
-    protected ?ArchiverRepository $archiverRepository;
+    private ArchiverRepository $archiverRepository;
 
     protected Archiver $archiver;
 
-    public function setArchiverRepository(ArchiverRepository $archiverRepository)
+    public function __construct(ArchiverRepository $archiverRepository)
     {
+        parent::__construct();
         $this->archiverRepository = $archiverRepository;
+    }
+
+    abstract protected function doExecute(): int;
+
+    protected function doConfigure()
+    {
     }
 
     protected function configure()
@@ -35,6 +42,7 @@ abstract class AbstractCommand extends Command
         $this
             ->addArgument('archiver', InputArgument::REQUIRED, 'Archiver to run (name or id)')
             ->addOption('last-run-at', null, InputOption::VALUE_REQUIRED, 'Use this time as value of Archiver.lastRunAt');
+        $this->doConfigure();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -53,7 +61,7 @@ abstract class AbstractCommand extends Command
         }
 
         if ($this->archiver->getType() !== $this->archiverType) {
-            throw new RuntimeException('Invalid archiver type: '.$this->archiver->getType());
+            throw new RuntimeException(sprintf('Invalid archiver type: %s (%s expected)', $this->archiver->getType(), $this->archiverType));
         }
 
         if ($lastRunAt = $input->getOption('last-run-at')) {
@@ -64,7 +72,7 @@ abstract class AbstractCommand extends Command
             }
         }
 
-        return self::SUCCESS;
+        return $this->doExecute();
     }
 
     protected function writeTable($data, $vertical = false)

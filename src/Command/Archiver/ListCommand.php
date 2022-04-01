@@ -15,7 +15,8 @@ class ListCommand extends Command
 {
     protected static $defaultName = 'app:archiver:list';
     protected static $defaultDescription = 'List archivers';
-    protected ArchiverRepository $archiverRepository;
+
+    private ArchiverRepository $archiverRepository;
 
     public function __construct(ArchiverRepository $archiverRepository)
     {
@@ -63,6 +64,7 @@ class ListCommand extends Command
             }
         } else {
             $table = new Table($output);
+            $table->setHorizontal();
             $first = true;
             foreach ($archivers as $archiver) {
                 $values = array_map(function ($field) use ($archiver, $propertyAccessor) {
@@ -83,5 +85,4 @@ class ListCommand extends Command
 
         return self::SUCCESS;
     }
-
 }
