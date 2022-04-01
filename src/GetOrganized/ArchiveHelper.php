@@ -6,6 +6,7 @@ use App\Entity\Archiver;
 use App\Entity\ExceptionLogEntry;
 use App\Exception\RuntimeException;
 use App\Repository\GetOrganized\DocumentRepository;
+use App\ShareFile\Item;
 use App\ShareFile\ShareFileService;
 use App\Traits\ArchiverAwareTrait;
 use Doctrine\ORM\EntityManagerInterface;
@@ -68,6 +69,9 @@ class ArchiveHelper
 
                 foreach ($shareFileHearing->getChildren() as $shareFileResponse) {
                     try {
+                        $sourceFile = null;
+                        $sourceFileCreatedAt = null;
+
                         $caseWorker = null;
                         $departmentId = $shareFileResponse->metadata['ticket_data']['department_id'] ?? null;
                         $organisationReference = $archiver->getGetOrganizedOrganizationReference($departmentId);
@@ -109,11 +113,7 @@ class ArchiveHelper
                         }
 
                         $this->info($shareFileResponse->name);
-                        $document = $this->documentRepository->findOneByItemAndArchiver($shareFileResponse, $this->archiver);
-                        $this->info('Getting file contents from ShareFile');
 
-                        $sourceFile = null;
-                        $sourceFileCreatedAt = null;
                         $pattern = $this->archiver->getConfigurationValue('[getorganized][sharefile_file_name_pattern]');
                         if (null !== $pattern) {
                             $files = $this->shareFile->getFiles($shareFileResponse);
@@ -130,198 +130,139 @@ class ArchiveHelper
                             $sourceFile = $shareFileResponse;
                             $sourceFileCreatedAt = $shareFileResponse->creationDate;
                         }
-                        $fileContents = $this->shareFile->downloadFile($sourceFile);
-                        if (null === $fileContents) {
-                            throw new RuntimeException(sprintf('Cannot get file contents for item %s', $shareFileResponse->id));
-                        }
-                        $metadata = [];
-                        if (null === $document) {
-                            $this->info('Creating new document in GetOrganized');
 
-                            // @todo
-                            // if (null !== $caseWorker) {
-                            //     $metadata['CaseManagerReference'] = $caseWorker['CaseWorkerId'];
-                            // }
-                            if (null !== $organisationReference) {
-                                $metadata['OrganisationReference'] = $organisationReference;
-                            }
+                        $title = $sourceFile->getName();
 
-                            $document = $this->getOrganized->createDocument($fileContents, $getOrganizedHearing, $shareFileResponse, $metadata);
-                        } else {
-                            if ($document->getUpdatedAt() < $sourceFileCreatedAt) {
-                                $this->info('Updating document in GetOrganized');
-                                $this->getOrganized->updateDocument(
-                                    $fileContents,
-                                    $getOrganizedHearing,
-                                    $shareFileResponse,
-                                    $metadata
-                                );
-                            } else {
-                                $this->info('Document in GetOrganized is already up to date');
-                            }
-                        }
-                        if (null === $document) {
-                            throw new RuntimeException(sprintf('Error creating response %s', $shareFileResponse['Name']));
-                        }
+                        $this->archiveDocument($sourceFile, $sourceFileCreatedAt, $title, $getOrganizedHearing);
                     } catch (\Throwable $t) {
                         $this->logException($t, [
                             'shareFileHearing' => $shareFileHearing,
-                            'shareFileResponse' => $shareFileResponse,
+                            'getOrganizedHearing' => $getOrganizedHearing,
+                            'sourceFile' => $sourceFile,
                         ]);
                     }
                 }
-            }
 
-            // Overview files
-            if (null !== $hearingItemId) {
-                $this->info(sprintf('Getting overview files from hearing %s', $hearingItemId));
-                $hearing = $this->shareFile->getHearingOverviewFiles($hearingItemId);
-                $shareFileData = [$hearing];
-            } else {
-                $date = $archiver->getLastRunAt() ?? new \DateTime('-1 month ago');
-                $this->info(sprintf('Getting overview files updated since %s from ShareFile', $date->format(\DateTimeInterface::ATOM)));
-                $shareFileData = $this->shareFile->getUpdatedOverviewFiles($date);
-            }
+                // Overview files
+                if (null !== $hearingItemId) {
+                    $this->info(sprintf('Getting overview files from hearing %s', $hearingItemId));
+                    $hearing = $this->shareFile->getHearingOverviewFiles($hearingItemId);
+                    $shareFileData = [$hearing];
+                } else {
+                    $date = $archiver->getLastRunAt() ?? new \DateTime('-1 month ago');
+                    $this->info(sprintf('Getting overview files updated since %s from ShareFile', $date->format(\DateTimeInterface::ATOM)));
+                    $shareFileData = $this->shareFile->getUpdatedOverviewFiles($date);
+                }
 
-            foreach ($shareFileData as $shareFileHearing) {
-                try {
-                    // Get GetOrganized hearing under which to archive.
-                    //
-                    // This hearing must be created previously by archiving a
-                    // response.
+                foreach ($shareFileData as $shareFileHearing) {
+                    try {
+                        // Get GetOrganized hearing under which to archive.
+                        //
+                        // This hearing must be created previously by archiving a
+                        // response.
 
-                    $getOrganizedHearing = null;
-                    $shareFileResponses = $this->shareFile->getResponses($shareFileHearing);
+                        $getOrganizedHearing = null;
+                        $shareFileResponses = $this->shareFile->getResponses($shareFileHearing);
 
-                    $caseWorker = null;
-                    $departmentId = null;
-                    foreach ($shareFileResponses as $shareFileResponse) {
-                        if (!empty($shareFileResponse->metadata['ticket_data']['department_id'])) {
-                            $departmentId = $shareFileResponse->metadata['ticket_data']['department_id'];
-
-                            break;
-                        }
-                    }
-
-                    $organisationReference = $archiver->getGetOrganizedOrganizationReference($departmentId);
-                    if (null === $organisationReference) {
-                        throw new RuntimeException(sprintf('Unknown department %s on item %s', $departmentId, $shareFileHearing->id));
-                    }
-
-                    if ($archiver->getCreateHearing()) {
-                        // @todo
-                        // $getOrganizedHearing = $this->getOrganized->getHearing($shareFileHearing);
-                        if (null === $getOrganizedHearing) {
-                            throw new RuntimeException(sprintf('Cannot get GetOrganized case %s', $shareFileHearing->id));
-                        }
-                    } else {
-                        $getOrganizedCaseId = null;
+                        $caseWorker = null;
+                        $departmentId = null;
                         foreach ($shareFileResponses as $shareFileResponse) {
-                            if (!empty($shareFileResponse->metadata['ticket_data']['get_organized_case_id'])) {
-                                $getOrganizedCaseId = $shareFileResponse->metadata['ticket_data']['get_organized_case_id'];
+                            if (!empty($shareFileResponse->metadata['ticket_data']['department_id'])) {
+                                $departmentId = $shareFileResponse->metadata['ticket_data']['department_id'];
 
                                 break;
                             }
                         }
 
-                        if (null === $getOrganizedCaseId) {
-                            throw new RuntimeException(sprintf('Cannot get GetOrganized case id from item %s (%s)', $shareFileHearing->name, $shareFileHearing->id));
+                        $organisationReference = $archiver->getGetOrganizedOrganizationReference($departmentId);
+                        if (null === $organisationReference) {
+                            throw new RuntimeException(sprintf('Unknown department %s on item %s', $departmentId, $shareFileHearing->id));
                         }
 
-                        $getOrganizedHearing = $this->getOrganized->getCaseById($getOrganizedCaseId);
-                        if (null === $getOrganizedHearing) {
-                            throw new RuntimeException(sprintf('Cannot get GetOrganized case %s', $shareFileHearing->id));
-                        }
-                    }
+                        if ($archiver->getCreateHearing()) {
+                            // @todo
+                            // $getOrganizedHearing = $this->getOrganized->getHearing($shareFileHearing);
+                            if (null === $getOrganizedHearing) {
+                                throw new RuntimeException(sprintf('Cannot get GetOrganized case %s', $shareFileHearing->id));
+                            }
+                        } else {
+                            $getOrganizedCaseId = null;
+                            foreach ($shareFileResponses as $shareFileResponse) {
+                                if (!empty($shareFileResponse->metadata['ticket_data']['get_organized_case_id'])) {
+                                    $getOrganizedCaseId = $shareFileResponse->metadata['ticket_data']['get_organized_case_id'];
 
-                    $overviews = [
-                        [
-                            'pattern' => $this->archiver->getConfigurationValue('[getorganized][sharefile_file_combined_name_pattern]', '*-combined.pdf'),
-                            'title' => sprintf('%s - samlede høringssvar', $shareFileHearing->getName()),
-                        ],
-                        [
-                            'pattern' => $this->archiver->getConfigurationValue('[getorganized][sharefile_file_overview_name_pattern]', 'overblik.xlsx'),
-                            'title' => sprintf('%s - overblik over høringssvar', $shareFileHearing->getName()),
-                        ],
-                    ];
-                    foreach ($overviews as $overview) {
-                        $pattern = $overview['pattern'] ?? null;
-                        $title = $overview['title'];
-
-                        try {
-                            $this->info(sprintf('Getting overview file "%s" (%s) from ShareFile', $title, $pattern));
-
-                            $sourceFile = null;
-                            $sourceFileCreatedAt = null;
-                            if (null !== $pattern) {
-                                $files = $shareFileHearing->getChildren();
-                                foreach ($files as $file) {
-                                    if (fnmatch($pattern, $file['Name'])) {
-                                        $sourceFile = $file;
-                                        $sourceFileCreatedAt = new \DateTime($file->creationDate);
-                                        break;
-                                    }
+                                    break;
                                 }
                             }
 
-                            if (null !== $sourceFile) {
-                                $fileContents = $this->shareFile->downloadFile($sourceFile);
-                                if (null === $fileContents) {
-                                    throw new RuntimeException(sprintf('Cannot get file contents for item %s', $sourceFile->id));
-                                }
-
-                                $document = $this->documentRepository->findOneByItemAndArchiver($sourceFile, $this->archiver);
-
-                                $metadata = [];
-                                if (null === $document) {
-                                    $this->info(sprintf('Creating new document in GetOrganized (%s)', $title));
-                                    // @todo
-                                    // if (null !== $caseWorker) {
-                                    //     $metadata['CaseManagerReference'] = $caseWorker['CaseWorkerId'];
-                                    // }
-                                    if (null !== $organisationReference) {
-                                        $metadata['OrganisationReference'] = $organisationReference;
-                                    }
-
-                                    $document = $this->getOrganized->createDocument($fileContents, $getOrganizedHearing, $sourceFile, $metadata);
-                                } else {
-                                    if ($document->getUpdatedAt() < $sourceFileCreatedAt) {
-                                        $this->info(sprintf('Updating document in GetOrganized (%s)', $title));
-                                        $document = $this->getOrganized->updateDocument(
-                                            $fileContents,
-                                            $getOrganizedHearing,
-                                            $sourceFile,
-                                            $metadata
-                                        );
-                                    } else {
-                                        $this->info('Document in GetOrganized is already up to date');
-                                    }
-                                }
-                                if (null === $document) {
-                                    throw new RuntimeException(sprintf('Error creating overview "%s" (%s)', $title, $shareFileHearing['Name']));
-                                }
-                            } else {
-                                $this->warning(sprintf('Overview file not found: %s (%s)', $title, $pattern));
+                            if (null === $getOrganizedCaseId) {
+                                throw new RuntimeException(sprintf('Cannot get GetOrganized case id from item %s (%s)', $shareFileHearing->name, $shareFileHearing->id));
                             }
-                        } catch (\Throwable $t) {
-                            $this->logException($t, [
-                                'shareFileHearing' => $shareFileHearing,
-                                'getOrganizedHearing' => $getOrganizedHearing,
-                                'overview' => $overview,
-                            ]);
+
+                            $getOrganizedHearing = $this->getOrganized->getCaseById($getOrganizedCaseId);
+                            if (null === $getOrganizedHearing) {
+                                throw new RuntimeException(sprintf('Cannot get GetOrganized case %s', $shareFileHearing->id));
+                            }
                         }
+
+                        $overviews = [
+                            [
+                                'pattern' => $this->archiver->getConfigurationValue('[getorganized][sharefile_file_combined_name_pattern]', '*-combined.pdf'),
+                                'title' => sprintf('%s - samlede høringssvar', $shareFileHearing->getName()),
+                            ],
+                            [
+                                'pattern' => $this->archiver->getConfigurationValue('[getorganized][sharefile_file_overview_name_pattern]', 'overblik.xlsx'),
+                                'title' => sprintf('%s - overblik over høringssvar', $shareFileHearing->getName()),
+                            ],
+                        ];
+                        foreach ($overviews as $overview) {
+                            $pattern = $overview['pattern'] ?? null;
+                            $title = $overview['title'];
+
+                            try {
+                                $sourceFile = null;
+                                $sourceFileCreatedAt = null;
+
+                                $this->info(sprintf('Getting overview file "%s" (%s) from ShareFile', $title, $pattern));
+
+                                if (null !== $pattern) {
+                                    $files = $shareFileHearing->getChildren();
+                                    foreach ($files as $file) {
+                                        if (fnmatch($pattern, $file['Name'])) {
+                                            $sourceFile = $file;
+                                            $sourceFileCreatedAt = new \DateTime($file->creationDate);
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (null === $sourceFile) {
+                                    $this->warning(sprintf('Overview file not found: %s (%s)', $title, $pattern));
+                                    continue;
+                                }
+
+                                $this->archiveDocument($sourceFile, $sourceFileCreatedAt, $title, $getOrganizedHearing);
+                            } catch (\Throwable $t) {
+                                $this->logException($t, [
+                                    'shareFileHearing' => $shareFileHearing,
+                                    'getOrganizedHearing' => $getOrganizedHearing,
+                                    'sourceFile' => $sourceFile,
+                                    'overview' => $overview,
+                                ]);
+                            }
+                        }
+                    } catch (\Throwable $t) {
+                        $this->logException($t, [
+                            'shareFileHearing' => $shareFileHearing,
+                        ]);
                     }
-                } catch (\Throwable $t) {
-                    $this->logException($t, [
-                        'shareFileHearing' => $shareFileHearing,
-                    ]);
                 }
-            }
 
-            if (null === $hearingItemId) {
-                $archiver->setLastRunAt($startTime);
-                $this->entityManager->persist($archiver);
-                $this->entityManager->flush();
+                if (null === $hearingItemId) {
+                    $archiver->setLastRunAt($startTime);
+                    $this->entityManager->persist($archiver);
+                    $this->entityManager->flush();
+                }
             }
         } catch (\Throwable $t) {
             $this->logException($t);
@@ -332,6 +273,48 @@ class ArchiveHelper
     {
         if (null !== $this->logger) {
             $this->logger->log($level, $message, $context);
+        }
+    }
+
+    private function archiveDocument(Item $sourceFile, \DateTimeInterface $sourceFileCreatedAt, string $title, $getOrganizedHearing)
+    {
+        $this->info(sprintf('Getting file contents from ShareFile (%s)', $sourceFile->id));
+
+        $fileContents = $this->shareFile->downloadFile($sourceFile);
+        if (null === $fileContents) {
+            throw new RuntimeException(sprintf('Cannot get file contents for item %s', $sourceFile->id));
+        }
+
+        $document = $this->documentRepository->findOneByItemAndArchiver($sourceFile, $this->archiver);
+
+        $metadata = [];
+        if (null === $document) {
+            $this->info(sprintf('Creating new document in GetOrganized (%s)', $title));
+
+            // @todo
+            // if (null !== $caseWorker) {
+            //     $metadata['CaseManagerReference'] = $caseWorker['CaseWorkerId'];
+            // }
+            // if (null !== $organisationReference) {
+            //     $metadata['OrganisationReference'] = $organisationReference;
+            // }
+
+            $document = $this->getOrganized->createDocument($fileContents, $getOrganizedHearing, $sourceFile, $metadata);
+        } else {
+            if ($document->getUpdatedAt() < $sourceFileCreatedAt) {
+                $this->info(sprintf('Updating document in GetOrganized (%s)', $title));
+                $document = $this->getOrganized->updateDocument(
+                    $fileContents,
+                    $getOrganizedHearing,
+                    $sourceFile,
+                    $metadata
+                );
+            } else {
+                $this->info(sprintf('Document in GetOrganized is already up to date (%s)', $title));
+            }
+        }
+        if (null === $document) {
+            throw new RuntimeException(sprintf('Error creating document in GetOrganized (%s; %s)', $title, $sourceFile->id));
         }
     }
 
