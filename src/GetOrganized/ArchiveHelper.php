@@ -52,8 +52,8 @@ class ArchiveHelper
 
             $startTime = new \DateTimeImmutable();
 
-            $this->archiveResponses($archiver, $hearingItemId);
-            $this->archiveOverviews($archiver, $hearingItemId);
+            $this->archiveResponses($hearingItemId);
+            $this->archiveOverviews($hearingItemId);
 
             if (null === $hearingItemId) {
                 $archiver->setLastRunAt($startTime);
@@ -72,14 +72,14 @@ class ArchiveHelper
         }
     }
 
-    private function archiveResponses(Archiver $archiver, string $hearingItemId = null)
+    private function archiveResponses(string $hearingItemId = null)
     {
         if (null !== $hearingItemId) {
             $this->info(sprintf('Getting hearing %s', $hearingItemId));
             $hearing = $this->shareFile->getHearing($hearingItemId);
             $shareFileData = [$hearing];
         } else {
-            $date = $archiver->getLastRunAt() ?? new \DateTime('-1 month ago');
+            $date = $this->archiver->getLastRunAt() ?? new \DateTime('-1 month ago');
             $this->info(sprintf('Getting files updated since %s from ShareFile', $date->format(\DateTimeInterface::ATOM)));
             $shareFileData = $this->shareFile->getUpdatedFiles($date);
         }
@@ -93,13 +93,13 @@ class ArchiveHelper
 
                     $caseWorker = null;
                     $departmentId = $shareFileResponse->metadata['ticket_data']['department_id'] ?? null;
-                    $organisationReference = $archiver->getGetOrganizedOrganizationReference($departmentId);
+                    $organisationReference = $this->archiver->getGetOrganizedOrganizationReference($departmentId);
                     if (null === $organisationReference) {
                         throw new RuntimeException(sprintf('Unknown department %s on item %s', $departmentId, $shareFileResponse->id));
                     }
 
                     if (null === $getOrganizedHearing) {
-                        if ($archiver->getCreateHearing()) {
+                        if ($this->archiver->getCreateHearing()) {
                             $this->info(sprintf('Getting hearing: %s', $shareFileHearing->name));
                             $shareFileHearing->metadata = $shareFileResponse->metadata;
 
@@ -160,7 +160,7 @@ class ArchiveHelper
         }
     }
 
-    private function archiveOverviews(Archiver $archiver, string $hearingItemId = null)
+    private function archiveOverviews(string $hearingItemId = null)
     {
         // Overview files
         if (null !== $hearingItemId) {
@@ -168,7 +168,7 @@ class ArchiveHelper
             $hearing = $this->shareFile->getHearingOverviewFiles($hearingItemId);
             $shareFileData = [$hearing];
         } else {
-            $date = $archiver->getLastRunAt() ?? new \DateTime('-1 month ago');
+            $date = $this->archiver->getLastRunAt() ?? new \DateTime('-1 month ago');
             $this->info(sprintf('Getting overview files updated since %s from ShareFile', $date->format(\DateTimeInterface::ATOM)));
             $shareFileData = $this->shareFile->getUpdatedOverviewFiles($date);
         }
@@ -193,12 +193,12 @@ class ArchiveHelper
                     }
                 }
 
-                $organisationReference = $archiver->getGetOrganizedOrganizationReference($departmentId);
+                $organisationReference = $this->archiver->getGetOrganizedOrganizationReference($departmentId);
                 if (null === $organisationReference) {
                     throw new RuntimeException(sprintf('Unknown department %s on item %s', $departmentId, $shareFileHearing->id));
                 }
 
-                if ($archiver->getCreateHearing()) {
+                if ($this->archiver->getCreateHearing()) {
                     // @todo
                     // $getOrganizedHearing = $this->getOrganized->getHearing($shareFileHearing);
                     if (null === $getOrganizedHearing) {
