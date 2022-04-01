@@ -136,118 +136,7 @@ class ArchiveHelper
                     }
                 }
 
-                // Overview files
-                if (null !== $hearingItemId) {
-                    $this->info(sprintf('Getting overview files from hearing %s', $hearingItemId));
-                    $hearing = $this->shareFile->getHearingOverviewFiles($hearingItemId);
-                    $shareFileData = [$hearing];
-                } else {
-                    $date = $archiver->getLastRunAt() ?? new \DateTime('-1 month ago');
-                    $this->info(sprintf('Getting overview files updated since %s from ShareFile', $date->format(\DateTimeInterface::ATOM)));
-                    $shareFileData = $this->shareFile->getUpdatedOverviewFiles($date);
-                }
-
-                foreach ($shareFileData as $shareFileHearing) {
-                    try {
-                        // Get GetOrganized hearing under which to archive.
-                        //
-                        // This hearing must be created previously by archiving a
-                        // response.
-
-                        $getOrganizedHearing = null;
-                        $shareFileResponses = $this->shareFile->getResponses($shareFileHearing);
-
-                        $caseWorker = null;
-                        $departmentId = null;
-                        foreach ($shareFileResponses as $shareFileResponse) {
-                            if (!empty($shareFileResponse->metadata['ticket_data']['department_id'])) {
-                                $departmentId = $shareFileResponse->metadata['ticket_data']['department_id'];
-
-                                break;
-                            }
-                        }
-
-                        $organisationReference = $archiver->getGetOrganizedOrganizationReference($departmentId);
-                        if (null === $organisationReference) {
-                            throw new RuntimeException(sprintf('Unknown department %s on item %s', $departmentId, $shareFileHearing->id));
-                        }
-
-                        if ($archiver->getCreateHearing()) {
-                            // @todo
-                            // $getOrganizedHearing = $this->getOrganized->getHearing($shareFileHearing);
-                            if (null === $getOrganizedHearing) {
-                                throw new RuntimeException(sprintf('Cannot get GetOrganized case %s', $shareFileHearing->id));
-                            }
-                        } else {
-                            $getOrganizedCaseId = null;
-                            foreach ($shareFileResponses as $shareFileResponse) {
-                                if (!empty($shareFileResponse->metadata['ticket_data']['get_organized_case_id'])) {
-                                    $getOrganizedCaseId = $shareFileResponse->metadata['ticket_data']['get_organized_case_id'];
-
-                                    break;
-                                }
-                            }
-
-                            if (null === $getOrganizedCaseId) {
-                                throw new RuntimeException(sprintf('Cannot get GetOrganized case id from item %s (%s)', $shareFileHearing->name, $shareFileHearing->id));
-                            }
-
-                            $getOrganizedHearing = $this->getOrganized->getCaseById($getOrganizedCaseId);
-                            if (null === $getOrganizedHearing) {
-                                throw new RuntimeException(sprintf('Cannot get GetOrganized case %s', $shareFileHearing->id));
-                            }
-                        }
-
-                        $overviews = [
-                            [
-                                'pattern' => $this->archiver->getConfigurationValue('[getorganized][sharefile_file_combined_name_pattern]', '*-combined.pdf'),
-                                'title' => sprintf('%s - samlede høringssvar', $shareFileHearing->getName()),
-                            ],
-                            [
-                                'pattern' => $this->archiver->getConfigurationValue('[getorganized][sharefile_file_overview_name_pattern]', 'overblik.xlsx'),
-                                'title' => sprintf('%s - overblik over høringssvar', $shareFileHearing->getName()),
-                            ],
-                        ];
-                        foreach ($overviews as $overview) {
-                            $pattern = $overview['pattern'] ?? null;
-                            $title = $overview['title'];
-
-                            try {
-                                $sourceFile = null;
-
-                                $this->info(sprintf('Getting overview file "%s" (%s) from ShareFile', $title, $pattern));
-
-                                if (null !== $pattern) {
-                                    $files = $shareFileHearing->getChildren();
-                                    foreach ($files as $file) {
-                                        if (fnmatch($pattern, $file['Name'])) {
-                                            $sourceFile = $file;
-                                            break;
-                                        }
-                                    }
-                                }
-
-                                if (null === $sourceFile) {
-                                    $this->warning(sprintf('Overview file not found: %s (%s)', $title, $pattern));
-                                    continue;
-                                }
-
-                                $this->archiveDocument($sourceFile, $getOrganizedHearing, $title);
-                            } catch (\Throwable $t) {
-                                $this->logException($t, [
-                                    'shareFileHearing' => $shareFileHearing,
-                                    'getOrganizedHearing' => $getOrganizedHearing,
-                                    'sourceFile' => $sourceFile,
-                                    'overview' => $overview,
-                                ]);
-                            }
-                        }
-                    } catch (\Throwable $t) {
-                        $this->logException($t, [
-                            'shareFileHearing' => $shareFileHearing,
-                        ]);
-                    }
-                }
+                $this->archiveOverviews($archiver, $hearingItemId);
 
                 if (null === $hearingItemId) {
                     $archiver->setLastRunAt($startTime);
@@ -264,6 +153,122 @@ class ArchiveHelper
     {
         if (null !== $this->logger) {
             $this->logger->log($level, $message, $context);
+        }
+    }
+
+    private function archiveOverviews(Archiver $archiver, string $hearingItemId = null)
+    {
+        // Overview files
+        if (null !== $hearingItemId) {
+            $this->info(sprintf('Getting overview files from hearing %s', $hearingItemId));
+            $hearing = $this->shareFile->getHearingOverviewFiles($hearingItemId);
+            $shareFileData = [$hearing];
+        } else {
+            $date = $archiver->getLastRunAt() ?? new \DateTime('-1 month ago');
+            $this->info(sprintf('Getting overview files updated since %s from ShareFile', $date->format(\DateTimeInterface::ATOM)));
+            $shareFileData = $this->shareFile->getUpdatedOverviewFiles($date);
+        }
+
+        foreach ($shareFileData as $shareFileHearing) {
+            try {
+                // Get GetOrganized hearing under which to archive.
+                //
+                // This hearing must be created previously by archiving a
+                // response.
+
+                $getOrganizedHearing = null;
+                $shareFileResponses = $this->shareFile->getResponses($shareFileHearing);
+
+                $caseWorker = null;
+                $departmentId = null;
+                foreach ($shareFileResponses as $shareFileResponse) {
+                    if (!empty($shareFileResponse->metadata['ticket_data']['department_id'])) {
+                        $departmentId = $shareFileResponse->metadata['ticket_data']['department_id'];
+
+                        break;
+                    }
+                }
+
+                $organisationReference = $archiver->getGetOrganizedOrganizationReference($departmentId);
+                if (null === $organisationReference) {
+                    throw new RuntimeException(sprintf('Unknown department %s on item %s', $departmentId, $shareFileHearing->id));
+                }
+
+                if ($archiver->getCreateHearing()) {
+                    // @todo
+                    // $getOrganizedHearing = $this->getOrganized->getHearing($shareFileHearing);
+                    if (null === $getOrganizedHearing) {
+                        throw new RuntimeException(sprintf('Cannot get GetOrganized case %s', $shareFileHearing->id));
+                    }
+                } else {
+                    $getOrganizedCaseId = null;
+                    foreach ($shareFileResponses as $shareFileResponse) {
+                        if (!empty($shareFileResponse->metadata['ticket_data']['get_organized_case_id'])) {
+                            $getOrganizedCaseId = $shareFileResponse->metadata['ticket_data']['get_organized_case_id'];
+
+                            break;
+                        }
+                    }
+
+                    if (null === $getOrganizedCaseId) {
+                        throw new RuntimeException(sprintf('Cannot get GetOrganized case id from item %s (%s)', $shareFileHearing->name, $shareFileHearing->id));
+                    }
+
+                    $getOrganizedHearing = $this->getOrganized->getCaseById($getOrganizedCaseId);
+                    if (null === $getOrganizedHearing) {
+                        throw new RuntimeException(sprintf('Cannot get GetOrganized case %s', $shareFileHearing->id));
+                    }
+                }
+
+                $overviews = [
+                    [
+                        'pattern' => $this->archiver->getConfigurationValue('[getorganized][sharefile_file_combined_name_pattern]', '*-combined.pdf'),
+                        'title' => sprintf('%s - samlede høringssvar', $shareFileHearing->getName()),
+                    ],
+                    [
+                        'pattern' => $this->archiver->getConfigurationValue('[getorganized][sharefile_file_overview_name_pattern]', 'overblik.xlsx'),
+                        'title' => sprintf('%s - overblik over høringssvar', $shareFileHearing->getName()),
+                    ],
+                ];
+                foreach ($overviews as $overview) {
+                    $pattern = $overview['pattern'] ?? null;
+                    $title = $overview['title'];
+
+                    try {
+                        $sourceFile = null;
+
+                        $this->info(sprintf('Getting overview file "%s" (%s) from ShareFile', $title, $pattern));
+
+                        if (null !== $pattern) {
+                            $files = $shareFileHearing->getChildren();
+                            foreach ($files as $file) {
+                                if (fnmatch($pattern, $file['Name'])) {
+                                    $sourceFile = $file;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (null === $sourceFile) {
+                            $this->warning(sprintf('Overview file not found: %s (%s)', $title, $pattern));
+                            continue;
+                        }
+
+                        $this->archiveDocument($sourceFile, $getOrganizedHearing, $title);
+                    } catch (\Throwable $t) {
+                        $this->logException($t, [
+                            'shareFileHearing' => $shareFileHearing,
+                            'getOrganizedHearing' => $getOrganizedHearing,
+                            'sourceFile' => $sourceFile,
+                            'overview' => $overview,
+                        ]);
+                    }
+                }
+            } catch (\Throwable $t) {
+                $this->logException($t, [
+                    'shareFileHearing' => $shareFileHearing,
+                ]);
+            }
         }
     }
 
