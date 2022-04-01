@@ -20,18 +20,12 @@ class ShareFileService
     private const SHAREFILE_FOLDER = 'ShareFile.Api.Models.Folder';
     private const SHAREFILE_FILE = 'ShareFile.Api.Models.File';
 
-    /** @var Archiver */
-    private $archiver;
+    private array $configuration;
 
-    /** @var array */
-    private $configuration;
-
-    /** @var Client */
-    private $client;
+    private Client $client;
 
     public function setArchiver(Archiver $archiver)
     {
-        $this->archiver = $archiver;
         $this->configuration = $archiver->getConfigurationValue('sharefile', []);
         $this->validateConfiguration();
     }
@@ -45,11 +39,9 @@ class ShareFileService
     }
 
     /**
-     * @param \DateTime|null $changedAfter
-     *
      * @return Item[]
      */
-    public function getUpdatedFiles(\DateTime $changedAfter)
+    public function getUpdatedFiles(\DateTimeInterface $changedAfter)
     {
         $hearings = $this->getHearings($changedAfter);
         foreach ($hearings as &$hearing) {
@@ -65,11 +57,9 @@ class ShareFileService
     }
 
     /**
-     * @param \DateTime|null $changedAfter
-     *
      * @return Item[]
      */
-    public function getUpdatedOverviewFiles(\DateTime $changedAfter)
+    public function getUpdatedOverviewFiles(\DateTimeInterface $changedAfter)
     {
         $hearings = $this->getHearings($changedAfter);
         foreach ($hearings as &$hearing) {
@@ -99,7 +89,7 @@ class ShareFileService
     /**
      * @return Item[]
      */
-    public function getHearings(\DateTime $changedAfter = null)
+    public function getHearings(\DateTimeInterface $changedAfter = null)
     {
         $itemId = $this->configuration['root_id'];
         $folders = $this->getFolders($itemId, $changedAfter);
@@ -149,7 +139,7 @@ class ShareFileService
     /**
      * @return Item[]
      */
-    public function getResponses(Item $hearing, \DateTime $changedAfter = null)
+    public function getResponses(Item $hearing, \DateTimeInterface $changedAfter = null)
     {
         $folders = $this->getFolders($hearing, $changedAfter);
         $responses = array_filter($folders ?? [], function ($item) use ($changedAfter) {
@@ -165,7 +155,7 @@ class ShareFileService
     }
 
     /**
-     * @param $item
+     * @param string|Item $item
      *
      * @return Item
      */
@@ -182,7 +172,7 @@ class ShareFileService
     /**
      * Get metadata list.
      *
-     * @param $item
+     * @param string|Item $item
      *
      * @return array
      */
@@ -208,7 +198,7 @@ class ShareFileService
     /**
      * Get all metadata values.
      *
-     * @param $item
+     * @param string|Item $item
      *
      * @return array
      */
@@ -230,7 +220,7 @@ class ShareFileService
     /**
      * Get a single metadata value.
      *
-     * @param $item
+     * @param string|Item $item
      *
      * @return mixed|null
      */
@@ -241,7 +231,7 @@ class ShareFileService
         return $metadata[$name] ?? null;
     }
 
-    public function getFiles($item, \DateTime $changedAfter = null)
+    public function getFiles($item, \DateTimeInterface $changedAfter = null)
     {
         $itemId = $this->getItemId($item);
         $children = $this->getChildren($itemId, self::SHAREFILE_FILE, $changedAfter);
@@ -253,7 +243,7 @@ class ShareFileService
         return $this->construct(Item::class, $files);
     }
 
-    public function getFolders($item, \DateTime $changedAfter = null)
+    public function getFolders($item, \DateTimeInterface $changedAfter = null)
     {
         $itemId = $this->getItemId($item);
 
@@ -344,12 +334,17 @@ class ShareFileService
         }
     }
 
+    /**
+     * @param string|Item $item
+     *
+     * @return string
+     */
     private function getItemId($item)
     {
         return $item instanceof Item ? $item->id : $item;
     }
 
-    private function getChildren(string $itemId, string $type, \DateTime $changedAfter = null)
+    private function getChildren(string $itemId, string $type, \DateTimeInterface $changedAfter = null)
     {
         $query = [
             //            '$select' => implode(',', [
@@ -437,7 +432,7 @@ class ShareFileService
      */
     private function client()
     {
-        if (null === $this->client) {
+        if (empty($this->client)) {
             $this->client = new ShareFileClient(
                 $this->configuration['hostname'],
                 $this->configuration['client_id'],

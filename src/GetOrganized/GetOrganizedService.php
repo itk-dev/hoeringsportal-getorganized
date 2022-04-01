@@ -40,13 +40,6 @@ class GetOrganizedService
         $this->validateConfiguration();
     }
 
-    public function getDocument(CaseFile $case, Item $item)
-    {
-        $document = $this->documentRepository->findOneByItemAndArchiver($item, $this->archiver);
-
-        return $document ? $this->getDocumentById($document->getDocumentIdentifier()) : null;
-    }
-
     public function updateDocumentSettings(Document $document, array $data)
     {
         $return = $this->getOrganizedCases()->updateDocument($document, $data);
@@ -57,118 +50,6 @@ class GetOrganizedService
         return $this->getCases();
     }
 
-    /**
-     * Create a case file.
-     *
-     * @param array $data additional data for new case file
-     *
-     * @throws \ItkDev\Edoc\Util\EdocException
-     *
-     * @return CaseFile
-     */
-    public function createCase(Item $item, array $data = [], array $config = [])
-    {
-        $name = $this->getCaseName($item);
-        $data += [
-            'TitleText' => $name,
-        ];
-
-        if (isset($this->configuration['project_id'])) {
-            $data += ['Project' => $this->configuration['project_id']];
-        }
-
-        if (isset($this->configuration['case_file']['defaults'])) {
-            $data += $this->configuration['case_file']['defaults'];
-        }
-
-        $caseFile = $this->getOrganizedCases()->createCaseFile($data);
-
-        $this->caseFileRepository->created($caseFile, $item, $this->archiver);
-
-        if (\is_callable($config['callback'] ?? null)) {
-            $config['callback']([
-                'status' => self::CREATED,
-                'item' => $item,
-                'data' => $data,
-                'case_file' => $caseFile,
-            ]);
-        }
-
-        return $caseFile;
-    }
-
-    public function updateCaseFile(CaseFile $caseFile, Item $item, array $data)
-    {
-        if ($this->getOrganizedCases()->updateCaseFile($caseFile, $data)) {
-            $this->caseFileRepository->updated($caseFile, $item, $this->archiver);
-
-            return $this->getCaseById($caseFile->CaseFileIdentifier);
-        }
-
-        return null;
-    }
-
-    /**
-     * Get a hearing reponse.
-     *
-     * @param string $item
-     * @param bool   $create if true, a new response will be created
-     * @param array  $data   additional data for new response
-     *
-     * @return Document
-     */
-    public function getResponse(CaseEntity $hearing, Item $item, bool $create = false, array $data = [])
-    {
-        $document = $this->documentRepository->findOneByItemAndArchiver($item, $this->archiver);
-
-        $response = $document ? $this->getDocumentById($document->getDocumentIdentifier()) : null;
-        if (null !== $response || !$create) {
-            // @TODO Update response
-            return $response;
-        }
-
-        return $this->createDocument($hearing, $item, $data);
-    }
-
-    /**
-     * Ensure that a document exists in eDoc.
-     *
-     * @param bool $create
-     *
-     * @throws \ItkDev\Edoc\Util\EdocException
-     *
-     * @return Document|mixed|null
-     */
-    public function ensureDocument(CaseFile $hearing, Item $item, array $data = [])
-    {
-        $document = $this->documentRepository->findOneByItemAndArchiver($item, $this->archiver);
-
-        $edocDocument = $document ? $this->getDocumentById($document->getDocumentIdentifier()) : null;
-        if (null !== $edocDocument) {
-            // @TODO Update document.
-            return $edocDocument;
-        }
-
-        return $this->createDocument($hearing, $item, $data);
-    }
-
-    public function getDocumentUpdatedAt(Document $document)
-    {
-        $document = $this->documentRepository->findOneByDocumentAndArchiver($document, $this->archiver);
-
-        return $document ? $document->getUpdatedAt() : null;
-    }
-
-    /**
-     * Create a hearing response.
-     *
-     * @param Item  $item     the response name
-     * @param array $metadata data for new response
-     *
-     * @return Document
-     *
-     *@throws \ItkDev\Edoc\Util\EdocException
-     */
     public function createDocument(string $contents, CaseEntity $case, Item $item, array $metadata): \App\Entity\GetOrganized\Document
     {
         $path = $this->writeFile($contents, $item);
@@ -219,7 +100,7 @@ class GetOrganizedService
     }
 
     /**
-     * @return array|CaseFile[]
+     * @return array|CaseEntity[]
      */
     public function getCases(array $criteria = [])
     {
@@ -248,18 +129,6 @@ class GetOrganizedService
         return 1 === \count($result) ? reset($result) : null;
     }
 
-    public function getDocumentList(CaseFile $case)
-    {
-        return $this->getOrganizedCases()->getDocumentList($case);
-    }
-
-    public function getDocuments(CaseFile $case)
-    {
-        return $this->getOrganizedCases()->searchDocument([
-            'CaseFileIdentifier' => '200031',
-        ]);
-    }
-
     public function getDocumentsBy(array $criteria)
     {
         return $this->getOrganizedCases()->searchDocument($criteria);
@@ -279,73 +148,9 @@ class GetOrganizedService
         return 1 === \count($result) ? reset($result) : null;
     }
 
-    public function getDocumentByName(CaseFile $case, string $name)
-    {
-        $result = $this->getOrganizedCases()->searchDocument([
-            'CaseFileReference' => $case->CaseFileIdentifier,
-            'TitleText' => $name,
-        ]);
-
-        return 1 === \count($result) ? reset($result) : null;
-    }
-
     public function getDocumentVersion(string $documentVersionIdentifier)
     {
         return $this->getOrganizedCases()->getDocumentVersion($documentVersionIdentifier);
-    }
-
-    public function getCaseWorkerByAz($az)
-    {
-        $az = 'adm\\'.$az;
-        $result = $this->getOrganizedCases()->getItemList(
-            ItemListType::CASE_WORKER,
-            [
-                'CaseWorkerAccountName' => $az,
-            ]
-        );
-
-        return 1 === \count($result) ? reset($result) : null;
-    }
-
-    public function getDocumentTypeByName(string $name)
-    {
-        if (null === $this->documentTypes) {
-            $this->documentTypes = $this->getOrganizedCases()->getItemList(ItemListType::DOCUMENT_TYPE);
-        }
-
-        if (\is_array($this->documentTypes)) {
-            foreach ($this->documentTypes as $item) {
-                if (0 === strcasecmp($name, $item['DocumentTypeName'])) {
-                    return $item;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    public function getDocumentStatusByName(string $name)
-    {
-        if (null === $this->documentStatuses) {
-            $this->documentStatuses = $this->getOrganizedCases()->getItemList(ItemListType::DOCUMENT_STATUS_CODE);
-        }
-
-        if (\is_array($this->documentStatuses)) {
-            foreach ($this->documentStatuses as $item) {
-                if (0 === strcasecmp($name, $item['DocumentStatusCodeName'])) {
-                    return $item;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    private function getCaseName(Item $item)
-    {
-        $template = $this->configuration['case']['name'] ?? '{{ item.name }}';
-
-        return $this->template->render($template, ['item' => ['name' => $item->name] + $item->metadata]);
     }
 
     private function getDocumentName(Item $item)
@@ -358,7 +163,7 @@ class GetOrganizedService
     private function validateConfiguration()
     {
         // @HACK
-        if (null === $this->configuration) {
+        if (empty($this->configuration)) {
             return;
         }
 

@@ -51,7 +51,7 @@ abstract class ArchiverCommand extends Command
         $this->output = $output;
 
         $archiverId = $input->getArgument('archiver');
-        if (null === $this->archiverRepository) {
+        if (empty($this->archiverRepository)) {
             throw new RuntimeException('Archiver repository not set in '.static::class);
         }
 

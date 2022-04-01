@@ -6,11 +6,11 @@ use Opis\JsonSchema\Schema;
 use Opis\JsonSchema\Validator;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Yaml\Yaml;
 
@@ -39,7 +39,7 @@ class YamlType extends AbstractType
         return TextareaType::class;
     }
 
-    private function validateData($input, Form $form)
+    private function validateData($input, FormInterface $form)
     {
         try {
             $data = Yaml::parse($input, YAML::PARSE_OBJECT_FOR_MAP);

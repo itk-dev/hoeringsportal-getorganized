@@ -81,14 +81,16 @@ class ArchiveHelper
                                 $shareFileHearing->metadata = $shareFileResponse->metadata;
 
                                 $metadata = [];
-                                if (null !== $caseWorker) {
-                                    $metadata['CaseFileManagerReference'] = $caseWorker['CaseWorkerId'];
-                                }
+                                // @todo
+                                // if (null !== $caseWorker) {
+                                //     $metadata['CaseFileManagerReference'] = $caseWorker['CaseWorkerId'];
+                                // }
                                 if (null !== $organisationReference) {
                                     $metadata['OrganisationReference'] = $organisationReference;
                                 }
 
-                                $getOrganizedHearing = $this->getOrganized->getHearing($shareFileHearing, true, $metadata);
+                                // @todo
+                                // $getOrganizedHearing = $this->getOrganized->getHearing($shareFileHearing, true, $metadata);
                                 if (null === $getOrganizedHearing) {
                                     throw new RuntimeException('Error creating hearing: '.$shareFileHearing['Name']);
                                 }
@@ -136,9 +138,10 @@ class ArchiveHelper
                         if (null === $document) {
                             $this->info('Creating new document in GetOrganized');
 
-                            if (null !== $caseWorker) {
-                                $metadata['CaseManagerReference'] = $caseWorker['CaseWorkerId'];
-                            }
+                            // @todo
+                            // if (null !== $caseWorker) {
+                            //     $metadata['CaseManagerReference'] = $caseWorker['CaseWorkerId'];
+                            // }
                             if (null !== $organisationReference) {
                                 $metadata['OrganisationReference'] = $organisationReference;
                             }
@@ -146,7 +149,7 @@ class ArchiveHelper
                             $document = $this->getOrganized->createDocument($fileContents, $getOrganizedHearing, $shareFileResponse, $metadata);
                         } else {
                             if ($document->getUpdatedAt() < $sourceFileCreatedAt) {
-                                $this->info('Updating document in eDoc');
+                                $this->info('Updating document in GetOrganized');
                                 $this->getOrganized->updateDocument(
                                     $fileContents,
                                     $getOrganizedHearing,
@@ -202,11 +205,12 @@ class ArchiveHelper
 
                     $organisationReference = $archiver->getGetOrganizedOrganizationReference($departmentId);
                     if (null === $organisationReference) {
-                        throw new RuntimeException(sprintf('Unknown department %s on item %s', $departmentId, $shareFileResponse->id));
+                        throw new RuntimeException(sprintf('Unknown department %s on item %s', $departmentId, $shareFileHearing->id));
                     }
 
                     if ($archiver->getCreateHearing()) {
-                        $getOrganizedHearing = $this->getOrganized->getHearing($shareFileHearing);
+                        // @todo
+                        // $getOrganizedHearing = $this->getOrganized->getHearing($shareFileHearing);
                         if (null === $getOrganizedHearing) {
                             throw new RuntimeException(sprintf('Cannot get GetOrganized case %s', $shareFileHearing->id));
                         }
@@ -221,17 +225,13 @@ class ArchiveHelper
                         }
 
                         if (null === $getOrganizedCaseId) {
-                            throw new RuntimeException(sprintf('Cannot get GetOrganized case id from item %s (%s)', $shareFileResponse->name, $shareFileResponse->id));
+                            throw new RuntimeException(sprintf('Cannot get GetOrganized case id from item %s (%s)', $shareFileHearing->name, $shareFileHearing->id));
                         }
 
                         $getOrganizedHearing = $this->getOrganized->getCaseById($getOrganizedCaseId);
                         if (null === $getOrganizedHearing) {
                             throw new RuntimeException(sprintf('Cannot get GetOrganized case %s', $shareFileHearing->id));
                         }
-                    }
-
-                    if (null === $getOrganizedHearing) {
-                        throw new RuntimeException('Cannot get GetOrganized case');
                     }
 
                     $overviews = [
@@ -246,7 +246,7 @@ class ArchiveHelper
                     ];
                     foreach ($overviews as $overview) {
                         $pattern = $overview['pattern'] ?? null;
-                        $title = $overview['title'] ?? null;
+                        $title = $overview['title'];
 
                         try {
                             $this->info(sprintf('Getting overview file "%s" (%s) from ShareFile', $title, $pattern));
@@ -275,9 +275,10 @@ class ArchiveHelper
                                 $metadata = [];
                                 if (null === $document) {
                                     $this->info(sprintf('Creating new document in GetOrganized (%s)', $title));
-                                    if (null !== $caseWorker) {
-                                        $metadata['CaseManagerReference'] = $caseWorker['CaseWorkerId'];
-                                    }
+                                    // @todo
+                                    // if (null !== $caseWorker) {
+                                    //     $metadata['CaseManagerReference'] = $caseWorker['CaseWorkerId'];
+                                    // }
                                     if (null !== $organisationReference) {
                                         $metadata['OrganisationReference'] = $organisationReference;
                                     }
@@ -336,7 +337,6 @@ class ArchiveHelper
 
     private function logException(\Throwable $t, array $context = [])
     {
-        throw $t;
         $this->emergency($t->getMessage(), $context);
         $logEntry = new ExceptionLogEntry($t, $context);
         $this->entityManager->persist($logEntry);
