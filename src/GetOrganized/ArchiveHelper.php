@@ -9,6 +9,7 @@ use App\Repository\GetOrganized\DocumentRepository;
 use App\ShareFile\Item;
 use App\ShareFile\ShareFileService;
 use App\Traits\ArchiverAwareTrait;
+use App\Util\TemplateHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerTrait;
@@ -31,14 +32,17 @@ class ArchiveHelper
 
     private EntityManagerInterface $entityManager;
 
+    private TemplateHelper $templateHelper;
+
     private MailerInterface $mailer;
 
-    public function __construct(ShareFileService $shareFile, GetOrganizedService $getOrganized, DocumentRepository $documentRepository, EntityManagerInterface $entityManager, MailerInterface $mailer)
+    public function __construct(ShareFileService $shareFile, GetOrganizedService $getOrganized, DocumentRepository $documentRepository, EntityManagerInterface $entityManager, TemplateHelper $templateHelper, MailerInterface $mailer)
     {
         $this->shareFile = $shareFile;
         $this->getOrganized = $getOrganized;
         $this->documentRepository = $documentRepository;
         $this->entityManager = $entityManager;
+        $this->templateHelper = $templateHelper;
         $this->mailer = $mailer;
     }
 
@@ -162,6 +166,13 @@ class ArchiveHelper
 
     private function archiveOverviews(string $hearingItemId = null)
     {
+        $overviews = $this->archiver->getConfigurationValue('[getorganized][overview][items]');
+        if (empty($overviews)) {
+            $this->warning('No overviews defined');
+
+            return;
+        }
+
         // Overview files
         if (null !== $hearingItemId) {
             $this->info(sprintf('Getting overview files from hearing %s', $hearingItemId));
@@ -224,24 +235,12 @@ class ArchiveHelper
                     }
                 }
 
-                $overviews = [
-                    [
-                        'pattern' => $this->archiver->getConfigurationValue('[getorganized][sharefile_file_combined_name_pattern]', '*-combined.pdf'),
-                        'title' => sprintf('%s - samlede høringssvar', $shareFileHearing->getName()),
-                    ],
-                    [
-                        'pattern' => $this->archiver->getConfigurationValue('[getorganized][sharefile_file_overview_name_pattern]', 'overblik.xlsx'),
-                        'title' => sprintf('%s - overblik over høringssvar', $shareFileHearing->getName()),
-                    ],
-                ];
                 foreach ($overviews as $overview) {
                     $pattern = $overview['pattern'] ?? null;
-                    $title = $overview['title'];
+                    $titleTemplate = $overview['title'] ?? '{{ item.name }}';
 
                     try {
                         $sourceFile = null;
-
-                        $this->info(sprintf('Getting overview file "%s" (%s) from ShareFile', $title, $pattern));
 
                         if (null !== $pattern) {
                             $files = $shareFileHearing->getChildren();
@@ -254,10 +253,11 @@ class ArchiveHelper
                         }
 
                         if (null === $sourceFile) {
-                            $this->warning(sprintf('Overview file not found: %s (%s)', $title, $pattern));
+                            $this->warning(sprintf('Overview file not found: %s (%s)', $pattern, $shareFileHearing->id));
                             continue;
                         }
 
+                        $title = $this->templateHelper->render($titleTemplate, ['item' => $shareFileHearing]);
                         $this->archiveDocument($sourceFile, $getOrganizedHearing, $title);
                     } catch (\Throwable $t) {
                         $this->logException($t, [
