@@ -73,13 +73,12 @@ class ArchiveHelper
                         $departmentId = $shareFileResponse->metadata['ticket_data']['department_id'] ?? null;
                         $organisationReference = $archiver->getGetOrganizedOrganizationReference($departmentId);
                         if (null === $organisationReference) {
-                            throw new RuntimeException(sprintf('Unknown department %s on item %s', $departmentId,
-                                $shareFileResponse->id));
+                            throw new RuntimeException(sprintf('Unknown department %s on item %s', $departmentId, $shareFileResponse->id));
                         }
 
                         if (null === $getOrganizedHearing) {
                             if ($archiver->getCreateHearing()) {
-                                $this->info('Getting hearing: ' . $shareFileHearing->name);
+                                $this->info(sprintf('Getting hearing: %s', $shareFileHearing->name));
                                 $shareFileHearing->metadata = $shareFileResponse->metadata;
 
                                 $metadata = [];
@@ -94,20 +93,18 @@ class ArchiveHelper
                                 // @todo
                                 // $getOrganizedHearing = $this->getOrganized->getHearing($shareFileHearing, true, $metadata);
                                 if (null === $getOrganizedHearing) {
-                                    throw new RuntimeException('Error creating hearing: ' . $shareFileHearing['Name']);
+                                    throw new RuntimeException(sprintf('Error creating hearing: %s', $shareFileHearing->name));
                                 }
                             } else {
                                 $this->info(sprintf('Getting hearing for response %s', $shareFileResponse->name));
                                 $getOrganizedCaseId = $shareFileResponse->metadata['ticket_data']['get_organized_case_id'] ?? null;
 
                                 if (null === $getOrganizedCaseId) {
-                                    throw new RuntimeException(sprintf('Cannot get GetOrganized case id from item %s (%s)',
-                                        $shareFileResponse->name, $shareFileResponse->id));
+                                    throw new RuntimeException(sprintf('Cannot get GetOrganized case id from item %s (%s)', $shareFileResponse->name, $shareFileResponse->id));
                                 }
                                 $getOrganizedHearing = $this->getOrganized->getCaseById($getOrganizedCaseId);
                                 if (null === $getOrganizedHearing) {
-                                    throw new RuntimeException(sprintf('Cannot get GetOrganized case %s',
-                                        $getOrganizedCaseId));
+                                    throw new RuntimeException(sprintf('Cannot get GetOrganized case %s', $getOrganizedCaseId));
                                 }
                             }
                         }
@@ -124,8 +121,7 @@ class ArchiveHelper
                             }
                         );
                         if (null !== $pattern && empty($sourceFiles)) {
-                            throw new RuntimeException(sprintf('Cannot find file matching pattern %s for item %s',
-                                $pattern, $shareFileResponse->id));
+                            throw new RuntimeException(sprintf('Cannot find file matching pattern %s for item %s', $pattern, $shareFileResponse->id));
                         }
 
                         foreach ($sourceFiles as $sourceFile) {
