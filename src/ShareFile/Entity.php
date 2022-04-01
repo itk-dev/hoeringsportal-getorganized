@@ -4,12 +4,7 @@ namespace App\ShareFile;
 
 abstract class Entity implements \ArrayAccess, \JsonSerializable
 {
-    /**
-     * The data.
-     *
-     * @var array
-     */
-    private $data;
+    private array $data;
 
     public function __construct(array $data)
     {
@@ -23,15 +18,15 @@ abstract class Entity implements \ArrayAccess, \JsonSerializable
             return $this->data[$name];
         }
 
-        throw new \OutOfBoundsException('Undefined property: '.$name);
+        throw new \OutOfBoundsException(sprintf('Undefined property: %s', $name));
     }
 
     public function __set($name, $value)
     {
-        throw new \RuntimeException(__METHOD__.' not implemented');
+        throw new \RuntimeException(sprintf('%s not implemented', __METHOD__));
     }
 
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return \array_key_exists($offset, $this->data);
     }
@@ -41,17 +36,17 @@ abstract class Entity implements \ArrayAccess, \JsonSerializable
         return $this->data[$offset];
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
-        throw new \RuntimeException(static::class.' is immutable');
+        throw new \RuntimeException(sprintf('%s is immutable', static::class));
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
-        throw new \RuntimeException(static::class.' is immutable');
+        throw new \RuntimeException(sprintf('%s is immutable', static::class));
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return $this->data;
     }

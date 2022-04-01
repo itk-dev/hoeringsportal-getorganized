@@ -38,13 +38,13 @@ class DocumentRepository extends ServiceEntityRepository
         ]);
     }
 
-    public function created(GetOrganizedDocument $document, Item $item, Archiver $archiver)
+    public function created(GetOrganizedDocument $document, Item $item, array $metadata, Archiver $archiver): Document
     {
         $docId = $document->docId;
         $shareFileItemStreamId = $item->streamId;
 
         $entity = $this->findOneBy([
-            'documentIdentifier' => $docId,
+            'docId' => $docId,
             'shareFileItemStreamId' => $shareFileItemStreamId,
             'archiver' => $archiver,
         ]);
@@ -60,7 +60,8 @@ class DocumentRepository extends ServiceEntityRepository
             ->setShareFileItemId($item->id)
             ->setData([
                 'sharefile' => $item->getData(),
-                'edoc' => $document->getData(),
+                'getorganized' => $document->getData(),
+                'metadata' => $metadata,
             ])
             ->setUpdatedAt(new \DateTime());
 
@@ -71,8 +72,8 @@ class DocumentRepository extends ServiceEntityRepository
         return $entity;
     }
 
-    public function updated(GetOrganizedDocument $document, Item $item, Archiver $archiver)
+    public function updated(GetOrganizedDocument $document, Item $item, array $metadata, Archiver $archiver)
     {
-        $this->created($document, $item, $archiver);
+        $this->created($document, $item, $metadata, $archiver);
     }
 }

@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Archiver;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * @method Archiver|null find($id, $lockMode = null, $lockVersion = null)
@@ -21,9 +22,16 @@ class ArchiverRepository extends ServiceEntityRepository
 
     public function findOneByNameOrId($value): ?Archiver
     {
+        $valueId = $value;
+        try {
+            $valueId = (new Uuid($value))->toBinary();
+        } catch (\InvalidArgumentException $exception) {
+        }
+
         return $this->createQueryBuilder('s')
-            ->andWhere('s.name = :val or s.id = :val')
-            ->setParameter('val', $value)
+            ->andWhere('s.name = :value or s.id = :value_id')
+            ->setParameter('value', $value)
+            ->setParameter('value_id', $valueId)
             ->getQuery()
             ->getOneOrNullResult()
         ;

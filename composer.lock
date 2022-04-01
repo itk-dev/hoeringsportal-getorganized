@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "630b2a90117135ef220de0c1fe739023",
+    "content-hash": "0564b49fff0cf9cbd375b0dbd10599d1",
     "packages": [
         {
             "name": "behat/transliterator",
@@ -2191,17 +2191,11 @@
         },
         {
             "name": "kapersoft/sharefile-api",
-            "version": "1.1.0",
+            "version": "dev-deltag.aarhus.dk",
             "source": {
                 "type": "git",
-                "url": "https://github.com/kapersoft/sharefile-api.git",
-                "reference": "488a96461f24f874d987b4c747133d319c7bad51"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/kapersoft/sharefile-api/zipball/488a96461f24f874d987b4c747133d319c7bad51",
-                "reference": "488a96461f24f874d987b4c747133d319c7bad51",
-                "shasum": ""
+                "url": "https://github.com/rimi-itk/sharefile-api",
+                "reference": "5a1e413e65c85128b043d2c5ca6ecd2bf0ea304f"
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.2",
@@ -2215,10 +2209,19 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Kapersoft\\Sharefile\\": "src"
+                    "Kapersoft\\ShareFile\\": "src"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "psr-4": {
+                    "Kapersoft\\ShareFile\\Test\\": "tests"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "vendor/bin/phpunit"
+                ]
+            },
             "license": [
                 "MIT"
             ],
@@ -2239,11 +2242,7 @@
                 "sharefile",
                 "sharefile-api"
             ],
-            "support": {
-                "issues": "https://github.com/kapersoft/sharefile-api/issues",
-                "source": "https://github.com/kapersoft/sharefile-api/tree/master"
-            },
-            "time": "2017-09-14T20:44:28+00:00"
+            "time": "2019-05-13T19:08:50+00:00"
         },
         {
             "name": "laminas/laminas-code",
@@ -9913,7 +9912,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "itk-dev/getorganized-api-client-php": 20
+        "itk-dev/getorganized-api-client-php": 20,
+        "kapersoft/sharefile-api": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

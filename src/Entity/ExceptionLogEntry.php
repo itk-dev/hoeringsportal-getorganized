@@ -40,7 +40,7 @@ class ExceptionLogEntry
     public function __construct(\Throwable $t, array $context = [])
     {
         $trace = array_map(function (array &$frame) {
-            $frame['num_args'] = \count($frame['args']);
+            $frame['num_args'] = \count($frame['args'] ?? []);
             unset($frame['args']);
 
             return $frame;

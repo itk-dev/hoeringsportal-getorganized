@@ -3,12 +3,25 @@
 namespace App\Command\ShareFile2GetOrganized;
 
 use App\Command\ArchiverCommand;
+use App\Entity\Archiver;
+use App\GetOrganized\ArchiveHelper;
+use App\Repository\ArchiverRepository;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Logger\ConsoleLogger;
 
 class ArchiveCommand extends ArchiverCommand
 {
     protected static $defaultName = 'app:sharefile2getorganized:archive';
     protected static $defaultDescription = 'Archive files from ShareFile in GetOrganized';
+    protected string $archiverType = Archiver::TYPE_SHAREFILE2GETORGANIZED;
+
+    private ArchiveHelper $helper;
+
+    public function __construct(ArchiverRepository $archiverRepository, ArchiveHelper $helper)
+    {
+        parent::__construct($archiverRepository);
+        $this->helper = $helper;
+    }
 
     protected function doConfigure()
     {
@@ -21,5 +34,7 @@ class ArchiveCommand extends ArchiverCommand
         $logger = new ConsoleLogger($this->output);
         $this->helper->setLogger($logger);
         $this->helper->archive($this->archiver, $hearingItemId);
+
+        return self::SUCCESS;
     }
 }

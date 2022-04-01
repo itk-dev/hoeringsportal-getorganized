@@ -140,7 +140,7 @@ class Archiver implements Loggable, \JsonSerializable
 
     public function getCreateCaseFile(): bool
     {
-        $value = $this->getConfigurationValue('edoc');
+        $value = $this->getConfigurationValue('getorganized');
 
         return isset($value['project_id']);
     }
@@ -151,13 +151,13 @@ class Archiver implements Loggable, \JsonSerializable
     }
 
     /**
-     * Get eDoc organization reference (id) from Deskpro department id.
+     * Get GetOrganized organization reference (id) from Deskpro department id.
      *
      * @return int|null
      */
-    public function getEdocOrganizationReference(?string $id)
+    public function getGetOrganizedOrganizationReference(?string $id)
     {
-        $map = $this->getConfigurationValue('[edoc][organizations]') ?? [];
+        $map = $this->getConfigurationValue('[getorganized][organizations]') ?? [];
 
         return $map[$id] ?? $map['default'] ?? null;
     }

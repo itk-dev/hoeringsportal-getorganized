@@ -23,7 +23,7 @@ abstract class ArchiverCommand extends Command
 
     private ArchiverRepository $archiverRepository;
 
-    protected Archiver $archiver;
+    protected ?Archiver $archiver;
 
     public function __construct(ArchiverRepository $archiverRepository)
     {
@@ -45,7 +45,7 @@ abstract class ArchiverCommand extends Command
         $this->doConfigure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input = $input;
         $this->output = $output;
@@ -54,10 +54,10 @@ abstract class ArchiverCommand extends Command
         if (null === $this->archiverRepository) {
             throw new RuntimeException('Archiver repository not set in '.static::class);
         }
-        $this->archiver = $this->archiverRepository->findOneByNameOrId($archiverId);
 
+        $this->archiver = $this->archiverRepository->findOneByNameOrId($archiverId);
         if (null === $this->archiver) {
-            throw new RuntimeException('Invalid archiver: '.$archiverId);
+            throw new RuntimeException(sprintf('Invalid archiver: %s', $archiverId));
         }
 
         if ($this->archiver->getType() !== $this->archiverType) {

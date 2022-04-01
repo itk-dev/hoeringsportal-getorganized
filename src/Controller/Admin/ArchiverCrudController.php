@@ -7,6 +7,7 @@ use App\Entity\Archiver;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
@@ -21,6 +22,9 @@ class ArchiverCrudController extends AbstractCrudController
     {
         yield IdField::new('id')->hideOnForm();
         yield TextField::new('name');
+        yield DateField::new('lastRunAt')
+            ->setFormat('yyyy-MM-dd hh:mm:ss')
+            ->hideOnForm();
         yield YamlField::new('configuration')->hideOnIndex()
         ->setFormTypeOptions([
             'schema' => $this->getParameter('kernel.project_dir').'/config/schema/archiver.configuration.schema.yaml',
