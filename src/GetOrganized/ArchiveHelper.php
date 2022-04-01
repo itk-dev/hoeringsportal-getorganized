@@ -52,97 +52,13 @@ class ArchiveHelper
 
             $startTime = new \DateTimeImmutable();
 
-            if (null !== $hearingItemId) {
-                $this->info(sprintf('Getting hearing %s', $hearingItemId));
-                $hearing = $this->shareFile->getHearing($hearingItemId);
-                $shareFileData = [$hearing];
-            } else {
-                $date = $archiver->getLastRunAt() ?? new \DateTime('-1 month ago');
-                $this->info(sprintf('Getting files updated since %s from ShareFile', $date->format(\DateTimeInterface::ATOM)));
-                $shareFileData = $this->shareFile->getUpdatedFiles($date);
-            }
+            $this->archiveResponses($archiver, $hearingItemId);
+            $this->archiveOverviews($archiver, $hearingItemId);
 
-            foreach ($shareFileData as $shareFileHearing) {
-                $getOrganizedHearing = null;
-
-                foreach ($shareFileHearing->getChildren() as $shareFileResponse) {
-                    try {
-                        $sourceFile = null;
-
-                        $caseWorker = null;
-                        $departmentId = $shareFileResponse->metadata['ticket_data']['department_id'] ?? null;
-                        $organisationReference = $archiver->getGetOrganizedOrganizationReference($departmentId);
-                        if (null === $organisationReference) {
-                            throw new RuntimeException(sprintf('Unknown department %s on item %s', $departmentId, $shareFileResponse->id));
-                        }
-
-                        if (null === $getOrganizedHearing) {
-                            if ($archiver->getCreateHearing()) {
-                                $this->info(sprintf('Getting hearing: %s', $shareFileHearing->name));
-                                $shareFileHearing->metadata = $shareFileResponse->metadata;
-
-                                $metadata = [];
-                                // @todo
-                                // if (null !== $caseWorker) {
-                                //     $metadata['CaseFileManagerReference'] = $caseWorker['CaseWorkerId'];
-                                // }
-                                if (null !== $organisationReference) {
-                                    $metadata['OrganisationReference'] = $organisationReference;
-                                }
-
-                                // @todo
-                                // $getOrganizedHearing = $this->getOrganized->getHearing($shareFileHearing, true, $metadata);
-                                if (null === $getOrganizedHearing) {
-                                    throw new RuntimeException(sprintf('Error creating hearing: %s', $shareFileHearing->name));
-                                }
-                            } else {
-                                $this->info(sprintf('Getting hearing for response %s', $shareFileResponse->name));
-                                $getOrganizedCaseId = $shareFileResponse->metadata['ticket_data']['get_organized_case_id'] ?? null;
-
-                                if (null === $getOrganizedCaseId) {
-                                    throw new RuntimeException(sprintf('Cannot get GetOrganized case id from item %s (%s)', $shareFileResponse->name, $shareFileResponse->id));
-                                }
-                                $getOrganizedHearing = $this->getOrganized->getCaseById($getOrganizedCaseId);
-                                if (null === $getOrganizedHearing) {
-                                    throw new RuntimeException(sprintf('Cannot get GetOrganized case %s', $getOrganizedCaseId));
-                                }
-                            }
-                        }
-
-                        $this->info($shareFileResponse->name);
-
-                        $files = $this->shareFile->getFiles($shareFileResponse);
-
-                        $pattern = $this->archiver->getConfigurationValue('[getorganized][sharefile_file_name_pattern]');
-                        $sourceFiles = array_filter(
-                            $files,
-                            static function (Item $file) use ($pattern) {
-                                return null === $pattern || fnmatch($pattern, $file->name);
-                            }
-                        );
-                        if (null !== $pattern && empty($sourceFiles)) {
-                            throw new RuntimeException(sprintf('Cannot find file matching pattern %s for item %s', $pattern, $shareFileResponse->id));
-                        }
-
-                        foreach ($sourceFiles as $sourceFile) {
-                            $this->archiveDocument($sourceFile, $getOrganizedHearing);
-                        }
-                    } catch (\Throwable $t) {
-                        $this->logException($t, [
-                            'shareFileHearing' => $shareFileHearing,
-                            'getOrganizedHearing' => $getOrganizedHearing,
-                            'sourceFile' => $sourceFile,
-                        ]);
-                    }
-                }
-
-                $this->archiveOverviews($archiver, $hearingItemId);
-
-                if (null === $hearingItemId) {
-                    $archiver->setLastRunAt($startTime);
-                    $this->entityManager->persist($archiver);
-                    $this->entityManager->flush();
-                }
+            if (null === $hearingItemId) {
+                $archiver->setLastRunAt($startTime);
+                $this->entityManager->persist($archiver);
+                $this->entityManager->flush();
             }
         } catch (\Throwable $t) {
             $this->logException($t);
@@ -153,6 +69,94 @@ class ArchiveHelper
     {
         if (null !== $this->logger) {
             $this->logger->log($level, $message, $context);
+        }
+    }
+
+    private function archiveResponses(Archiver $archiver, string $hearingItemId = null)
+    {
+        if (null !== $hearingItemId) {
+            $this->info(sprintf('Getting hearing %s', $hearingItemId));
+            $hearing = $this->shareFile->getHearing($hearingItemId);
+            $shareFileData = [$hearing];
+        } else {
+            $date = $archiver->getLastRunAt() ?? new \DateTime('-1 month ago');
+            $this->info(sprintf('Getting files updated since %s from ShareFile', $date->format(\DateTimeInterface::ATOM)));
+            $shareFileData = $this->shareFile->getUpdatedFiles($date);
+        }
+
+        foreach ($shareFileData as $shareFileHearing) {
+            $getOrganizedHearing = null;
+
+            foreach ($shareFileHearing->getChildren() as $shareFileResponse) {
+                try {
+                    $sourceFile = null;
+
+                    $caseWorker = null;
+                    $departmentId = $shareFileResponse->metadata['ticket_data']['department_id'] ?? null;
+                    $organisationReference = $archiver->getGetOrganizedOrganizationReference($departmentId);
+                    if (null === $organisationReference) {
+                        throw new RuntimeException(sprintf('Unknown department %s on item %s', $departmentId, $shareFileResponse->id));
+                    }
+
+                    if (null === $getOrganizedHearing) {
+                        if ($archiver->getCreateHearing()) {
+                            $this->info(sprintf('Getting hearing: %s', $shareFileHearing->name));
+                            $shareFileHearing->metadata = $shareFileResponse->metadata;
+
+                            $metadata = [];
+                            // @todo
+                            // if (null !== $caseWorker) {
+                            //     $metadata['CaseFileManagerReference'] = $caseWorker['CaseWorkerId'];
+                            // }
+                            if (null !== $organisationReference) {
+                                $metadata['OrganisationReference'] = $organisationReference;
+                            }
+
+                            // @todo
+                            // $getOrganizedHearing = $this->getOrganized->getHearing($shareFileHearing, true, $metadata);
+                            if (null === $getOrganizedHearing) {
+                                throw new RuntimeException(sprintf('Error creating hearing: %s', $shareFileHearing->name));
+                            }
+                        } else {
+                            $this->info(sprintf('Getting hearing for response %s', $shareFileResponse->name));
+                            $getOrganizedCaseId = $shareFileResponse->metadata['ticket_data']['get_organized_case_id'] ?? null;
+
+                            if (null === $getOrganizedCaseId) {
+                                throw new RuntimeException(sprintf('Cannot get GetOrganized case id from item %s (%s)', $shareFileResponse->name, $shareFileResponse->id));
+                            }
+                            $getOrganizedHearing = $this->getOrganized->getCaseById($getOrganizedCaseId);
+                            if (null === $getOrganizedHearing) {
+                                throw new RuntimeException(sprintf('Cannot get GetOrganized case %s', $getOrganizedCaseId));
+                            }
+                        }
+                    }
+
+                    $this->info($shareFileResponse->name);
+
+                    $files = $this->shareFile->getFiles($shareFileResponse);
+
+                    $pattern = $this->archiver->getConfigurationValue('[getorganized][sharefile_file_name_pattern]');
+                    $sourceFiles = array_filter(
+                            $files,
+                            static function (Item $file) use ($pattern) {
+                                return null === $pattern || fnmatch($pattern, $file->name);
+                            }
+                        );
+                    if (null !== $pattern && empty($sourceFiles)) {
+                        throw new RuntimeException(sprintf('Cannot find file matching pattern %s for item %s', $pattern, $shareFileResponse->id));
+                    }
+
+                    foreach ($sourceFiles as $sourceFile) {
+                        $this->archiveDocument($sourceFile, $getOrganizedHearing);
+                    }
+                } catch (\Throwable $t) {
+                    $this->logException($t, [
+                            'shareFileHearing' => $shareFileHearing,
+                            'getOrganizedHearing' => $getOrganizedHearing,
+                            'sourceFile' => $sourceFile,
+                        ]);
+                }
+            }
         }
     }
 
