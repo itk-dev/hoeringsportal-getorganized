@@ -1,20 +1,27 @@
 <?php
 
-namespace App\Controller\Admin;
+namespace App\Controller\Admin\GetOrganized;
 
+use App\Admin\Field\JsonField;
 use App\Entity\GetOrganized\Document;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
-class GetOrganizedDocumentCrudController extends AbstractCrudController
+class DocumentCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
     {
         return Document::class;
+    }
+
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud->showEntityActionsInlined();
     }
 
     public function configureActions(Actions $actions): Actions
@@ -26,12 +33,14 @@ class GetOrganizedDocumentCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        yield TextField::new('archiver');
+        yield AssociationField::new('archiver');
         yield TextField::new('docId');
         yield TextField::new('shareFileItemId');
         yield DateField::new('createdAt')
             ->setFormat('yyyy-MM-dd hh:mm:ss');
         yield DateField::new('updatedAt')
             ->setFormat('yyyy-MM-dd hh:mm:ss');
+        yield JsonField::new('data')
+            ->onlyOnDetail();
     }
 }

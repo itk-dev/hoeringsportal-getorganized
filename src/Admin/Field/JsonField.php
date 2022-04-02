@@ -2,11 +2,10 @@
 
 namespace App\Admin\Field;
 
-use App\Form\YamlType;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FieldTrait;
 
-final class YamlField implements FieldInterface
+final class JsonField implements FieldInterface
 {
     use FieldTrait;
 
@@ -18,8 +17,8 @@ final class YamlField implements FieldInterface
         return (new self())
             ->setProperty($propertyName)
             ->setLabel($label)
-            ->setFormType(YamlType::class)
-            ->addCssClass('yaml')
+            ->addCssClass('field-json')
+            ->setTemplatePath('admin/field/json.html.twig')
             ;
     }
 }

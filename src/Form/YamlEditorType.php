@@ -2,10 +2,8 @@
 
 namespace App\Form;
 
-use Opis\JsonSchema\Schema;
-use Opis\JsonSchema\Validator;
+use EasyCorp\Bundle\EasyAdminBundle\Form\Type\CodeEditorType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
@@ -14,7 +12,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Yaml\Yaml;
 
-class YamlType extends AbstractType
+class YamlEditorType extends AbstractType
 {
     private array $options;
 
@@ -36,7 +34,7 @@ class YamlType extends AbstractType
 
     public function getParent()
     {
-        return TextareaType::class;
+        return CodeEditorType::class;
     }
 
     private function validateData($input, FormInterface $form)

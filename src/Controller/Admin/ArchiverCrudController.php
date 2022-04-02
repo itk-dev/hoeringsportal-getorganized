@@ -2,11 +2,15 @@
 
 namespace App\Controller\Admin;
 
-use App\Admin\Field\YamlField;
 use App\Entity\Archiver;
+use App\Form\YamlEditorType;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CodeEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
@@ -18,27 +22,35 @@ class ArchiverCrudController extends AbstractCrudController
         return Archiver::class;
     }
 
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud->showEntityActionsInlined();
+    }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        return $actions
+            ->disable(Action::DELETE);
+    }
+
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')->hideOnForm();
         yield TextField::new('name');
-        yield DateField::new('lastRunAt')
-            ->setFormat('yyyy-MM-dd hh:mm:ss')
-            ->hideOnForm();
-        yield YamlField::new('configuration')->hideOnIndex()
-        ->setFormTypeOptions([
-            'schema' => $this->getParameter('kernel.project_dir').'/config/schema/archiver.configuration.schema.yaml',
-            'attr' => [
-                'rows' => 20,
-                'cols' => 80,
-            ],
-        ]);
         yield ChoiceField::new('type')
             ->setChoices([
                 Archiver::TYPE_SHAREFILE2GETORGANIZED => Archiver::TYPE_SHAREFILE2GETORGANIZED,
                 Archiver::TYPE_PDF_COMBINE => Archiver::TYPE_PDF_COMBINE,
                 Archiver::TYPE_HEARING_OVERVIEW => Archiver::TYPE_HEARING_OVERVIEW,
             ]);
+        yield DateField::new('lastRunAt')
+            ->setFormat('yyyy-MM-dd hh:mm:ss')
+            ->hideOnForm();
         yield BooleanField::new('enabled');
+        yield CodeEditorField::new('configuration')
+            ->hideOnIndex()
+            ->setLanguage('yaml')
+            ->setFormType(YamlEditorType::class)
+        ;
     }
 }
