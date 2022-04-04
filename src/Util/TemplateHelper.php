@@ -14,8 +14,7 @@ use Twig\Environment;
 
 class TemplateHelper
 {
-    /** @var Environment */
-    private $twig;
+    private Environment $twig;
 
     public function __construct(Environment $twig)
     {

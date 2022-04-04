@@ -352,18 +352,20 @@ class ArchiveHelper
         if (null !== $this->archiver) {
             $config = $this->archiver->getConfigurationValue('[notifications][email]');
 
-            $email = (new Email())
-                ->from($config['from'])
-                ->to(...$config['to'])
-                ->subject($t->getMessage())
-                ->text(
-                    implode(PHP_EOL, [
-                        json_encode($context, JSON_PRETTY_PRINT),
-                        $t->getTraceAsString(),
-                    ])
-                );
+            if (null !== $config) {
+                $email = (new Email())
+                       ->from($config['from'])
+                       ->to(...$config['to'])
+                       ->subject($t->getMessage())
+                       ->text(
+                           implode(PHP_EOL, [
+                               json_encode($context, JSON_PRETTY_PRINT),
+                               $t->getTraceAsString(),
+                           ])
+                       );
 
-            $this->mailer->send($email);
+                $this->mailer->send($email);
+            }
         }
     }
 }
