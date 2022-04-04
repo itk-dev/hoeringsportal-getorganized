@@ -2,6 +2,7 @@
 
 namespace App\Pdf;
 
+use App\Entity\Archiver;
 use App\Entity\ExceptionLogEntry;
 use App\Repository\ArchiverRepository;
 use App\ShareFile\Item;
@@ -27,6 +28,8 @@ class PdfHelper
     use LoggerAwareTrait;
     use LoggerTrait;
     use ArchiverAwareTrait;
+
+    protected static string $archiverType = Archiver::TYPE_SHAREFILE2GETORGANIZED;
 
     private const GROUP_DEFAULT = 'Privatperson';
 

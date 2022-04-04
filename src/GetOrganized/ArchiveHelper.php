@@ -23,7 +23,7 @@ class ArchiveHelper
     use LoggerTrait;
     use ArchiverAwareTrait;
 
-    protected string $archiverType = Archiver::TYPE_SHAREFILE2GETORGANIZED;
+    protected static string $archiverType = Archiver::TYPE_SHAREFILE2GETORGANIZED;
 
     private ShareFileService $shareFile;
 

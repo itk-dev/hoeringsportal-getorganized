@@ -28,3 +28,15 @@ services:
             $options:
                 project_dir: '%kernel.project_dir%'
                 hearing_reply_deadline_offset: '%env(HEARING_REPLY_DEADLINE_OFFSET)%'
+
+    App\Overview\HearingOverviewHelper:
+        arguments:
+            $options:
+                project_dir: '%kernel.project_dir%'
+                hearing_reply_deadline_offset: '%env(HEARING_REPLY_DEADLINE_OFFSET)%'
+
+    App\Deskpro\DeskproService:
+        arguments:
+            $options:
+                deskpro_url: '%env(DESKPRO_URL)%'
+                deskpro_api_code_key: '%env(DESKPRO_API_CODE_KEY)%'

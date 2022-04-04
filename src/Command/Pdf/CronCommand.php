@@ -19,7 +19,7 @@ use Symfony\Component\Console\Logger\ConsoleLogger;
 class CronCommand extends ArchiverCommand
 {
     protected static $defaultName = 'app:pdf:cron';
-    protected string $archiverType = Archiver::TYPE_PDF_COMBINE;
+    protected static string $archiverType = Archiver::TYPE_PDF_COMBINE;
 
     private PdfHelper $helper;
 

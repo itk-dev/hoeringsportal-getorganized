@@ -13,7 +13,7 @@ class ArchiveCommand extends ArchiverCommand
 {
     protected static $defaultName = 'app:sharefile2getorganized:archive';
     protected static $defaultDescription = 'Archive files from ShareFile in GetOrganized';
-    protected string $archiverType = Archiver::TYPE_SHAREFILE2GETORGANIZED;
+    protected static string $archiverType = Archiver::TYPE_SHAREFILE2GETORGANIZED;
 
     private ArchiveHelper $helper;
 

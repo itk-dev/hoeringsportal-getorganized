@@ -12,12 +12,13 @@ trait ArchiverAwareTrait
     {
         $this->archiver = $archiver;
 
-        if (!isset($this->archiverType)) {
-            throw new \RuntimeException(sprintf('Archiver type not set in %s', self::class));
+        $archiverType = static::$archiverType ?? null;
+        if (null === $archiverType) {
+            throw new \RuntimeException(sprintf('Archiver type not set in %s', static::class));
         }
 
-        if ($archiver->getType() !== $this->archiverType) {
-            throw new \RuntimeException(sprintf('Cannot handle archiver with type %s', $archiver->getType()));
+        if ($archiver->getType() !== $archiverType) {
+            throw new \RuntimeException(sprintf('Cannot handle archiver with type %s; %s expected', $archiver->getType(), $archiverType));
         }
 
         if (!$archiver->isEnabled()) {

@@ -13,7 +13,7 @@ use Symfony\Component\Console\Logger\ConsoleLogger;
 class CombineCommand extends ArchiverCommand
 {
     protected static $defaultName = 'app:pdf:combine';
-    protected string $archiverType = Archiver::TYPE_PDF_COMBINE;
+    protected static string $archiverType = Archiver::TYPE_PDF_COMBINE;
 
     private $helper;
 

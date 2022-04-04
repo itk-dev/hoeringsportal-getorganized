@@ -15,7 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class ArchiverCommand extends Command
 {
-    protected string $archiverType;
+    protected static string $archiverType;
 
     protected InputInterface $input;
 
@@ -60,8 +60,8 @@ abstract class ArchiverCommand extends Command
             throw new RuntimeException(sprintf('Invalid archiver: %s', $archiverId));
         }
 
-        if ($this->archiver->getType() !== $this->archiverType) {
-            throw new RuntimeException(sprintf('Invalid archiver type: %s (%s expected)', $this->archiver->getType(), $this->archiverType));
+        if ($this->archiver->getType() !== static::$archiverType) {
+            throw new RuntimeException(sprintf('Invalid archiver type: %s (%s expected)', $this->archiver->getType(), static::$archiverType));
         }
 
         if ($lastRunAt = $input->getOption('last-run-at')) {
