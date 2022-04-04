@@ -35,7 +35,10 @@ class ArchiverCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        yield IdField::new('id')->hideOnForm();
+        yield IdField::new('id')
+            // Show the full id on index.
+            ->setMaxLength(36)
+            ->setDisabled();
         yield TextField::new('name');
         yield ChoiceField::new('type')
             ->setChoices([

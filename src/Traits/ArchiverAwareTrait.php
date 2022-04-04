@@ -8,7 +8,7 @@ trait ArchiverAwareTrait
 {
     private Archiver $archiver;
 
-    private function setArchiver(Archiver $archiver)
+    public function setArchiver(Archiver $archiver)
     {
         $this->archiver = $archiver;
 
@@ -23,5 +23,10 @@ trait ArchiverAwareTrait
         if (!$archiver->isEnabled()) {
             throw new \RuntimeException(sprintf('Archiver %s is not enabled.', $archiver));
         }
+    }
+
+    public function getArchiver(): ?Archiver
+    {
+        return $this->archiver;
     }
 }

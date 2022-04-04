@@ -46,7 +46,7 @@ abstract class Entity implements \ArrayAccess, \JsonSerializable
         throw new \RuntimeException(sprintf('%s is immutable', static::class));
     }
 
-    public function jsonSerialize(): mixed
+    public function jsonSerialize()
     {
         return $this->data;
     }
