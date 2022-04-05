@@ -40,11 +40,6 @@ class GetOrganizedService
         $this->validateConfiguration();
     }
 
-    public function updateDocumentSettings(Document $document, array $data)
-    {
-        $return = $this->getOrganizedCases()->updateDocument($document, $data);
-    }
-
     public function getHearings()
     {
         return $this->getCases();

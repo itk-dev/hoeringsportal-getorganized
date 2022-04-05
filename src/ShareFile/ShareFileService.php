@@ -339,33 +339,8 @@ class ShareFileService
     private function getChildren(string $itemId, string $type, \DateTimeInterface $changedAfter = null)
     {
         $query = [
-            //            '$select' => implode(',', [
-            //                'Id',
-            //                'CreationDate',
-            //                'Name',
-            // // https://community.sharefilesupport.com/citrixsharefile/topics/using-api-what-way-can-clients-listen-for-new-files?topic-reply-list[settings][filter_by]=all&topic-reply-list[settings][reply_id]=17731261#reply_17731261
-            //                'ProgenyEditDate',
-            //            ]),
-
-            //            '$orderby' => 'ProgenyEditDate asc',
-
-            //            '$expand' => implode(',', [
-            //                'Children',
-            //                'Children/Children',
-            //            ]),
             '$filter' => 'isof(\''.$type.'\')',
         ];
-
-        // Filter on "ProgenyEditDate" results in "500 Internal server error" in ShareFile API if non-folder items (i.e. items with no ProgenyEditDate property) exists in parent.
-//        if (null !== $changedAfter && self::SHAREFILE_FOLDER === $type) {
-//            if (isset($query['$filter'])) {
-//                $query['$filter'] .= ' and ';
-//            } else {
-//                $query['$filter'] = '';
-//            }
-//            // https://www.odata.org/documentation/odata-version-3-0/odata-version-3-0-core-protocol/#thefiltersystemqueryoption
-//            $query['$filter'] .= 'ProgenyEditDate gt date('.$changedAfter->format('Y-m-d').')';
-//        }
 
         return $this->getAllChildren($itemId, $query);
     }
@@ -385,16 +360,6 @@ class ShareFileService
 
         $values[] = $result['value'];
 
-        // "odata.nextLink" seems to be incorrect when usign both $skip and $top.
-//        while (isset($result['odata.nextLink'])) {
-//            $url = parse_url($result['odata.nextLink']);
-//            parse_str($url['query'], $query);
-//            $result = $this->client()->getChildren($itemId, $query);
-//            if (isset($result['value'])) {
-//                $values[] = $result['value'];
-//            }
-//        }
-
         $pageSize = \count($result['value']);
         if ($pageSize > 0) {
             $numberOfPages = (int) ceil($result['odata.count'] / $pageSize);
@@ -410,12 +375,6 @@ class ShareFileService
         // Flatten the results.
         return array_merge(...$values);
     }
-
-//    private function getChildren($itemId) {
-//        $result = $this->client()->getItemById($itemId, true);
-//
-//        return $result['Children'] ?? null;
-//    }
 
     /**
      * @throws \Exception
