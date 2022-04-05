@@ -3,8 +3,8 @@
 namespace App\GetOrganized;
 
 use App\Entity\Archiver;
-use App\Repository\GetOrganized\DocumentRepository;
 use App\ShareFile\Item;
+use App\Util\DocumentHelper;
 use ItkDev\GetOrganized\Client;
 use ItkDev\GetOrganized\Service\Cases;
 use ItkDev\GetOrganized\Service\Documents;
@@ -15,7 +15,7 @@ class GetOrganizedService
     public const CREATED = 'created';
     public const UPDATED = 'updated';
 
-    private DocumentRepository $documentRepository;
+    private DocumentHelper $documentHelper;
 
     private Filesystem $filesystem;
 
@@ -27,9 +27,9 @@ class GetOrganizedService
     private Cases $getOrganizedCases;
     private Documents $getOrganizedDocuments;
 
-    public function __construct(DocumentRepository $documentRepository, Filesystem $filesystem)
+    public function __construct(DocumentHelper $documentHelper, Filesystem $filesystem)
     {
-        $this->documentRepository = $documentRepository;
+        $this->documentHelper = $documentHelper;
         $this->filesystem = $filesystem;
     }
 
@@ -57,7 +57,7 @@ class GetOrganizedService
             $metadata
         );
 
-        return $this->documentRepository->created(new Document($response), $item, $metadata, $this->archiver);
+        return $this->documentHelper->created(new Document($response), $item, $metadata, $this->archiver);
     }
 
     public function updateDocument(string $contents, CaseEntity $case, Item $item, array $metadata): \App\Entity\GetOrganized\Document
@@ -73,7 +73,7 @@ class GetOrganizedService
             true
         );
 
-        return $this->documentRepository->updated(new Document($response), $item, $metadata, $this->archiver);
+        return $this->documentHelper->updated(new Document($response), $item, $metadata, $this->archiver);
     }
 
     private function writeFile(string $content, Item $item): string

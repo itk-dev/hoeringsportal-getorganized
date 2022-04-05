@@ -37,43 +37,4 @@ class DocumentRepository extends ServiceEntityRepository
             'archiver' => $archiver,
         ]);
     }
-
-    public function created(GetOrganizedDocument $document, Item $item, array $metadata, Archiver $archiver): Document
-    {
-        $docId = $document->docId;
-        $shareFileItemStreamId = $item->streamId;
-
-        $entity = $this->findOneBy([
-            'docId' => $docId,
-            'shareFileItemStreamId' => $shareFileItemStreamId,
-            'archiver' => $archiver,
-        ]);
-
-        if (null === $entity) {
-            $entity = (new Document())
-                ->setDocId($docId)
-                ->setShareFileItemStreamId($shareFileItemStreamId)
-                ->setArchiver($archiver);
-        }
-
-        $entity
-            ->setShareFileItemId($item->id)
-            ->setData([
-                'sharefile' => $item->getData(),
-                'getorganized' => $document->getData(),
-                'metadata' => $metadata,
-            ])
-            ->setUpdatedAt(new \DateTime());
-
-        $em = $this->getEntityManager();
-        $em->persist($entity);
-        $em->flush();
-
-        return $entity;
-    }
-
-    public function updated(GetOrganizedDocument $document, Item $item, array $metadata, Archiver $archiver)
-    {
-        return $this->created($document, $item, $metadata, $archiver);
-    }
 }
