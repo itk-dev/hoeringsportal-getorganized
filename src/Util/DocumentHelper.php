@@ -4,6 +4,7 @@ namespace App\Util;
 
 use App\Entity\Archiver;
 use App\Entity\GetOrganized\Document;
+use App\GetOrganized\CaseEntity as GetOrganizedCase;
 use App\GetOrganized\Document as GetOrganizedDocument;
 use App\Repository\GetOrganized\DocumentRepository;
 use App\ShareFile\Item;
@@ -20,8 +21,9 @@ class DocumentHelper
         $this->entityManager = $entityManager;
     }
 
-    public function created(GetOrganizedDocument $document, Item $item, array $metadata, Archiver $archiver): Document
+    public function created(GetOrganizedCase $case, GetOrganizedDocument $document, Item $item, array $metadata, Archiver $archiver): Document
     {
+        $caseId = $case->id;
         $docId = $document->docId;
         $shareFileItemStreamId = $item->streamId;
 
@@ -33,6 +35,7 @@ class DocumentHelper
 
         if (null === $entity) {
             $entity = (new Document())
+                ->setCaseId($caseId)
                 ->setDocId($docId)
                 ->setShareFileItemStreamId($shareFileItemStreamId)
                 ->setArchiver($archiver);
@@ -53,8 +56,8 @@ class DocumentHelper
         return $entity;
     }
 
-    public function updated(GetOrganizedDocument $document, Item $item, array $metadata, Archiver $archiver)
+    public function updated(GetOrganizedCase $case, GetOrganizedDocument $document, Item $item, array $metadata, Archiver $archiver)
     {
-        return $this->created($document, $item, $metadata, $archiver);
+        return $this->created($case, $document, $item, $metadata, $archiver);
     }
 }

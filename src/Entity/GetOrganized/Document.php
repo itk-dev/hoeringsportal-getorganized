@@ -22,6 +22,13 @@ class Document
     private $id;
 
     /**
+     * The GetOrganized case id.
+     *
+     * @ORM\Column(type="string", length=255)
+     */
+    private $caseId;
+
+    /**
      * The GetOrganized document id.
      *
      * @ORM\Column(type="string", length=255)
@@ -57,6 +64,18 @@ class Document
     public function getId(): ?Uuid
     {
         return $this->id;
+    }
+
+    public function getCaseId(): ?string
+    {
+        return $this->caseId;
+    }
+
+    public function setCaseId(string $caseId): self
+    {
+        $this->caseId = $caseId;
+
+        return $this;
     }
 
     public function getDocId(): ?string

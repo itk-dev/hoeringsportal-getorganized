@@ -34,6 +34,7 @@ class DocumentCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         yield AssociationField::new('archiver');
+        yield TextField::new('caseId');
         yield TextField::new('docId');
         yield TextField::new('shareFileItemId');
         yield DateField::new('createdAt')

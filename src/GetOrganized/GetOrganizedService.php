@@ -57,7 +57,7 @@ class GetOrganizedService
             $metadata
         );
 
-        return $this->documentHelper->created(new Document($response), $item, $metadata, $this->archiver);
+        return $this->documentHelper->created($case, new Document($response), $item, $metadata, $this->archiver);
     }
 
     public function updateDocument(string $contents, CaseEntity $case, Item $item, array $metadata): \App\Entity\GetOrganized\Document
@@ -73,7 +73,7 @@ class GetOrganizedService
             true
         );
 
-        return $this->documentHelper->updated(new Document($response), $item, $metadata, $this->archiver);
+        return $this->documentHelper->updated($case, new Document($response), $item, $metadata, $this->archiver);
     }
 
     private function writeFile(string $content, Item $item): string
