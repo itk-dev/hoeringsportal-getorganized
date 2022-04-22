@@ -39,6 +39,8 @@ class ArchiveHelper
 
     private array $options;
 
+    private const GET_ORGANIZED_CASE_ID_TICKET_KEY = 'go_case_id';
+
     public function __construct(ShareFileService $shareFile, GetOrganizedService $getOrganized, DocumentRepository $documentRepository, EntityManagerInterface $entityManager, TemplateHelper $templateHelper, MailerInterface $mailer)
     {
         $this->shareFile = $shareFile;
@@ -129,7 +131,7 @@ class ArchiveHelper
                             }
                         } else {
                             $this->info(sprintf('Getting hearing for response %s', $shareFileResponse->name));
-                            $getOrganizedCaseId = $shareFileResponse->metadata['ticket_data']['get_organized_case_id'] ?? null;
+                            $getOrganizedCaseId = $shareFileResponse->metadata['ticket_data'][self::GET_ORGANIZED_CASE_ID_TICKET_KEY] ?? null;
 
                             if (null === $getOrganizedCaseId) {
                                 throw new RuntimeException(sprintf('Cannot get GetOrganized case id from item %s (%s)', $shareFileResponse->name, $shareFileResponse->id));
@@ -156,7 +158,7 @@ class ArchiveHelper
                     }
 
                     foreach ($sourceFiles as $sourceFile) {
-                        $this->archiveDocument($sourceFile, $getOrganizedHearing);
+                        $this->archiveDocument($sourceFile, $getOrganizedHearing, null, ['item_metadata' => ['name' => $shareFileResponse->name] + $shareFileResponse->metadata]);
                     }
                 } catch (\Throwable $t) {
                     $this->logException($t, [
@@ -223,8 +225,8 @@ class ArchiveHelper
                 } else {
                     $getOrganizedCaseId = null;
                     foreach ($shareFileResponses as $shareFileResponse) {
-                        if (!empty($shareFileResponse->metadata['ticket_data']['get_organized_case_id'])) {
-                            $getOrganizedCaseId = $shareFileResponse->metadata['ticket_data']['get_organized_case_id'];
+                        if (!empty($shareFileResponse->metadata['ticket_data'][self::GET_ORGANIZED_CASE_ID_TICKET_KEY])) {
+                            $getOrganizedCaseId = $shareFileResponse->metadata['ticket_data'][self::GET_ORGANIZED_CASE_ID_TICKET_KEY];
 
                             break;
                         }
@@ -236,7 +238,7 @@ class ArchiveHelper
 
                     $getOrganizedHearing = $this->getOrganized->getCaseById($getOrganizedCaseId);
                     if (null === $getOrganizedHearing) {
-                        throw new RuntimeException(sprintf('Cannot get GetOrganized case %s', $shareFileHearing->id));
+                        throw new RuntimeException(sprintf('Cannot get GetOrganized case %s', $getOrganizedCaseId));
                     }
                 }
 
@@ -283,8 +285,12 @@ class ArchiveHelper
 
     private function archiveDocument(Item $sourceFile, CaseEntity $getOrganizedHearing, string $title = null, array $options = [])
     {
+        $metadata = [];
+
         if (null === $title) {
             $title = $sourceFile->name;
+        } else {
+            $metadata['ows_Title'] = $title;
         }
 
         $this->info(sprintf('Archiving document %s (%s)', $title, $sourceFile->id));
@@ -298,7 +304,7 @@ class ArchiveHelper
 
         $document = $this->documentRepository->findOneByItemAndArchiver($sourceFile, $this->archiver);
 
-        $metadata = [];
+
         if (null === $document) {
             $this->info(sprintf('Creating new document in GetOrganized (%s)', $title));
 
@@ -310,7 +316,15 @@ class ArchiveHelper
             //     $metadata['OrganisationReference'] = $organisationReference;
             // }
 
-            $document = $this->getOrganized->createDocument($fileContents, $getOrganizedHearing, $sourceFile, $metadata);
+            $document = $this->getOrganized->createDocument(
+                $fileContents,
+                $getOrganizedHearing,
+                $sourceFile,
+                $metadata,
+                [
+                    'item_metadata' => $options['item_metadata'] ?? [],
+                ]
+            );
         } else {
             $sourceFileCreatedAt = new \DateTimeImmutable($sourceFile->creationDate);
             if ($this->force() || $document->getUpdatedAt() < $sourceFileCreatedAt) {
@@ -319,7 +333,10 @@ class ArchiveHelper
                     $fileContents,
                     $getOrganizedHearing,
                     $sourceFile,
-                    $metadata
+                    $metadata,
+                    [
+                        'item_metadata' => $options['item_metadata'] ?? [],
+                    ]
                 );
             } else {
                 $this->info(sprintf('Document in GetOrganized is already up to date (%s)', $title));

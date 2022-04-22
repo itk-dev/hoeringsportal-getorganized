@@ -5,6 +5,7 @@ namespace App\GetOrganized;
 use App\Entity\Archiver;
 use App\ShareFile\Item;
 use App\Util\DocumentHelper;
+use App\Util\TemplateHelper;
 use ItkDev\GetOrganized\Client;
 use ItkDev\GetOrganized\Service\Cases;
 use ItkDev\GetOrganized\Service\Documents;
@@ -27,10 +28,13 @@ class GetOrganizedService
     private Cases $getOrganizedCases;
     private Documents $getOrganizedDocuments;
 
-    public function __construct(DocumentHelper $documentHelper, Filesystem $filesystem)
+    private TemplateHelper $templateHelper;
+
+    public function __construct(DocumentHelper $documentHelper, Filesystem $filesystem, TemplateHelper $templateHelper)
     {
         $this->documentHelper = $documentHelper;
         $this->filesystem = $filesystem;
+        $this->templateHelper = $templateHelper;
     }
 
     public function setArchiver(Archiver $archiver)
@@ -45,10 +49,10 @@ class GetOrganizedService
         return $this->getCases();
     }
 
-    public function createDocument(string $contents, CaseEntity $case, Item $item, array $metadata): \App\Entity\GetOrganized\Document
+    public function createDocument(string $contents, CaseEntity $case, Item $item, array $metadata, array $options = []): \App\Entity\GetOrganized\Document
     {
         $path = $this->writeFile($contents, $item);
-        $metadata = $this->buildMetadata($metadata);
+        $metadata = $this->buildMetadata($metadata, $options['item_metadata'] ?? []);
 
         $response = $this->getOrganizedDocuments()->AddToDocumentLibrary(
             $path,
@@ -60,10 +64,10 @@ class GetOrganizedService
         return $this->documentHelper->created($case, new Document($response), $item, $metadata, $this->archiver);
     }
 
-    public function updateDocument(string $contents, CaseEntity $case, Item $item, array $metadata): \App\Entity\GetOrganized\Document
+    public function updateDocument(string $contents, CaseEntity $case, Item $item, array $metadata, array $options = []): \App\Entity\GetOrganized\Document
     {
         $path = $this->writeFile($contents, $item);
-        $metadata = $this->buildMetadata($metadata);
+        $metadata = $this->buildMetadata($metadata, $options['item_metadata'] ?? []);
 
         $response = $this->getOrganizedDocuments()->AddToDocumentLibrary(
             $path,
@@ -84,11 +88,16 @@ class GetOrganizedService
         return $path;
     }
 
-    private function buildMetadata(array $metadata): array
+    private function buildMetadata(array $metadata, array $itemMetadata): array
     {
         if (isset($this->configuration['document']['metadata'])) {
             $metadata += $this->configuration['document']['metadata'];
         }
+
+        // @todo Process TWIG templates in metadata.
+        $metadata = array_map(function ($value) use ($itemMetadata) {
+            return false !== strpos($value, '{{') ? $this->templateHelper->render($value, ['item' => $itemMetadata]) : $value;
+        }, $metadata);
 
         return $metadata;
     }
