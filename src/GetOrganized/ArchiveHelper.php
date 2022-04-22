@@ -304,7 +304,6 @@ class ArchiveHelper
 
         $document = $this->documentRepository->findOneByItemAndArchiver($sourceFile, $this->archiver);
 
-
         if (null === $document) {
             $this->info(sprintf('Creating new document in GetOrganized (%s)', $title));
 
@@ -330,6 +329,7 @@ class ArchiveHelper
             if ($this->force() || $document->getUpdatedAt() < $sourceFileCreatedAt) {
                 $this->info(sprintf('Updating document in GetOrganized (%s)', $title));
                 $document = $this->getOrganized->updateDocument(
+                    $document,
                     $fileContents,
                     $getOrganizedHearing,
                     $sourceFile,

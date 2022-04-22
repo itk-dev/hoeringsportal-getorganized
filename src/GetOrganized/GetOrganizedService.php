@@ -61,13 +61,21 @@ class GetOrganizedService
             $metadata
         );
 
+        // Mark the document as finalized (“journaliseret”).
+        if (isset($response['DocId'])) {
+            $this->getOrganizedDocuments()->Finalize((int) $response['DocId']);
+        }
+
         return $this->documentHelper->created($case, new Document($response), $item, $metadata, $this->archiver);
     }
 
-    public function updateDocument(string $contents, CaseEntity $case, Item $item, array $metadata, array $options = []): \App\Entity\GetOrganized\Document
+    public function updateDocument(\App\Entity\GetOrganized\Document $document, string $contents, CaseEntity $case, Item $item, array $metadata, array $options = []): \App\Entity\GetOrganized\Document
     {
         $path = $this->writeFile($contents, $item);
         $metadata = $this->buildMetadata($metadata, $options['item_metadata'] ?? []);
+
+        // Un-finalize document to be able to update file.
+        $this->getOrganizedDocuments()->UnmarkFinalized([(int) $document->getDocId()]);
 
         $response = $this->getOrganizedDocuments()->AddToDocumentLibrary(
             $path,
@@ -76,6 +84,11 @@ class GetOrganizedService
             $metadata,
             true
         );
+
+        // Mark the document as finalized (“journaliseret”).
+        if (isset($response['DocId'])) {
+            $this->getOrganizedDocuments()->Finalize((int) $response['DocId']);
+        }
 
         return $this->documentHelper->updated($case, new Document($response), $item, $metadata, $this->archiver);
     }
