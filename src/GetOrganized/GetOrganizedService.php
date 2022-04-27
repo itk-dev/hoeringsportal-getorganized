@@ -107,7 +107,7 @@ class GetOrganizedService
             $metadata += $this->configuration['document']['metadata'];
         }
 
-        // @todo Process TWIG templates in metadata.
+        // Process TWIG templates in metadata.
         $metadata = array_map(function ($value) use ($itemMetadata) {
             return false !== strpos($value, '{{') ? $this->templateHelper->render($value, ['item' => $itemMetadata]) : $value;
         }, $metadata);
