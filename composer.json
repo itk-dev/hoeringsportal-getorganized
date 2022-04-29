@@ -7,7 +7,6 @@
     "prefer-stable": true,
     "require": {
         "php": ">=7.2.5",
-        "ext-amqp": "*",
         "ext-ctype": "*",
         "ext-iconv": "*",
         "deskpro/deskpro-api-client-php": "^2.1",
