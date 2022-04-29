@@ -1,0 +1,113 @@
+<style>
+    @page {
+        margin: 38mm 25mm 20mm 25mm;
+        footer: html_page_footer;
+    }
+
+    .frontpage {
+        font-family: Arial Black,Arial,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,sans-serif;
+    }
+
+    table {
+        border-collapse: collapse;
+    }
+
+    table th,
+    table td {
+        font-family: Arial Black,Arial,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,sans-serif;
+        text-align: left;
+        font-weight: normal;
+        padding-right: 1em;
+    }
+
+    h2 {
+        font-weight: normal;
+    }
+
+    .hero-container {
+        margin-top: 28.5mm;
+        font-weight: bold;
+        text-transform: uppercase;
+
+        color: #fff;
+        background: #008486;
+        margin-right: -25mm;
+        padding-right: 25mm;
+        padding-top: 12mm;
+        padding-left: 30mm;
+        padding-bottom: 12mm;
+    }
+
+    .underlined::after {
+        content: "";
+        display: block;
+        width: 110px;
+        height: 4px;
+        margin-top: .5rem;
+        background: #fff;
+    }
+
+    a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .rule {
+        width: 25mm;
+        height: 1mm;
+        margin-top: 1mm;
+        background: #fff;
+    }
+
+    span.mpdf_toc_t_level_1 {
+        font-style: normal;
+        font-weight: normal;
+    }
+</style>
+
+<htmlpagefooter name="page_footer" style="display:none">
+    <div style="text-align: right; font-size: 10pt; background: #fff;">
+        {PAGENO}/{nbpg}
+    </div>
+</htmlpagefooter>
+
+<div class="frontpage">
+    {% set metadata = hearing._metadata|default({}) %}
+    <div style="text-align: right">
+        <img src="{{ context.template_base_url }}/assets/aak_02_venstre_70_store.jpg" style="width: 44.5mm" />
+    </div>
+
+    <div class="group-header hero-container mb-4">
+        <div class="hero hero--image-right">
+            <div class="container">
+                <div class="hero__content">
+                    <h1 class="title underlined hero__title pt-4 pb-4">
+                        <a href="{{ metadata.hearing_url }}">{{ metadata.hearing_title }} ({{ hearing.Name }})</a>
+                        <div class="rule"></div>
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2>Samlede høringssvar</h2>
+
+    {% if metadata.department_title|default(false) %}
+        <h2>{{ metadata.department_title }}</h2>
+    {% endif %}
+
+    <table>
+        <tr>
+            <th>Start på høring</th>
+            <td>{{ metadata.hearing_start_date|date('d/m/Y') }}</td>
+        </tr>
+        <tr>
+            <th>Høringsfrist</th>
+            <td>{{ metadata.hearing_reply_deadline|date('d/m/Y') }}</td>
+        </tr>
+        <tr>
+            <th>Antal høringssvar</th>
+            <td><a href="{{ metadata.hearing_url }}#hearing-tickets">{{ responses|length }}</a></td>
+        </tr>
+    </table>
+</div>
