@@ -45,5 +45,8 @@ class DashboardController extends AbstractDashboardController
 
         yield MenuItem::section('GetOrganized');
         yield MenuItem::linkToCrud(new TranslatableMessage('Document'), 'fas fa-list', Document::class);
+
+        yield MenuItem::section('PDF');
+        yield MenuItem::linkToRoute(new TranslatableMessage('Combine'), 'fas fa-list', 'admin_pdf_combine');
     }
 }

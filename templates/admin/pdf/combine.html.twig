@@ -1,0 +1,28 @@
+{# @see https://symfony.com/bundles/EasyAdminBundle/current/actions.html#integrating-symfony-actions #}
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block page_title %}{{ 'PDF Combine'|trans }}{% endblock %}
+
+{% block head_stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pdf/combine') }}
+{% endblock %}
+
+{% block head_javascript %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('pdf/combine') }}
+{% endblock %}
+
+{% block page_content %}
+    {% form_theme form '@EasyAdmin/crud/form_theme.html.twig' %}
+
+    <div class="pdf-combine">
+        <div>
+            {{ form(form, {attr: {target: 'output'}}) }}
+            <div id="message" class="alert"></div>
+        </div>
+        <div>
+            <iframe name="output"></iframe>
+        </div>
+    </div>
+{% endblock %}

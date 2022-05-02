@@ -7,6 +7,7 @@ use App\Entity\Archiver;
 use App\Pdf\PdfHelper;
 use App\Repository\ArchiverRepository;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 
@@ -41,13 +42,13 @@ class CombineCommand extends ArchiverCommand
         $this->helper->setLogger(new ConsoleLogger($this->output));
 
         $action = $this->input->getArgument('action');
-        if (!in_array($action, self::ACTIONS)) {
-            throw new InvalidArgumentException(sprintf('Invalid action: %s', $action));
-        }
         $hearing = $this->input->getArgument('hearing');
         $method = $this->getCommandName($action);
 
         $this->helper->setArchiver($this->archiver);
+        if (!$this->archiver->isEnabled()) {
+            throw new RuntimeException(sprintf('Archiver %s is not enabled', $this->archiver->getId()));
+        }
 
         if (!method_exists($this->helper, $method)) {
             throw new InvalidArgumentException(sprintf('Invalid action: %s', $action));
