@@ -4,6 +4,7 @@ namespace App\Controller\Admin\GetOrganized;
 
 use App\Admin\Field\JsonField;
 use App\Entity\GetOrganized\Document;
+use Doctrine\Common\Collections\Criteria;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -21,7 +22,9 @@ class DocumentCrudController extends AbstractCrudController
 
     public function configureCrud(Crud $crud): Crud
     {
-        return $crud->showEntityActionsInlined();
+        return $crud->showEntityActionsInlined()
+            ->setDefaultSort(['updatedAt' => Criteria::DESC])
+            ;
     }
 
     public function configureActions(Actions $actions): Actions
