@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Archiver;
+use App\Entity\ExceptionLogEntry;
 use App\Entity\GetOrganized\Document;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -40,6 +41,7 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToCrud(new TranslatableMessage('Archiver'), 'fas fa-list', Archiver::class);
+        yield MenuItem::linkToCrud(new TranslatableMessage('Error log'), 'fas fa-list', ExceptionLogEntry::class);
 
         yield MenuItem::section('GetOrganized');
         yield MenuItem::linkToCrud(new TranslatableMessage('Document'), 'fas fa-list', Document::class);
