@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8cf362e9bb1cb146f7003b210083110b",
+    "content-hash": "89ea525935219cf39d52d5528786f154",
     "packages": [
         {
             "name": "behat/transliterator",
@@ -2168,16 +2168,16 @@
         },
         {
             "name": "itk-dev/getorganized-api-client-php",
-            "version": "dev-develop",
+            "version": "dev-feature/custom-http-client",
             "source": {
                 "type": "git",
                 "url": "https://github.com/itk-dev/getorganized-api-client-php.git",
-                "reference": "f1856515fe0f77780c65b0edc2cafb4dc2457616"
+                "reference": "e8b088cad7bf03e004adb40960666e347a4f7940"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/itk-dev/getorganized-api-client-php/zipball/f1856515fe0f77780c65b0edc2cafb4dc2457616",
-                "reference": "f1856515fe0f77780c65b0edc2cafb4dc2457616",
+                "url": "https://api.github.com/repos/itk-dev/getorganized-api-client-php/zipball/e8b088cad7bf03e004adb40960666e347a4f7940",
+                "reference": "e8b088cad7bf03e004adb40960666e347a4f7940",
                 "shasum": ""
             },
             "require": {
@@ -2193,7 +2193,6 @@
                 "symfony/finder": "^5.4 || ^6.0",
                 "symfony/yaml": "^5.4 || ^6.0"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -2235,10 +2234,10 @@
             ],
             "description": "PHP client for GetOrganized API",
             "support": {
-                "source": "https://github.com/itk-dev/getorganized-api-client-php/tree/develop",
+                "source": "https://github.com/itk-dev/getorganized-api-client-php/tree/feature/custom-http-client",
                 "issues": "https://github.com/itk-dev/getorganized-api-client-php/issues"
             },
-            "time": "2022-04-27T13:24:47+00:00"
+            "time": "2022-05-05T09:39:05+00:00"
         },
         {
             "name": "kapersoft/sharefile-api",

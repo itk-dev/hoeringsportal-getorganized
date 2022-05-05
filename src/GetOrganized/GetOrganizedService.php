@@ -9,10 +9,16 @@ use App\Util\TemplateHelper;
 use ItkDev\GetOrganized\Client;
 use ItkDev\GetOrganized\Service\Cases;
 use ItkDev\GetOrganized\Service\Documents;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpClient\TraceableHttpClient;
 
-class GetOrganizedService
+class GetOrganizedService implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     public const CREATED = 'created';
     public const UPDATED = 'updated';
 
@@ -35,13 +41,16 @@ class GetOrganizedService
         $this->documentHelper = $documentHelper;
         $this->filesystem = $filesystem;
         $this->templateHelper = $templateHelper;
+        $this->setLogger(new NullLogger());
     }
 
-    public function setArchiver(Archiver $archiver)
+    public function setArchiver(Archiver $archiver): self
     {
         $this->archiver = $archiver;
         $this->configuration = $archiver->getConfigurationValue('getorganized', []);
         $this->validateConfiguration();
+
+        return $this;
     }
 
     public function getHearings()
@@ -54,17 +63,16 @@ class GetOrganizedService
         $path = $this->writeFile($contents, $item);
         $metadata = $this->buildMetadata($metadata, $options['item_metadata'] ?? []);
 
+        $this->logger->debug(sprintf('%s; add to document library; %s', __METHOD__, json_encode(['case' => ['id' => $case->id], 'item' => ['id' => $item->id]])));
         $response = $this->getOrganizedDocuments()->AddToDocumentLibrary(
             $path,
             $case->id,
             $item->name,
             $metadata
         );
+        $this->logger->debug(sprintf('%s; add to document library; response: %s', __METHOD__, json_encode($response)));
 
-        // Mark the document as finalized (“journaliseret”).
-        if (isset($response['DocId'])) {
-            $this->getOrganizedDocuments()->Finalize((int) $response['DocId']);
-        }
+        $response = $this->finalizeDocument($response);
 
         return $this->documentHelper->created($case, new Document($response), $item, $metadata, $this->archiver);
     }
@@ -74,9 +82,12 @@ class GetOrganizedService
         $path = $this->writeFile($contents, $item);
         $metadata = $this->buildMetadata($metadata, $options['item_metadata'] ?? []);
 
+        $this->logger->debug(sprintf('%s; unfinalize document %d', __METHOD__, $document->getDocId()));
         // Un-finalize document to be able to update file.
-        $this->getOrganizedDocuments()->UnmarkFinalized([(int) $document->getDocId()]);
+        $response = $this->getOrganizedDocuments()->UnmarkFinalized([(int) $document->getDocId()]);
+        $this->logger->debug(sprintf('%s; unfinalize document %d; response: %s', __METHOD__, $document->getDocId(), json_encode($response)));
 
+        $this->logger->debug(sprintf('%s; add to document library; %s', __METHOD__, json_encode(['case' => ['id' => $case->id], 'item' => ['id' => $item->id]])));
         $response = $this->getOrganizedDocuments()->AddToDocumentLibrary(
             $path,
             $case->id,
@@ -84,13 +95,27 @@ class GetOrganizedService
             $metadata,
             true
         );
+        $this->logger->debug(sprintf('%s; add to document library; response: %s', __METHOD__, json_encode($response)));
 
-        // Mark the document as finalized (“journaliseret”).
-        if (isset($response['DocId'])) {
-            $this->getOrganizedDocuments()->Finalize((int) $response['DocId']);
-        }
+        $response = $this->finalizeDocument($response);
 
         return $this->documentHelper->updated($case, new Document($response), $item, $metadata, $this->archiver);
+    }
+
+    private function finalizeDocument(array $response): ?array
+    {
+        if (isset($response['DocId'])) {
+            $this->logger->debug(sprintf('%s; finalize document; %s', __METHOD__, json_encode($response)));
+            // Mark the document as finalized (“journaliseret”).
+            $response = $this->getOrganizedDocuments()->Finalize((int) $response['DocId']);
+            $this->logger->debug(sprintf('%s; finalize document; response: %s', __METHOD__, json_encode($response)));
+
+            return $response;
+        } else {
+            $this->logger->error(sprintf('%s; finalize document; unexpected response: %s', __METHOD__, json_encode($response)));
+
+            return null;
+        }
     }
 
     private function writeFile(string $content, Item $item): string
@@ -205,11 +230,18 @@ class GetOrganizedService
 
     private function client()
     {
+        $httpClient = new TraceableHttpClient(Client::createHttpClient(
+            $this->configuration['api_username'],
+            $this->configuration['api_password'],
+            $this->configuration['api_url']
+        ));
+        $httpClient->setLogger($this->logger);
+
         if (empty($this->client)) {
             $this->client = new Client(
                 $this->configuration['api_username'],
                 $this->configuration['api_password'],
-                $this->configuration['api_url']
+                $this->configuration['api_url'], $httpClient
             );
         }
 
