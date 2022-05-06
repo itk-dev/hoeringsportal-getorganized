@@ -21,6 +21,8 @@ Encore
      * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
      */
     .addEntry('easy_admin', './assets/js/easy_admin.js')
+    .addEntry('pdf/combine', './assets/js/pdf/combine.js')
+    .addEntry('console', './assets/js/console.js')
 
     // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
     // .enableStimulusBridge('./assets/controllers.json')
