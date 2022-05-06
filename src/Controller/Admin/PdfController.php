@@ -63,6 +63,10 @@ class PdfController extends AbstractController
             $verbosity,
         ];
 
+        // Start a process running the command and continously send output to the browser.
+        // @see https://www.php.net/manual/en/function.ob-implicit-flush.php#116748
+        ob_implicit_flush();
+
         // We need to be able to run for a long time.
         set_time_limit(0);
 
@@ -74,6 +78,7 @@ class PdfController extends AbstractController
             echo '<body>';
             printf('<pre><code>');
             $process = new Process($cmd);
+            // https://symfony.com/doc/current/components/process.html#getting-real-time-process-output
             $process->run(function ($type, $buffer) {
                 $classNames = [Process::ERR === $type ? 'stderr' : 'stdout'];
                 if (preg_match('/^\[(?<type>debug|info)\]/', $buffer, $matches)) {
@@ -81,7 +86,6 @@ class PdfController extends AbstractController
                 }
                 printf('<div class="%s">%s</div>', implode(' ', $classNames), htmlspecialchars($buffer));
                 ob_flush();
-                flush();
             });
             printf('</code></pre>');
             printf('<script>try { parent.processCompleted(%s) } catch (ex) { console.debug(ex) }</script>',
@@ -93,7 +97,6 @@ class PdfController extends AbstractController
             echo '</html>';
         };
 
-//        $response->headers->set('content-type', 'text/plain');
         $response->setCallback($callback);
 
         return $response;
