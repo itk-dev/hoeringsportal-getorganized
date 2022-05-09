@@ -4,11 +4,16 @@ namespace App\ShareFile;
 
 use App\Entity\Archiver;
 use Kapersoft\ShareFile\Client;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ShareFileService
+class ShareFileService implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     private const SHAREFILE_FOLDER = 'ShareFile.Api.Models.Folder';
     private const SHAREFILE_FILE = 'ShareFile.Api.Models.File';
 
@@ -16,10 +21,17 @@ class ShareFileService
 
     private Client $client;
 
-    public function setArchiver(Archiver $archiver)
+    public function __construct()
+    {
+        $this->setLogger(new NullLogger());
+    }
+
+    public function setArchiver(Archiver $archiver): self
     {
         $this->configuration = $archiver->getConfigurationValue('sharefile', []);
         $this->validateConfiguration();
+
+        return $this;
     }
 
     /**

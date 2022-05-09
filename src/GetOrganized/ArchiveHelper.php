@@ -11,13 +11,15 @@ use App\ShareFile\ShareFileService;
 use App\Traits\ArchiverAwareTrait;
 use App\Util\TemplateHelper;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerTrait;
+use Psr\Log\NullLogger;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ArchiveHelper
+class ArchiveHelper implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
     use LoggerTrait;
@@ -49,6 +51,7 @@ class ArchiveHelper
         $this->entityManager = $entityManager;
         $this->templateHelper = $templateHelper;
         $this->mailer = $mailer;
+        $this->setLogger(new NullLogger());
     }
 
     public function archive(Archiver $archiver, $hearingItemId = null, array $options = [])
@@ -59,8 +62,12 @@ class ArchiveHelper
         $this->options = $resolver->resolve($options);
 
         try {
-            $this->shareFile->setArchiver($archiver);
-            $this->getOrganized->setArchiver($archiver);
+            $this->shareFile
+                ->setArchiver($archiver)
+                ->setLogger($this->logger);
+            $this->getOrganized
+                ->setArchiver($archiver)
+                ->setLogger($this->logger);
 
             $startTime = new \DateTimeImmutable();
 
@@ -79,9 +86,7 @@ class ArchiveHelper
 
     public function log($level, $message, array $context = [])
     {
-        if (null !== $this->logger) {
-            $this->logger->log($level, $message, $context);
-        }
+        $this->logger->log($level, $message, $context);
     }
 
     private function archiveResponses(string $hearingItemId = null)
