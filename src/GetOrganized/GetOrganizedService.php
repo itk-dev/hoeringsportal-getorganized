@@ -230,18 +230,19 @@ class GetOrganizedService implements LoggerAwareInterface
 
     private function client()
     {
-        $httpClient = new TraceableHttpClient(Client::createHttpClient(
-            $this->configuration['api_username'],
-            $this->configuration['api_password'],
-            $this->configuration['api_url']
-        ));
-        $httpClient->setLogger($this->logger);
-
         if (empty($this->client)) {
+            $httpClient = new TraceableHttpClient(Client::createHttpClient(
+                $this->configuration['api_username'],
+                $this->configuration['api_password'],
+                $this->configuration['api_url']
+            ));
+            $httpClient->setLogger($this->logger);
+
             $this->client = new Client(
                 $this->configuration['api_username'],
                 $this->configuration['api_password'],
-                $this->configuration['api_url'], $httpClient
+                $this->configuration['api_url'],
+                $httpClient
             );
         }
 
