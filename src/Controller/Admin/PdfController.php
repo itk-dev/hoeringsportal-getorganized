@@ -78,6 +78,8 @@ class PdfController extends AbstractController
             echo '<body>';
             printf('<pre><code>');
             $process = new Process($cmd);
+            // Allow the process to run for at most 10 minutes.
+            $process->setTimeout(10 * 60);
             // https://symfony.com/doc/current/components/process.html#getting-real-time-process-output
             $process->run(function ($type, $buffer) {
                 $classNames = [Process::ERR === $type ? 'stderr' : 'stdout'];
