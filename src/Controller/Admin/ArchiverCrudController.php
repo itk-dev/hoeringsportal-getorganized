@@ -47,7 +47,8 @@ class ArchiverCrudController extends AbstractCrudController
                 Archiver::TYPE_HEARING_OVERVIEW => Archiver::TYPE_HEARING_OVERVIEW,
             ]);
         yield DateField::new('lastRunAt')
-            ->setFormat('yyyy-MM-dd hh:mm:ss')
+            ->setFormat($this->getParameter('display_datetime_format'))
+            ->setTimezone($this->getParameter('display_datetime_timezone'))
             ->hideOnForm();
         yield BooleanField::new('enabled');
         yield CodeEditorField::new('configuration')
