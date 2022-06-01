@@ -72,7 +72,7 @@ class GetOrganizedService implements LoggerAwareInterface
         );
         $this->logger->debug(sprintf('%s; add to document library; response: %s', __METHOD__, json_encode($response)));
 
-        $response = $this->finalizeDocument($response);
+        $this->finalizeDocument($response);
 
         return $this->documentHelper->created($case, new Document($response), $item, $metadata, $this->archiver);
     }
@@ -97,7 +97,7 @@ class GetOrganizedService implements LoggerAwareInterface
         );
         $this->logger->debug(sprintf('%s; add to document library; response: %s', __METHOD__, json_encode($response)));
 
-        $response = $this->finalizeDocument($response);
+        $this->finalizeDocument($response);
 
         return $this->documentHelper->updated($case, new Document($response), $item, $metadata, $this->archiver);
     }
