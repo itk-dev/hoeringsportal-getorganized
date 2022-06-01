@@ -31,6 +31,8 @@ class Item extends Entity
 
     public $metadata;
 
+    public $fileName;
+
     /**
      * @var Item[]
      */
@@ -70,5 +72,6 @@ class Item extends Entity
         $this->progenyEditDate = $data['ProgenyEditDate'] ?? null;
         $this->creationDate = $data['CreationDate'];
         $this->metadata = $data['_metadata'] ?? null;
+        $this->fileName = $data['FileName'] ?? null;
     }
 }
