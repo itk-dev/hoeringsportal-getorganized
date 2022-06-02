@@ -5,6 +5,11 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     env(HEARING_REPLY_DEADLINE_OFFSET): '-30 days'
+    env(DISPLAY_DATETIME_FORMAT): 'yyyy-MM-dd HH:mm:ss'
+    env(DISPLAY_DATETIME_TIMEZONE): 'UTC'
+
+    display_datetime_format: '%env(DISPLAY_DATETIME_FORMAT)%'
+    display_datetime_timezone: '%env(DISPLAY_DATETIME_TIMEZONE)%'
 
 services:
     # default configuration for services in *this* file

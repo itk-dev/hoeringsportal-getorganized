@@ -41,9 +41,11 @@ class DocumentCrudController extends AbstractCrudController
         yield TextField::new('docId');
         yield TextField::new('shareFileItemId');
         yield DateField::new('createdAt')
-            ->setFormat('yyyy-MM-dd hh:mm:ss');
+            ->setFormat($this->getParameter('display_datetime_format'))
+            ->setTimezone($this->getParameter('display_datetime_timezone'));
         yield DateField::new('updatedAt')
-            ->setFormat('yyyy-MM-dd hh:mm:ss');
+            ->setFormat($this->getParameter('display_datetime_format'))
+            ->setTimezone($this->getParameter('display_datetime_timezone'));
         yield JsonField::new('data')
             ->onlyOnDetail();
     }

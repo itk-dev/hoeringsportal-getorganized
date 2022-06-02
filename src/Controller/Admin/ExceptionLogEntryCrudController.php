@@ -35,7 +35,8 @@ class ExceptionLogEntryCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         yield DateField::new('createdAt')
-            ->setFormat('yyyy-MM-dd hh:mm:ss');
+            ->setFormat($this->getParameter('display_datetime_format'))
+            ->setTimezone($this->getParameter('display_datetime_timezone'));
         yield TextareaField::new('message');
     }
 }

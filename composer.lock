@@ -2172,12 +2172,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/itk-dev/getorganized-api-client-php.git",
-                "reference": "566f53324f5533fbbeda2886a76d29e122e1c710"
+                "reference": "1714150431450b5f9df793edd7304b3fc1b6287d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/itk-dev/getorganized-api-client-php/zipball/566f53324f5533fbbeda2886a76d29e122e1c710",
-                "reference": "566f53324f5533fbbeda2886a76d29e122e1c710",
+                "url": "https://api.github.com/repos/itk-dev/getorganized-api-client-php/zipball/1714150431450b5f9df793edd7304b3fc1b6287d",
+                "reference": "1714150431450b5f9df793edd7304b3fc1b6287d",
                 "shasum": ""
             },
             "require": {
@@ -2238,7 +2238,7 @@
                 "source": "https://github.com/itk-dev/getorganized-api-client-php/tree/develop",
                 "issues": "https://github.com/itk-dev/getorganized-api-client-php/issues"
             },
-            "time": "2022-05-09T07:34:33+00:00"
+            "time": "2022-06-01T10:51:08+00:00"
         },
         {
             "name": "kapersoft/sharefile-api",

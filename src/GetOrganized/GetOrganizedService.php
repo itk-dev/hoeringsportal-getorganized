@@ -3,6 +3,9 @@
 namespace App\GetOrganized;
 
 use App\Entity\Archiver;
+use App\Entity\GetOrganized\Document;
+use App\GetOrganized\CaseEntity as GetOrganizedCase;
+use App\GetOrganized\Document as GetOrganizedDocument;
 use App\ShareFile\Item;
 use App\Util\DocumentHelper;
 use App\Util\TemplateHelper;
@@ -58,7 +61,15 @@ class GetOrganizedService implements LoggerAwareInterface
         return $this->getCases();
     }
 
-    public function createDocument(string $contents, CaseEntity $case, Item $item, array $metadata, array $options = []): \App\Entity\GetOrganized\Document
+    /**
+     * Link a GetOrganized document and ShareFile item.
+     */
+    public function linkDocument(GetOrganizedCase $case, GetOrganizedDocument $document, Item $item, array $metadata, Archiver $archiver): Document
+    {
+        return $this->documentHelper->created($case, $document, $item, $metadata, $archiver);
+    }
+
+    public function createDocument(string $contents, CaseEntity $case, Item $item, array $metadata, array $options = []): Document
     {
         $path = $this->writeFile($contents, $item);
         $metadata = $this->buildMetadata($metadata, $options['item_metadata'] ?? []);
@@ -74,10 +85,10 @@ class GetOrganizedService implements LoggerAwareInterface
 
         $this->finalizeDocument($response);
 
-        return $this->documentHelper->created($case, new Document($response), $item, $metadata, $this->archiver);
+        return $this->documentHelper->created($case, new GetOrganizedDocument($response), $item, $metadata, $this->archiver);
     }
 
-    public function updateDocument(\App\Entity\GetOrganized\Document $document, string $contents, CaseEntity $case, Item $item, array $metadata, array $options = []): \App\Entity\GetOrganized\Document
+    public function updateDocument(Document $document, string $contents, CaseEntity $case, Item $item, array $metadata, array $options = []): Document
     {
         $path = $this->writeFile($contents, $item);
         $metadata = $this->buildMetadata($metadata, $options['item_metadata'] ?? []);
@@ -99,7 +110,7 @@ class GetOrganizedService implements LoggerAwareInterface
 
         $this->finalizeDocument($response);
 
-        return $this->documentHelper->updated($case, new Document($response), $item, $metadata, $this->archiver);
+        return $this->documentHelper->updated($case, new GetOrganizedDocument($response), $item, $metadata, $this->archiver);
     }
 
     private function finalizeDocument(array $response): ?array
@@ -192,6 +203,38 @@ class GetOrganizedService implements LoggerAwareInterface
     public function getDocumentVersion(string $documentVersionIdentifier)
     {
         return $this->getOrganizedCases()->getDocumentVersion($documentVersionIdentifier);
+    }
+
+    // Temporary cache.
+    private $caseDocuments = [];
+
+    public function getDocumentByFilename(string $caseId, string $filename): ?GetOrganizedDocument
+    {
+        if (!isset($this->caseDocuments[$caseId])) {
+            $this->caseDocuments[$caseId] = $this->getOrganizedDocuments()->getDocumentsByCaseId($caseId);
+        }
+
+        if (isset($this->caseDocuments[$caseId])) {
+            foreach ($this->caseDocuments[$caseId] as $document) {
+                if (isset($document['ListItemAllFields']['DocID'])) {
+                    $editUrl = $document['odata.editLink'] ?? null;
+                    // Extract filename from edit url, e.g. "Web/GetFileByServerRelativePath(decodedurl='/cases/GEO277/GEO-2021-019143/Dokumenter/HS2672873-internal.pdf')")
+                    if (preg_match('@decodedurl=[\'"][^\'"]*/(?P<filename>[^/]+)[\'"]@i', $editUrl, $matches)) {
+                        if ($filename === $matches['filename']) {
+                            return new GetOrganizedDocument(
+                                $document['ListItemAllFields'] + [
+                                    // Note change in case: DocID => DocId.
+                                    'DocId' => $document['ListItemAllFields']['DocID'],
+                                    'filename' => $filename,
+                                ]
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     private function validateConfiguration()

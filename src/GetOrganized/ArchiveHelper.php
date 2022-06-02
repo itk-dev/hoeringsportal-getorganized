@@ -308,6 +308,22 @@ class ArchiveHelper implements LoggerAwareInterface
         }
 
         $document = $this->documentRepository->findOneByItemAndArchiver($sourceFile, $this->archiver);
+        if (null === $document) {
+            // Try to find document by filename.
+            $this->info(sprintf('Looking for document by filename (%s on case %s)', $sourceFile->fileName, $getOrganizedHearing->id));
+            $getOrganizedDocument = $this->getOrganized->getDocumentByFilename($getOrganizedHearing->id, $sourceFile->fileName);
+            if (null !== $getOrganizedDocument) {
+                $this->info(sprintf('Found document by filename (%s on case %s): %s', $sourceFile->fileName, $getOrganizedHearing->id, $getOrganizedDocument->docId));
+
+                $document = $this->getOrganized->linkDocument(
+                    $getOrganizedHearing,
+                    $getOrganizedDocument,
+                    $sourceFile,
+                    $metadata,
+                    $this->archiver
+                );
+            }
+        }
 
         if (null === $document) {
             $this->info(sprintf('Creating new document in GetOrganized (%s)', $title));
