@@ -300,13 +300,6 @@ class ArchiveHelper implements LoggerAwareInterface
 
         $this->info(sprintf('Archiving document %s (%s)', $title, $sourceFile->id));
 
-        $this->info(sprintf('Getting file contents from ShareFile (%s)', $sourceFile->id));
-
-        $fileContents = $this->shareFile->downloadFile($sourceFile);
-        if (null === $fileContents) {
-            throw new RuntimeException(sprintf('Cannot get file contents for item %s', $sourceFile->id));
-        }
-
         $document = $this->documentRepository->findOneByItemAndArchiver($sourceFile, $this->archiver);
         if (null === $document) {
             // Try to find document by filename.
@@ -315,6 +308,7 @@ class ArchiveHelper implements LoggerAwareInterface
             if (null !== $getOrganizedDocument) {
                 $this->info(sprintf('Found document by filename (%s on case %s): %s', $sourceFile->fileName, $getOrganizedHearing->id, $getOrganizedDocument->docId));
 
+                $fileContents = $this->getFileContents($sourceFile);
                 $document = $this->getOrganized->linkDocument(
                     $getOrganizedHearing,
                     $getOrganizedDocument,
@@ -349,6 +343,8 @@ class ArchiveHelper implements LoggerAwareInterface
             $sourceFileCreatedAt = new \DateTimeImmutable($sourceFile->creationDate);
             if ($this->force() || $document->getUpdatedAt() < $sourceFileCreatedAt) {
                 $this->info(sprintf('Updating document in GetOrganized (%s)', $title));
+                $fileContents = $this->getFileContents($sourceFile);
+
                 $document = $this->getOrganized->updateDocument(
                     $document,
                     $fileContents,
@@ -363,9 +359,24 @@ class ArchiveHelper implements LoggerAwareInterface
                 $this->info(sprintf('Document in GetOrganized is already up to date (%s)', $title));
             }
         }
+
+        unset($fileContents);
+
         if (null === $document) {
             throw new RuntimeException(sprintf('Error creating document in GetOrganized (%s; %s)', $title, $sourceFile->id));
         }
+    }
+
+    private function getFileContents(Item $sourceFile) {
+        $this->info(sprintf('Getting file contents from ShareFile (%s)', $sourceFile->id));
+
+        $fileContents = $this->shareFile->downloadFile($sourceFile);
+
+        if (null === $fileContents) {
+            throw new RuntimeException(sprintf('Cannot get file contents for item %s', $sourceFile->id));
+        }
+
+        return $fileContents;
     }
 
     private function configureOptions(OptionsResolver $resolver)
