@@ -8,6 +8,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CodeEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 
@@ -38,5 +39,9 @@ class ExceptionLogEntryCrudController extends AbstractCrudController
             ->setFormat($this->getParameter('display_datetime_format'))
             ->setTimezone($this->getParameter('display_datetime_timezone'));
         yield TextareaField::new('message');
+        yield CodeEditorField::new('traceYaml')
+            ->setLabel('Trace')
+            ->onlyOnDetail()
+        ;
     }
 }

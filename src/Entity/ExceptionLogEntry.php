@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ExceptionLogEntryRepository")
@@ -63,6 +64,16 @@ class ExceptionLogEntry
     public function getMessage(): ?string
     {
         return $this->message;
+    }
+
+    public function getTrace(): ?array
+    {
+        return $this->data['trace'] ?? null;
+    }
+
+    public function getTraceYaml(): ?string
+    {
+        return Yaml::dump($this->getTrace());
     }
 
     public function getCreatedAt(): ?\DateTimeInterface
