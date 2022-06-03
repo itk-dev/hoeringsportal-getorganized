@@ -308,7 +308,6 @@ class ArchiveHelper implements LoggerAwareInterface
             if (null !== $getOrganizedDocument) {
                 $this->info(sprintf('Found document by filename (%s on case %s): %s', $sourceFile->fileName, $getOrganizedHearing->id, $getOrganizedDocument->docId));
 
-                $fileContents = $this->getFileContents($sourceFile);
                 $document = $this->getOrganized->linkDocument(
                     $getOrganizedHearing,
                     $getOrganizedDocument,
@@ -330,6 +329,7 @@ class ArchiveHelper implements LoggerAwareInterface
             //     $metadata['OrganisationReference'] = $organisationReference;
             // }
 
+            $fileContents = $this->getFileContents($sourceFile);
             $document = $this->getOrganized->createDocument(
                 $fileContents,
                 $getOrganizedHearing,
@@ -343,8 +343,8 @@ class ArchiveHelper implements LoggerAwareInterface
             $sourceFileCreatedAt = new \DateTimeImmutable($sourceFile->creationDate);
             if ($this->force() || $document->getUpdatedAt() < $sourceFileCreatedAt) {
                 $this->info(sprintf('Updating document in GetOrganized (%s)', $title));
-                $fileContents = $this->getFileContents($sourceFile);
 
+                $fileContents = $this->getFileContents($sourceFile);
                 $document = $this->getOrganized->updateDocument(
                     $document,
                     $fileContents,
@@ -367,7 +367,8 @@ class ArchiveHelper implements LoggerAwareInterface
         }
     }
 
-    private function getFileContents(Item $sourceFile) {
+    private function getFileContents(Item $sourceFile)
+    {
         $this->info(sprintf('Getting file contents from ShareFile (%s)', $sourceFile->id));
 
         $fileContents = $this->shareFile->downloadFile($sourceFile);
