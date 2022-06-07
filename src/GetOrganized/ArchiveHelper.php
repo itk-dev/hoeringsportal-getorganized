@@ -377,6 +377,8 @@ class ArchiveHelper implements LoggerAwareInterface
             throw new RuntimeException(sprintf('Cannot get file contents for item %s', $sourceFile->id));
         }
 
+        $this->debug(sprintf('File size: %d', strlen($fileContents)));
+
         return $fileContents;
     }
 
