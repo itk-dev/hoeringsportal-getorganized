@@ -474,10 +474,8 @@ class PdfHelper
 
     /**
      * Get responses indexed by item id.
-     *
-     * @return array|false
      */
-    private function getResponses(Item $hearing)
+    private function getResponses(Item $hearing): array
     {
         $responses = $this->shareFileService->getResponses($hearing);
 

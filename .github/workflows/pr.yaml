@@ -6,7 +6,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: ['7.4']
+        php: ['8.1']
     name: Validate composer (${{ matrix.php}})
     steps:
       - name: Checkout
@@ -34,7 +34,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: ['7.4']
+        php: ['8.1']
     name: PHP coding standards (${{ matrix.php }})
     steps:
       - name: Checkout
@@ -55,7 +55,7 @@ jobs:
           key: ${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ matrix.php }}-composer-
       - name: Install Dependencies
-        run: composer install
+        run: composer install --ignore-platform-req=php
       - name: Coding standards
         run: composer coding-standards-check
 
@@ -64,7 +64,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: ['7.4']
+        php: ['8.1']
     name: PHP code analysis (${{ matrix.php }})
     steps:
       - name: Checkout
@@ -85,6 +85,6 @@ jobs:
           key: ${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ matrix.php }}-composer-
       - name: Install Dependencies
-        run: composer install
+        run: composer install --ignore-platform-req=php
       - name: Code analysis
         run: composer code-analysis
