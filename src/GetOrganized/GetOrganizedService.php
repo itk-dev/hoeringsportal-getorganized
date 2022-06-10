@@ -208,13 +208,20 @@ class GetOrganizedService implements LoggerAwareInterface
     // Temporary cache.
     private $caseDocuments = [];
 
-    public function getDocumentByFilename(string $caseId, string $filename): ?GetOrganizedDocument
+    public function getDocumentsByCaseId(string $caseId): ?array
     {
         if (!isset($this->caseDocuments[$caseId])) {
             $this->caseDocuments[$caseId] = $this->getOrganizedDocuments()->getDocumentsByCaseId($caseId);
         }
 
-        if (isset($this->caseDocuments[$caseId])) {
+        return $this->caseDocuments[$caseId] ?? null;
+    }
+
+    public function getDocumentByFilename(string $caseId, string $filename): ?GetOrganizedDocument
+    {
+        $documents = $this->getDocumentsByCaseId($caseId);
+
+        if (null !== $documents) {
             foreach ($this->caseDocuments[$caseId] as $document) {
                 if (isset($document['ListItemAllFields']['DocID'])) {
                     $editUrl = $document['odata.editLink'] ?? null;

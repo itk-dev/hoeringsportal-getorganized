@@ -369,7 +369,7 @@ class ArchiveHelper implements LoggerAwareInterface
 
     private function getFileContents(Item $sourceFile)
     {
-        $this->info(sprintf('Getting file contents from ShareFile (%s)', $sourceFile->id));
+        $this->info(sprintf('Getting file contents from ShareFile (%s; %s)', $sourceFile->id, $sourceFile->fileName));
 
         $fileContents = $this->shareFile->downloadFile($sourceFile);
 
