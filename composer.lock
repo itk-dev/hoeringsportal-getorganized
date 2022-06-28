@@ -2223,16 +2223,16 @@
         },
         {
             "name": "itk-dev/getorganized-api-client-php",
-            "version": "1.1.0",
+            "version": "1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/itk-dev/getorganized-api-client-php.git",
-                "reference": "538036cb4aaf65b03da269543728ec7e40754795"
+                "reference": "ce05e9c66dda4c066873ab13181672725b39fb5f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/itk-dev/getorganized-api-client-php/zipball/538036cb4aaf65b03da269543728ec7e40754795",
-                "reference": "538036cb4aaf65b03da269543728ec7e40754795",
+                "url": "https://api.github.com/repos/itk-dev/getorganized-api-client-php/zipball/ce05e9c66dda4c066873ab13181672725b39fb5f",
+                "reference": "ce05e9c66dda4c066873ab13181672725b39fb5f",
                 "shasum": ""
             },
             "require": {
@@ -2289,10 +2289,10 @@
             ],
             "description": "PHP client for GetOrganized API",
             "support": {
-                "source": "https://github.com/itk-dev/getorganized-api-client-php/tree/1.1.0",
+                "source": "https://github.com/itk-dev/getorganized-api-client-php/tree/1.1.1",
                 "issues": "https://github.com/itk-dev/getorganized-api-client-php/issues"
             },
-            "time": "2022-06-27T19:04:54+00:00"
+            "time": "2022-06-28T08:00:20+00:00"
         },
         {
             "name": "kapersoft/sharefile-api",
