@@ -138,8 +138,19 @@ class Document
         return $this;
     }
 
-    public function getFilename(): ?string
+    public function getFileInfo(): ?string
     {
-        return $this->data['sharefile']['FileName'] ?? null;
+        $formatBytes = function ($size, $precision = 2) {
+            $base = log($size, 1024);
+            $suffixes = ['', 'K', 'M', 'G', 'T'];
+
+            return trim(round(pow(1024, $base - floor($base)), $precision).' '.$suffixes[floor($base)]);
+        };
+
+        return sprintf(
+            '%s (%s)',
+            $this->data['sharefile']['FileName'] ?? null,
+            $formatBytes($this->data['sharefile']['FileSizeBytes'] ?? 0)
+        );
     }
 }
