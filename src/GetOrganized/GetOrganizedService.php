@@ -75,7 +75,7 @@ class GetOrganizedService implements LoggerAwareInterface
         $metadata = $this->buildMetadata($metadata, $options['item_metadata'] ?? []);
 
         $this->logger->debug(sprintf('%s; add to document library; %s', __METHOD__, json_encode(['case' => ['id' => $case->id], 'item' => ['id' => $item->id]])));
-        $response = $this->getOrganizedDocuments()->AddToDocumentLibrary(
+        $response = $this->getOrganizedDocuments()->AddToCaseSOAP(
             $path,
             $case->id,
             $item->name,
