@@ -137,4 +137,9 @@ class Document
 
         return $this;
     }
+
+    public function getFilename(): ?string
+    {
+        return $this->data['sharefile']['FileName'] ?? null;
+    }
 }
