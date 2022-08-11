@@ -75,12 +75,17 @@ class GetOrganizedService implements LoggerAwareInterface
         $metadata = $this->buildMetadata($metadata, $options['item_metadata'] ?? []);
 
         $this->logger->debug(sprintf('%s; add to document library; %s', __METHOD__, json_encode(['case' => ['id' => $case->id], 'item' => ['id' => $item->id]])));
-        $response = $this->getOrganizedDocuments()->AddToCaseSOAP(
-            $path,
-            $case->id,
-            $item->name,
-            $metadata
-        );
+        try {
+            $response = $this->getOrganizedDocuments()->AddToCaseSOAP(
+                $path,
+                $case->id,
+                $item->name,
+                $metadata
+            );
+        } finally {
+            // Clean up.
+            $this->filesystem->remove($path);
+        }
         $this->logger->debug(sprintf('%s; add to document library; response: %s', __METHOD__, json_encode($response)));
 
         $this->finalizeDocument($response);
@@ -99,13 +104,18 @@ class GetOrganizedService implements LoggerAwareInterface
         $this->logger->debug(sprintf('%s; unfinalize document %d; response: %s', __METHOD__, $document->getDocId(), json_encode($response)));
 
         $this->logger->debug(sprintf('%s; add to document library; %s', __METHOD__, json_encode(['case' => ['id' => $case->id], 'item' => ['id' => $item->id]])));
-        $response = $this->getOrganizedDocuments()->AddToDocumentLibrary(
-            $path,
-            $case->id,
-            $item->name,
-            $metadata,
-            true
-        );
+        try {
+            $response = $this->getOrganizedDocuments()->AddToDocumentLibrary(
+                $path,
+                $case->id,
+                $item->name,
+                $metadata,
+                true
+            );
+        } finally {
+            // Clean up.
+            $this->filesystem->remove($path);
+        }
         $this->logger->debug(sprintf('%s; add to document library; response: %s', __METHOD__, json_encode($response)));
 
         $this->finalizeDocument($response);
