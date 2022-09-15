@@ -563,23 +563,27 @@ class PdfHelper
         $this->entityManager->persist($logEntry);
         $this->entityManager->flush();
 
-        if (null !== $this->archiver) {
-            $config = $this->archiver->getConfigurationValue('[notifications][email]');
+        try {
+            if (null !== $this->archiver) {
+                $config = $this->archiver->getConfigurationValue('[notifications][email]');
 
-            if (null !== $config) {
-                $email = (new Email())
-                       ->from($config['from'])
-                       ->to(...$config['to'])
-                       ->subject($t->getMessage())
-                       ->text(
-                           implode(PHP_EOL, [
-                               json_encode($context, JSON_PRETTY_PRINT),
-                               $t->getTraceAsString(),
-                           ])
-                       );
+                if (isset($config['from'], $config['to'])) {
+                    $email = (new Email())
+                           ->from($config['from'])
+                           ->to(...$config['to'])
+                           ->subject($t->getMessage())
+                           ->text(
+                               implode(PHP_EOL, [
+                                   json_encode($context, JSON_PRETTY_PRINT),
+                                   $t->getTraceAsString(),
+                               ])
+                           );
 
-                $this->mailer->send($email);
+                    $this->mailer->send($email);
+                }
             }
+        } catch (\Throwable $throwable) {
+            // Ignore errors related to sending mails.
         }
     }
 
