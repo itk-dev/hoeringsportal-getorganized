@@ -43,5 +43,9 @@ class ExceptionLogEntryCrudController extends AbstractCrudController
             ->setLabel('Trace')
             ->onlyOnDetail()
         ;
+        yield CodeEditorField::new('contextYaml')
+            ->setLabel('Context')
+            ->onlyOnDetail()
+        ;
     }
 }

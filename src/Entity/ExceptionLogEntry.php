@@ -76,6 +76,16 @@ class ExceptionLogEntry
         return Yaml::dump($this->getTrace());
     }
 
+    public function getContext(): ?array
+    {
+        return $this->data['context'] ?? null;
+    }
+
+    public function getContextYaml(): ?string
+    {
+        return Yaml::dump($this->getContext());
+    }
+
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;
