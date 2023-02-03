@@ -166,7 +166,7 @@ class HearingOverviewHelper
         $sheet->freezePane('A2');
 
         // Add auto filter on all columns.
-        $dimensions = 'A1'.':'.$sheet->getHighestDataColumn().$sheet->getHighestDataRow();
+        $dimensions = 'A1:'.$sheet->getHighestDataColumn().$sheet->getHighestDataRow();
         $sheet->setAutoFilter($dimensions);
         $sheet->getAutoFilter()->showHideRows();
 

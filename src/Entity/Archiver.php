@@ -13,7 +13,9 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ArchiverRepository")
+ *
  * @Gedmo\Loggable()
+ *
  * @UniqueEntity("name")
  */
 class Archiver implements Loggable, \JsonSerializable
@@ -26,24 +28,28 @@ class Archiver implements Loggable, \JsonSerializable
 
     /**
      * @ORM\Id()
+     *
      * @ORM\Column(type="uuid", unique=true)
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     *
      * @Gedmo\Versioned()
      */
     private $name;
 
     /**
      * @ORM\Column(type="text")
+     *
      * @Gedmo\Versioned()
      */
     private $configuration;
 
     /**
      * @ORM\Column(type="boolean")
+     *
      * @Gedmo\Versioned()
      */
     private $enabled;
@@ -174,7 +180,7 @@ class Archiver implements Loggable, \JsonSerializable
         return $this;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return [
             'id' => $this->getId(),
