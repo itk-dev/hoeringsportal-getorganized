@@ -24,7 +24,7 @@ class DocumentCrudController extends AbstractCrudController
     {
         return $crud->showEntityActionsInlined()
             ->setDefaultSort(['updatedAt' => Criteria::DESC])
-            ;
+        ;
     }
 
     public function configureActions(Actions $actions): Actions

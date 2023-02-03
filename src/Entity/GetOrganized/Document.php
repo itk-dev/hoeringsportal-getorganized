@@ -9,6 +9,7 @@ use Symfony\Component\Uid\Uuid;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\GetOrganized\DocumentRepository")
+ *
  * @ORM\Table(name="get_organized_document")
  */
 class Document
@@ -17,6 +18,7 @@ class Document
 
     /**
      * @ORM\Id()
+     *
      * @ORM\Column(type="uuid", unique=true)
      */
     private $id;
@@ -42,6 +44,7 @@ class Document
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Archiver")
+     *
      * @ORM\JoinColumn(nullable=false)
      */
     private $archiver;

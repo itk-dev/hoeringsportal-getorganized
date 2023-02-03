@@ -389,9 +389,9 @@ class ShareFileService implements LoggerAwareInterface
     }
 
     /**
-     * @throws \Exception
-     *
      * @return Client
+     *
+     * @throws \Exception
      */
     private function client()
     {

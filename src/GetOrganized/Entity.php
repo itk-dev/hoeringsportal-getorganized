@@ -31,7 +31,7 @@ abstract class Entity implements \ArrayAccess, \JsonSerializable
         return \array_key_exists($offset, $this->data);
     }
 
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->data[$offset];
     }
@@ -46,7 +46,7 @@ abstract class Entity implements \ArrayAccess, \JsonSerializable
         throw new \RuntimeException(sprintf('%s is immutable', static::class));
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return $this->data;
     }

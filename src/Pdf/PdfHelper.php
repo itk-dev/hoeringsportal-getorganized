@@ -286,9 +286,9 @@ class PdfHelper
     /**
      * Download files from ShareFile.
      *
-     * @throws \Exception
-     *
      * @return string|null
+     *
+     * @throws \Exception
      */
     private function downloadFiles(array $data)
     {

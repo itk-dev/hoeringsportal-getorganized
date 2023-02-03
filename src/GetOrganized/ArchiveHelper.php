@@ -153,11 +153,11 @@ class ArchiveHelper implements LoggerAwareInterface
                     $files = $this->shareFile->getFiles($shareFileResponse);
                     $pattern = $this->archiver->getConfigurationValue('[getorganized][sharefile_file_name_pattern]');
                     $sourceFiles = array_filter(
-                            $files,
-                            static function (Item $file) use ($pattern) {
-                                return null === $pattern || fnmatch($pattern, $file->name);
-                            }
-                        );
+                        $files,
+                        static function (Item $file) use ($pattern) {
+                            return null === $pattern || fnmatch($pattern, $file->name);
+                        }
+                    );
                     if (null !== $pattern && empty($sourceFiles)) {
                         throw new RuntimeException(sprintf('Cannot find file matching pattern %s for item %s', $pattern, $shareFileResponse->id));
                     }
