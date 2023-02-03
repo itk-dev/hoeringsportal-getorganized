@@ -81,3 +81,4 @@ services:
       - app
     volumes:
       - .:/app:delegated
+    working_dir: /app
