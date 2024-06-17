@@ -52,7 +52,7 @@ class HearingOverviewHelper
         EntityManagerInterface $entityManager,
         MailerInterface $mailer,
         Filesystem $filesystem,
-        LoggerInterface $logger = null,
+        ?LoggerInterface $logger,
         array $options
     ) {
         $this->deskproService = $deskproService;
@@ -67,7 +67,7 @@ class HearingOverviewHelper
         $this->options = $resolver->resolve($options);
     }
 
-    public function process(array $hearingsIds = null)
+    public function process(?array $hearingsIds = null)
     {
         if (null === $this->getArchiver()) {
             throw new \RuntimeException('No archiver');
@@ -233,7 +233,7 @@ class HearingOverviewHelper
         }
     }
 
-    private function getHearings(array $hearingIds = null)
+    private function getHearings(?array $hearingIds = null)
     {
         $this->logger->info('Getting all hearings');
         $config = $this->archiver->getConfigurationValue('hearings');
@@ -280,7 +280,7 @@ class HearingOverviewHelper
         return $hearings;
     }
 
-    private function getFinishedHearings(array $hearingIds = null)
+    private function getFinishedHearings(?array $hearingIds = null)
     {
         $hearings = $this->getHearings($hearingIds);
 

@@ -69,7 +69,7 @@ class GetOrganizedService implements LoggerAwareInterface
         return $this->documentHelper->created($case, $document, $item, $metadata, $archiver);
     }
 
-    public function createDocument(string $contents, CaseEntity $case, Item $item, array $metadata, array $options = []): Document
+    public function createDocument(string $contents, GetOrganizedCase $case, Item $item, array $metadata, array $options = []): Document
     {
         $path = $this->writeFile($contents, $item);
         $metadata = $this->buildMetadata($metadata, $options['item_metadata'] ?? []);
@@ -93,7 +93,7 @@ class GetOrganizedService implements LoggerAwareInterface
         return $this->documentHelper->created($case, new GetOrganizedDocument($response), $item, $metadata, $this->archiver);
     }
 
-    public function updateDocument(Document $document, string $contents, CaseEntity $case, Item $item, array $metadata, array $options = []): Document
+    public function updateDocument(Document $document, string $contents, GetOrganizedCase $case, Item $item, array $metadata, array $options = []): Document
     {
         $path = $this->writeFile($contents, $item);
         $metadata = $this->buildMetadata($metadata, $options['item_metadata'] ?? []);
@@ -169,11 +169,11 @@ class GetOrganizedService implements LoggerAwareInterface
         $result = $this->getOrganizedCases()->FindCases($criteria);
 
         return array_map(static function (array $data) {
-            return new CaseEntity($data);
+            return new GetOrganizedCase($data);
         }, $result);
     }
 
-    public function getCaseById(string $id): ?CaseEntity
+    public function getCaseById(string $id): ?GetOrganizedCase
     {
         $result = $this->getCases([
             'CaseIdFilter' => $id,
