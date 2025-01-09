@@ -61,9 +61,9 @@ class DocumentsCommand extends ArchiverCommand
                 }
             }
             $io->definitionList(...$list);
-//            call_user_func_array([$io, 'definitionList'], $list);
+            //            call_user_func_array([$io, 'definitionList'], $list);
         }
-//        $this->writeTable($documents, true);
+        //        $this->writeTable($documents, true);
 
         return self::SUCCESS;
     }

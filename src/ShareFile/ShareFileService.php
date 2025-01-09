@@ -75,8 +75,6 @@ class ShareFileService implements LoggerAwareInterface
     }
 
     /**
-     * @param mixed $hearingItemId
-     *
      * @return Item[]
      */
     public function getHearingOverviewFiles($hearingItemId)
@@ -93,7 +91,7 @@ class ShareFileService implements LoggerAwareInterface
     /**
      * @return Item[]
      */
-    public function getHearings(\DateTimeInterface $changedAfter = null)
+    public function getHearings(?\DateTimeInterface $changedAfter = null)
     {
         $itemId = $this->configuration['root_id'];
         $folders = $this->getFolders($itemId, $changedAfter);
@@ -143,7 +141,7 @@ class ShareFileService implements LoggerAwareInterface
     /**
      * @return Item[]
      */
-    public function getResponses(Item $hearing, \DateTimeInterface $changedAfter = null)
+    public function getResponses(Item $hearing, ?\DateTimeInterface $changedAfter = null)
     {
         $folders = $this->getFolders($hearing, $changedAfter);
         $responses = array_filter($folders ?? [], function ($item) use ($changedAfter) {
@@ -180,7 +178,7 @@ class ShareFileService implements LoggerAwareInterface
      *
      * @return array
      */
-    public function getMetadata($item, array $names = null)
+    public function getMetadata($item, ?array $names = null)
     {
         $itemId = $this->getItemId($item);
         $metadata = $this->client()->getItemMetadataList($itemId);
@@ -206,7 +204,7 @@ class ShareFileService implements LoggerAwareInterface
      *
      * @return array
      */
-    public function getMetadataValues($item, array $names = null)
+    public function getMetadataValues($item, ?array $names = null)
     {
         $metadata = $this->getMetadata($item, $names);
 
@@ -235,7 +233,7 @@ class ShareFileService implements LoggerAwareInterface
         return $metadata[$name] ?? null;
     }
 
-    public function getFiles($item, \DateTimeInterface $changedAfter = null)
+    public function getFiles($item, ?\DateTimeInterface $changedAfter = null)
     {
         $itemId = $this->getItemId($item);
         $children = $this->getChildren($itemId, self::SHAREFILE_FILE, $changedAfter);
@@ -247,7 +245,7 @@ class ShareFileService implements LoggerAwareInterface
         return $this->construct(Item::class, $files);
     }
 
-    public function getFolders($item, \DateTimeInterface $changedAfter = null)
+    public function getFolders($item, ?\DateTimeInterface $changedAfter = null)
     {
         $itemId = $this->getItemId($item);
 
@@ -348,7 +346,7 @@ class ShareFileService implements LoggerAwareInterface
         return $item instanceof Item ? $item->id : $item;
     }
 
-    private function getChildren(string $itemId, string $type, \DateTimeInterface $changedAfter = null)
+    private function getChildren(string $itemId, string $type, ?\DateTimeInterface $changedAfter = null)
     {
         $query = [
             '$filter' => 'isof(\''.$type.'\')',

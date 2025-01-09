@@ -89,7 +89,7 @@ class ArchiveHelper implements LoggerAwareInterface
         $this->logger->log($level, $message, $context);
     }
 
-    private function archiveResponses(string $hearingItemId = null)
+    private function archiveResponses(?string $hearingItemId = null)
     {
         if (null !== $hearingItemId) {
             $this->info(sprintf('Getting hearing %s', $hearingItemId));
@@ -167,16 +167,16 @@ class ArchiveHelper implements LoggerAwareInterface
                     }
                 } catch (\Throwable $t) {
                     $this->logException($t, [
-                            'shareFileHearing' => $shareFileHearing,
-                            'getOrganizedHearing' => $getOrganizedHearing,
-                            'sourceFile' => $sourceFile,
-                        ]);
+                        'shareFileHearing' => $shareFileHearing,
+                        'getOrganizedHearing' => $getOrganizedHearing,
+                        'sourceFile' => $sourceFile,
+                    ]);
                 }
             }
         }
     }
 
-    private function archiveOverviews(string $hearingItemId = null)
+    private function archiveOverviews(?string $hearingItemId = null)
     {
         $overviews = $this->archiver->getConfigurationValue('[getorganized][overview][items]');
         if (empty($overviews)) {
@@ -288,7 +288,7 @@ class ArchiveHelper implements LoggerAwareInterface
         }
     }
 
-    private function archiveDocument(Item $sourceFile, CaseEntity $getOrganizedHearing, string $title = null, array $options = [])
+    private function archiveDocument(Item $sourceFile, CaseEntity $getOrganizedHearing, ?string $title = null, array $options = [])
     {
         $metadata = [];
 

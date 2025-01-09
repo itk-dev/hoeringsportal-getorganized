@@ -127,7 +127,7 @@ class Archiver implements Loggable, \JsonSerializable
         return $this;
     }
 
-    public function getConfigurationValue(string $key = null, $default = null)
+    public function getConfigurationValue(?string $key = null, $default = null)
     {
         $configuration = Yaml::parse($this->getConfiguration());
 

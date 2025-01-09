@@ -94,7 +94,7 @@ class PdfHelper
         }
     }
 
-    public function run($hearingId, array $metadata = null)
+    public function run($hearingId, ?array $metadata = null)
     {
         if (null === $this->getArchiver()) {
             throw new \RuntimeException('No archiver');
@@ -112,7 +112,7 @@ class PdfHelper
         return $result;
     }
 
-    public function getData($hearingId, array $metadata = null)
+    public function getData($hearingId, ?array $metadata = null)
     {
         if (null === $this->getArchiver()) {
             throw new \RuntimeException('No archiver');
@@ -540,11 +540,6 @@ class PdfHelper
         return false;
     }
 
-    private function isPrivateResponse($response)
-    {
-        return !$this->isOrganizationResponse($response);
-    }
-
     private function generateFrontPage(array $data)
     {
         $template = 'pdf/frontpage.html.twig';
@@ -587,7 +582,7 @@ class PdfHelper
         }
     }
 
-    private function getHearings(array $hearingIds = null)
+    private function getHearings(?array $hearingIds = null)
     {
         $this->logger->info('Getting all hearings');
         $config = $this->archiver->getConfigurationValue('hearings');

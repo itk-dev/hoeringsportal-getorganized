@@ -40,7 +40,7 @@ class YamlEditorType extends AbstractType
     private function validateData($input, FormInterface $form)
     {
         try {
-            $data = Yaml::parse($input, YAML::PARSE_OBJECT_FOR_MAP);
+            $data = Yaml::parse($input, Yaml::PARSE_OBJECT_FOR_MAP);
             if (!empty($this->options['schema'])) {
                 // @fixme
                 // $schemaContent = file_get_contents($this->options['schema']);
