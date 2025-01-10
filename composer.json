@@ -55,6 +55,8 @@
         "friendsofphp/php-cs-fixer": "^3.8",
         "phpstan/phpstan": "^1.5",
         "symfony/maker-bundle": "^1.38",
+        "symfony/stopwatch": "5.4.*",
+        "symfony/web-profiler-bundle": "5.4.*",
         "vincentlanglet/twig-cs-fixer": "^3.5"
     },
     "replace": {

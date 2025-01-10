@@ -17,6 +17,10 @@ framework:
     php_errors:
         log: true
 
+    # trust *all* requests (the 'REMOTE_ADDR' string is replaced at
+    # runtime by $_SERVER['REMOTE_ADDR'])
+    trusted_proxies: '127.0.0.1,REMOTE_ADDR'
+
 when@test:
     framework:
         test: true
