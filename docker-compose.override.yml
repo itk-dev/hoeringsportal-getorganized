@@ -1,4 +1,9 @@
 services:
+  phpfpm:
+    environment:
+      - PHP_MAX_EXECUTION_TIME=300
+      - PHP_MEMORY_LIMIT=512M
+
   node:
     image: node:22
     volumes:

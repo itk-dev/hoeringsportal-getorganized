@@ -1,1 +1,1 @@
-require('../css/console.scss');
+require("../css/console.scss");

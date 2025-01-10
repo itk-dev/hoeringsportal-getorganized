@@ -162,7 +162,7 @@ class GetOrganizedService implements LoggerAwareInterface
     }
 
     /**
-     * @return array|CaseEntity[]
+     * @return array|GetOrganizedCase[]
      */
     public function getCases(array $criteria = [])
     {

@@ -54,7 +54,7 @@ class PdfHelper
         Environment $twig,
         EntityManagerInterface $entityManager,
         MailerInterface $mailer,
-        array $options
+        array $options,
     ) {
         $this->archiverRepository = $archiverRepository;
         $this->shareFileService = $shareFileService;
