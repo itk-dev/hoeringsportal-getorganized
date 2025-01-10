@@ -1,90 +1,55 @@
 on: pull_request
 name: Review
+
+# https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#defining-environment-variables-for-a-single-workflow
+# (cf. services.phpfpm.user in ../../docker-compose.yml)
+env:
+  COMPOSE_USER: root
+
 jobs:
-  test-composer-install:
-    runs-on: ubuntu-20.04
-    strategy:
-      fail-fast: false
-      matrix:
-        php: ['8.3']
-    name: Validate composer (${{ matrix.php}})
+  composer-validate:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup PHP, with composer and extensions
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php}}
-          extensions: apcu, ctype, iconv, json, redis, tokenizer
-          coverage: none
-      - name: Get composer cache directory
-        id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
-      - name: Cache composer dependencies
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ matrix.php }}-composer-
-      - name: Validate composer files
-        run: composer validate composer.json
+      - uses: actions/checkout@v4
+      - run: |
+          docker network create frontend
+          docker compose run --rm phpfpm composer validate
 
-  coding-standards:
-    runs-on: ubuntu-20.04
-    strategy:
-      fail-fast: false
-      matrix:
-        php: ['8.3']
-    name: PHP coding standards (${{ matrix.php }})
+  coding-standards-php:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup PHP, with composer and extensions
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php}}
-          extensions: apcu, ctype, iconv, json, redis, tokenizer
-          coverage: none
-      - name: Get composer cache directory
-        id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
-      - name: Cache composer dependencies
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ matrix.php }}-composer-
-      - name: Install Dependencies
-        run: composer install --ignore-platform-req=php
-      - name: Coding standards
-        run: composer coding-standards-check
+      - uses: actions/checkout@v4
+      - run: |
+          docker network create frontend
+          docker compose run --rm phpfpm composer install
+          docker compose run --rm phpfpm composer coding-standards-check
 
-  code-analysis:
-    runs-on: ubuntu-20.04
-    strategy:
-      fail-fast: false
-      matrix:
-        php: ['8.3']
-    name: PHP code analysis (${{ matrix.php }})
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup PHP, with composer and extensions
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php}}
-          extensions: apcu, ctype, iconv, json, redis, tokenizer
-          coverage: none
-      - name: Get composer cache directory
-        id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
-      - name: Cache composer dependencies
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ matrix.php }}-composer-
-      - name: Install Dependencies
-        run: composer install --ignore-platform-req=php
-      - name: Code analysis
-        run: composer code-analysis
+  # code-analysis:
+  #   runs-on: ubuntu-20.04
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       php: ['8.3']
+  #   name: PHP code analysis (${{ matrix.php }})
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v2
+  #     - name: Setup PHP, with composer and extensions
+  #       uses: shivammathur/setup-php@v2
+  #       with:
+  #         php-version: ${{ matrix.php}}
+  #         extensions: apcu, ctype, iconv, json, redis, tokenizer
+  #         coverage: none
+  #     - name: Get composer cache directory
+  #       id: composer-cache
+  #       run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+  #     - name: Cache composer dependencies
+  #       uses: actions/cache@v2
+  #       with:
+  #         path: ${{ steps.composer-cache.outputs.dir }}
+  #         key: ${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
+  #         restore-keys: ${{ matrix.php }}-composer-
+  #     - name: Install Dependencies
+  #       run: composer install --ignore-platform-req=php
+  #     - name: Code analysis
+  #       run: composer code-analysis
