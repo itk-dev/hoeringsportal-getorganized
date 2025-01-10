@@ -53,7 +53,7 @@ class HearingOverviewHelper
         MailerInterface $mailer,
         Filesystem $filesystem,
         ?LoggerInterface $logger,
-        array $options
+        array $options,
     ) {
         $this->deskproService = $deskproService;
         $this->shareFileService = $shareFileService;

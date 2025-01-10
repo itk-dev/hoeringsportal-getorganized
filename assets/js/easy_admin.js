@@ -1,1 +1,1 @@
-require('../css/easy_admin.scss');
+require("../css/easy_admin.scss");
