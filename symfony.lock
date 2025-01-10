@@ -394,9 +394,9 @@
         "version": "5.4",
         "recipe": {
             "repo": "github.com/symfony/recipes",
-            "branch": "master",
-            "version": "4.3",
-            "ref": "25e3c964d3aee480b3acc3114ffb7940c89edfed"
+            "branch": "main",
+            "version": "5.4",
+            "ref": "8bd5f27013fb1d7217191c548e340f0bdb11912c"
         },
         "files": [
             "config/packages/messenger.yaml"
