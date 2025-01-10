@@ -7,7 +7,6 @@ use App\Form\YamlEditorType;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CodeEditorField;
@@ -24,12 +23,13 @@ class ArchiverCrudController extends AbstractCrudController
 
     public function configureCrud(Crud $crud): Crud
     {
-        return $crud->showEntityActionsInlined();
+        return parent::configureCrud($crud)
+            ->showEntityActionsInlined();
     }
 
     public function configureActions(Actions $actions): Actions
     {
-        return $actions
+        return parent::configureActions($actions)
             ->disable(Action::DELETE);
     }
 
@@ -50,7 +50,8 @@ class ArchiverCrudController extends AbstractCrudController
             ->setFormat($this->getParameter('display_datetime_format'))
             ->setTimezone($this->getParameter('display_datetime_timezone'))
             ->hideOnForm();
-        yield BooleanField::new('enabled');
+        yield BooleanField::new('enabled')
+            ->renderAsSwitch(false);
         yield CodeEditorField::new('configuration')
             ->hideOnIndex()
             ->setLanguage('yaml')
