@@ -6,7 +6,7 @@ use App\Entity\Archiver;
 
 trait ArchiverAwareTrait
 {
-    private Archiver $archiver;
+    private ?Archiver $archiver;
 
     public function setArchiver(Archiver $archiver)
     {
