@@ -4,6 +4,7 @@ namespace App\Command\User;
 
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -12,11 +13,12 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+#[AsCommand(
+    name: 'app:user:roles',
+    description: 'Edit user roles',
+)]
 class RolesCommand extends Command
 {
-    protected static $defaultName = 'app:user:roles';
-    protected static $defaultDescription = 'Edit user roles';
-
     public function __construct(private readonly EntityManagerInterface $entityManager)
     {
         parent::__construct();
