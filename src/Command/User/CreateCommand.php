@@ -19,14 +19,9 @@ class CreateCommand extends Command
     protected static $defaultName = 'app:user:create';
     protected static $defaultDescription = 'Create user';
 
-    private UserPasswordHasherInterface $passwordHasher;
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager)
+    public function __construct(private readonly UserPasswordHasherInterface $passwordHasher, private readonly EntityManagerInterface $entityManager)
     {
         parent::__construct();
-        $this->passwordHasher = $passwordHasher;
-        $this->entityManager = $entityManager;
     }
 
     protected function configure(): void

@@ -21,9 +21,7 @@ use Symfony\Component\Translation\TranslatableMessage;
 
 class PdfController extends AbstractController
 {
-    /**
-     * @Route("/admin/pdf/combine", name="admin_pdf_combine", methods={"GET"})
-     */
+    #[Route(path: '/admin/pdf/combine', name: 'admin_pdf_combine', methods: ['GET'])]
     public function combine(Request $request): Response
     {
         $form = $this->createCombineForm();
@@ -31,9 +29,7 @@ class PdfController extends AbstractController
         return $this->renderForm('admin/pdf/combine.html.twig', ['form' => $form]);
     }
 
-    /**
-     * @Route("/admin/pdf/combine", name="admin_pdf_combine_run", methods={"POST"})
-     */
+    #[Route(path: '/admin/pdf/combine', name: 'admin_pdf_combine_run', methods: ['POST'])]
     public function combineRun(Request $request, Packages $packages, ParameterBagInterface $parameters, ArchiverRepository $archiverRepository): Response
     {
         $form = $this->createCombineForm();
@@ -70,7 +66,7 @@ class PdfController extends AbstractController
         // We need to be able to run for a long time.
         set_time_limit(0);
 
-        $callback = function () use ($cmd, $packages) {
+        $callback = function () use ($cmd, $packages): void {
             echo '<html>';
             echo '<head>';
             printf('<link rel="stylesheet" href="%s"/>', $packages->getUrl('build/console.css'));
@@ -81,7 +77,7 @@ class PdfController extends AbstractController
             // Allow the process to run for at most 10 minutes.
             $process->setTimeout(10 * 60);
             // https://symfony.com/doc/current/components/process.html#getting-real-time-process-output
-            $process->run(function ($type, $buffer) {
+            $process->run(function ($type, $buffer): void {
                 $classNames = [Process::ERR === $type ? 'stderr' : 'stdout'];
                 if (preg_match('/^\[(?<type>debug|info)\]/', $buffer, $matches)) {
                     $classNames[] = $matches['type'];
@@ -112,14 +108,12 @@ class PdfController extends AbstractController
             ])
             ->add('archiver', EntityType::class, [
                 'class' => Archiver::class,
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('a')
-                        ->where('a.type = :type')
-                        ->setParameter('type', Archiver::TYPE_PDF_COMBINE)
-                        ->andWhere('a.enabled = :enabled')
-                        ->setParameter('enabled', true)
-                        ->orderBy('a.name', 'ASC');
-                },
+                'query_builder' => fn (EntityRepository $er) => $er->createQueryBuilder('a')
+                    ->where('a.type = :type')
+                    ->setParameter('type', Archiver::TYPE_PDF_COMBINE)
+                    ->andWhere('a.enabled = :enabled')
+                    ->setParameter('enabled', true)
+                    ->orderBy('a.name', 'ASC'),
                 'label' => new TranslatableMessage('Archiver'),
             ])
             ->add('run', SubmitType::class, [

@@ -4,12 +4,9 @@ namespace App\GetOrganized;
 
 abstract class Entity implements \ArrayAccess, \JsonSerializable
 {
-    private array $data;
-
-    public function __construct(array $data)
+    public function __construct(private array $data)
     {
-        $this->data = $data;
-        $this->build($data);
+        $this->build($this->data);
     }
 
     public function __get($name)

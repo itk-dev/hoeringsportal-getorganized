@@ -12,13 +12,11 @@ use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\ArchiverRepository")
- *
  * @Gedmo\Loggable()
- *
- * @UniqueEntity("name")
  */
-class Archiver implements Loggable, \JsonSerializable
+#[ORM\Entity(repositoryClass: \App\Repository\ArchiverRepository::class)]
+#[UniqueEntity('name')]
+class Archiver implements Loggable, \JsonSerializable, \Stringable
 {
     use TimestampableEntity;
 
@@ -26,42 +24,32 @@ class Archiver implements Loggable, \JsonSerializable
     public const TYPE_PDF_COMBINE = 'pdfcombine';
     public const TYPE_HEARING_OVERVIEW = 'hearing overview';
 
-    /**
-     * @ORM\Id()
-     *
-     * @ORM\Column(type="uuid", unique=true)
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: 'uuid', unique: true)]
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     *
      * @Gedmo\Versioned()
      */
+    #[ORM\Column(type: 'string', length: 255)]
     private $name;
 
     /**
-     * @ORM\Column(type="text")
-     *
      * @Gedmo\Versioned()
      */
+    #[ORM\Column(type: 'text')]
     private $configuration;
 
     /**
-     * @ORM\Column(type="boolean")
-     *
      * @Gedmo\Versioned()
      */
+    #[ORM\Column(type: 'boolean')]
     private $enabled;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private $lastRunAt;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $type;
 
     public function __construct()
@@ -69,9 +57,9 @@ class Archiver implements Loggable, \JsonSerializable
         $this->id = Uuid::v4();
     }
 
-    public function __toString()
+    public function __toString(): string
     {
-        return $this->name ?? self::class;
+        return (string) $this->name ?? self::class;
     }
 
     public function getId(): ?Uuid

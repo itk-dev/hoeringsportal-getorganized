@@ -20,7 +20,7 @@ class YamlEditorType extends AbstractType
     {
         $this->options = $options;
 
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $e) {
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $e): void {
             $this->validateData($e->getData(), $e->getForm());
         });
     }
@@ -32,6 +32,7 @@ class YamlEditorType extends AbstractType
         ]);
     }
 
+    #[\Override]
     public function getParent()
     {
         return CodeEditorType::class;

@@ -31,37 +31,19 @@ class PdfHelper
 
     protected static string $archiverType = Archiver::TYPE_SHAREFILE2GETORGANIZED;
 
-    private const GROUP_DEFAULT = 'Privatperson';
-
-    private ArchiverRepository $archiverRepository;
-
-    private ShareFileService $shareFileService;
-
-    private Filesystem $filesystem;
-
-    private Environment $twig;
-
-    private EntityManagerInterface $entityManager;
-
-    private MailerInterface $mailer;
+    private const string GROUP_DEFAULT = 'Privatperson';
 
     private array $options;
 
     public function __construct(
-        ArchiverRepository $archiverRepository,
-        ShareFileService $shareFileService,
-        Filesystem $filesystem,
-        Environment $twig,
-        EntityManagerInterface $entityManager,
-        MailerInterface $mailer,
+        private ArchiverRepository $archiverRepository,
+        private ShareFileService $shareFileService,
+        private Filesystem $filesystem,
+        private Environment $twig,
+        private EntityManagerInterface $entityManager,
+        private MailerInterface $mailer,
         array $options,
     ) {
-        $this->archiverRepository = $archiverRepository;
-        $this->shareFileService = $shareFileService;
-        $this->filesystem = $filesystem;
-        $this->twig = $twig;
-        $this->entityManager = $entityManager;
-        $this->mailer = $mailer;
         $this->setLogger(new NullLogger());
 
         $resolver = new OptionsResolver();
@@ -130,9 +112,7 @@ class PdfHelper
 
         foreach ($responses as $response) {
             $responseFiles = $this->shareFileService->getFiles($response);
-            $responseFiles = array_filter($responseFiles, function (Item $file) use ($fileNamePattern) {
-                return fnmatch($fileNamePattern, $file->name);
-            });
+            $responseFiles = array_filter($responseFiles, fn (Item $file) => fnmatch($fileNamePattern, $file->name));
             if (0 < \count($responseFiles)) {
                 $file = reset($responseFiles);
                 $this->debug($file->getId());
@@ -141,9 +121,7 @@ class PdfHelper
         }
 
         // Remove responses with no pdf file.
-        $responses = array_filter($responses, function (Item $response) use ($files) {
-            return isset($files[$response->getId()]);
-        });
+        $responses = array_filter($responses, fn (Item $response) => isset($files[$response->getId()]));
 
         $filename = $this->getDataFilename($hearingId);
 
@@ -191,13 +169,13 @@ class PdfHelper
         $result = $this->shareFileService->uploadFile($filename, $parentId);
 
         // @see https://api.sharefile.com/docs/resource?name=Items#Upload_File
-        if (0 !== strpos($result, 'OK')) {
+        if (!str_starts_with((string) $result, 'OK')) {
             throw new \RuntimeException('Error uploading file: '.$filename);
         }
 
         try {
             $result = $this->shareFileService->findFile(basename($filename), $parentId);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             throw new \RuntimeException(sprintf('Cannot get shared file %s in %s', $filename, $parentId));
         }
 
@@ -334,7 +312,7 @@ class PdfHelper
                 $this->filesystem->dumpFile($filename, $contents);
             }
 
-            return rtrim($dirname, '/');
+            return rtrim((string) $dirname, '/');
         } catch (IOExceptionInterface $exception) {
             $this->log(
                 LogLevel::EMERGENCY,
@@ -453,7 +431,7 @@ class PdfHelper
 
     private function getTOCName($name)
     {
-        return base64_encode($name);
+        return base64_encode((string) $name);
     }
 
     private function getTitle($response)
@@ -480,10 +458,8 @@ class PdfHelper
         $responses = $this->shareFileService->getResponses($hearing);
 
         // Remove responses that are marked as unpublished.
-        $responses = array_filter($responses, function (Item $response) {
-            return !isset($response->metadata['ticket_data']['unpublish_reply'])
-                || 'Checked' !== $response->metadata['ticket_data']['unpublish_reply'];
-        });
+        $responses = array_filter($responses, fn (Item $response) => !isset($response->metadata['ticket_data']['unpublish_reply'])
+            || 'Checked' !== $response->metadata['ticket_data']['unpublish_reply']);
 
         // Index by item id.
         return array_combine(
@@ -501,17 +477,13 @@ class PdfHelper
         }
 
         // Sort responses in groups.
-        $compareItemsByPersonName = function (array $a, array $b) {
-            return strcasecmp(
-                $a['_metadata']['user_data']['name'] ?? '',
-                $b['_metadata']['user_data']['name'] ?? ''
-            );
-        };
+        $compareItemsByPersonName = (fn (array $a, array $b) => strcasecmp(
+            $a['_metadata']['user_data']['name'] ?? '',
+            $b['_metadata']['user_data']['name'] ?? ''
+        ));
 
-        foreach ($groups as $name => &$responses) {
-            usort($responses, function (array $a, array $b) {
-                return strcasecmp($this->getTitle($a), $this->getTitle($b));
-            });
+        foreach ($groups as &$responses) {
+            usort($responses, fn (array $a, array $b) => strcasecmp((string) $this->getTitle($a), (string) $this->getTitle($b)));
         }
 
         // Sort groups by name and make sure that "Privatperson" comes last.
@@ -577,7 +549,7 @@ class PdfHelper
                     $this->mailer->send($email);
                 }
             }
-        } catch (\Throwable $throwable) {
+        } catch (\Throwable) {
             // Ignore errors related to sending mails.
         }
     }
@@ -600,18 +572,14 @@ class PdfHelper
             $response = $client->get($url);
             $data = json_decode((string) $response->getBody(), true);
 
-            $hearings[] = array_map(function ($feature) {
-                return $feature['properties'];
-            }, $data['features']);
+            $hearings[] = array_map(fn ($feature) => $feature['properties'], $data['features']);
 
             // Parse link header (cf. https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Link).
             $next = null;
             $link = $response->getHeader('link');
             $rels = reset($link);
-            if ($rels && preg_match_all('/<(?P<url>[^>]+)>; rel="(?P<rel>[^"]+)"/', $rels, $matches, PREG_SET_ORDER)) {
-                $next = array_values(array_filter($matches, static function ($match) {
-                    return 'next' === $match['rel'];
-                }))[0] ?? null;
+            if ($rels && preg_match_all('/<(?P<url>[^>]+)>; rel="(?P<rel>[^"]+)"/', (string) $rels, $matches, PREG_SET_ORDER)) {
+                $next = array_values(array_filter($matches, static fn ($match) => 'next' === $match['rel']))[0] ?? null;
             }
 
             $url = $next['url'] ?? null;
@@ -621,9 +589,7 @@ class PdfHelper
         $hearings = array_merge(...$hearings);
 
         if (!empty($hearingIds)) {
-            $hearings = array_filter($hearings, static function ($properties) use ($hearingIds) {
-                return \in_array($properties['hearing_id'], $hearingIds, true);
-            });
+            $hearings = array_filter($hearings, static fn ($properties) => \in_array($properties['hearing_id'], $hearingIds, true));
         }
 
         return $hearings;
@@ -639,7 +605,7 @@ class PdfHelper
         // Allow changes on hearings after reply deadline.
         try {
             $from->modify($this->options['hearing_reply_deadline_offset']);
-        } catch (\Throwable $t) {
+        } catch (\Throwable) {
         }
 
         // Get hearings finished since last run.
@@ -662,7 +628,7 @@ class PdfHelper
                     $lastChangeAt = new \DateTime($hearing['ProgenyEditDate']);
 
                     return $lastChangeAt >= $lastRunAt;
-                } catch (\Throwable $t) {
+                } catch (\Throwable) {
                     return false;
                 }
             }
@@ -674,7 +640,7 @@ class PdfHelper
     private function getHearing($hearingId)
     {
         $hearings = $this->getHearings();
-        $id = (int) preg_replace('/^[^\d]+/', '', $hearingId);
+        $id = (int) preg_replace('/^[^\d]+/', '', (string) $hearingId);
 
         foreach ($hearings as $hearing) {
             if ($id === $hearing['hearing_id']) {

@@ -13,12 +13,9 @@ class CronCommand extends ArchiverCommand
     protected static $defaultName = 'app:pdf:cron';
     protected static string $archiverType = Archiver::TYPE_PDF_COMBINE;
 
-    private PdfHelper $helper;
-
-    public function __construct(PdfHelper $pdfHelper, ArchiverRepository $archiverRepository)
+    public function __construct(private readonly PdfHelper $helper, ArchiverRepository $archiverRepository)
     {
         parent::__construct($archiverRepository);
-        $this->helper = $pdfHelper;
     }
 
     protected function doExecute(): int

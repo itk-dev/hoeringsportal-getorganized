@@ -25,10 +25,6 @@ class GetOrganizedService implements LoggerAwareInterface
     public const CREATED = 'created';
     public const UPDATED = 'updated';
 
-    private DocumentHelper $documentHelper;
-
-    private Filesystem $filesystem;
-
     private Archiver $archiver;
 
     private array $configuration;
@@ -37,13 +33,8 @@ class GetOrganizedService implements LoggerAwareInterface
     private Cases $getOrganizedCases;
     private Documents $getOrganizedDocuments;
 
-    private TemplateHelper $templateHelper;
-
-    public function __construct(DocumentHelper $documentHelper, Filesystem $filesystem, TemplateHelper $templateHelper)
+    public function __construct(private DocumentHelper $documentHelper, private Filesystem $filesystem, private TemplateHelper $templateHelper)
     {
-        $this->documentHelper = $documentHelper;
-        $this->filesystem = $filesystem;
-        $this->templateHelper = $templateHelper;
         $this->setLogger(new NullLogger());
     }
 
@@ -154,9 +145,7 @@ class GetOrganizedService implements LoggerAwareInterface
         }
 
         // Process TWIG templates in metadata.
-        $metadata = array_map(function ($value) use ($itemMetadata) {
-            return false !== strpos($value, '{{') ? $this->templateHelper->render($value, ['item' => $itemMetadata]) : $value;
-        }, $metadata);
+        $metadata = array_map(fn ($value) => str_contains((string) $value, '{{') ? $this->templateHelper->render($value, ['item' => $itemMetadata]) : $value, $metadata);
 
         return $metadata;
     }
@@ -168,9 +157,7 @@ class GetOrganizedService implements LoggerAwareInterface
     {
         $result = $this->getOrganizedCases()->FindCases($criteria);
 
-        return array_map(static function (array $data) {
-            return new GetOrganizedCase($data);
-        }, $result);
+        return array_map(static fn (array $data) => new GetOrganizedCase($data), $result);
     }
 
     public function getCaseById(string $id): ?GetOrganizedCase
@@ -236,7 +223,7 @@ class GetOrganizedService implements LoggerAwareInterface
                 if (isset($document['ListItemAllFields']['DocID'])) {
                     $editUrl = $document['odata.editLink'] ?? null;
                     // Extract filename from edit url, e.g. "Web/GetFileByServerRelativePath(decodedurl='/cases/GEO277/GEO-2021-019143/Dokumenter/HS2672873-internal.pdf')")
-                    if (preg_match('@decodedurl=[\'"][^\'"]*/(?P<filename>[^/]+)[\'"]@i', $editUrl, $matches)) {
+                    if (preg_match('@decodedurl=[\'"][^\'"]*/(?P<filename>[^/]+)[\'"]@i', (string) $editUrl, $matches)) {
                         if ($filename === $matches['filename']) {
                             return new GetOrganizedDocument(
                                 $document['ListItemAllFields'] + [

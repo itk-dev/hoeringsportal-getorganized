@@ -18,6 +18,7 @@ class ExceptionLogEntryCrudController extends AbstractCrudController
         return ExceptionLogEntry::class;
     }
 
+    #[\Override]
     public function configureCrud(Crud $crud): Crud
     {
         return parent::configureCrud($crud)
@@ -26,6 +27,7 @@ class ExceptionLogEntryCrudController extends AbstractCrudController
         ;
     }
 
+    #[\Override]
     public function configureActions(Actions $actions): Actions
     {
         return parent::configureActions($actions)
@@ -33,6 +35,7 @@ class ExceptionLogEntryCrudController extends AbstractCrudController
             ->add(Crud::PAGE_INDEX, Action::DETAIL);
     }
 
+    #[\Override]
     public function configureFields(string $pageName): iterable
     {
         yield DateField::new('createdAt')

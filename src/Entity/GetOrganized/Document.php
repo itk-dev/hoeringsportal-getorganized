@@ -7,56 +7,39 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Symfony\Component\Uid\Uuid;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\GetOrganized\DocumentRepository")
- *
- * @ORM\Table(name="get_organized_document")
- */
+#[ORM\Entity(repositoryClass: \App\Repository\GetOrganized\DocumentRepository::class)]
+#[ORM\Table(name: 'get_organized_document')]
 class Document
 {
     use TimestampableEntity;
 
-    /**
-     * @ORM\Id()
-     *
-     * @ORM\Column(type="uuid", unique=true)
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: 'uuid', unique: true)]
     private $id;
 
     /**
      * The GetOrganized case id.
-     *
-     * @ORM\Column(type="string", length=255)
      */
+    #[ORM\Column(type: 'string', length: 255)]
     private $caseId;
 
     /**
      * The GetOrganized document id.
-     *
-     * @ORM\Column(type="string", length=255)
      */
+    #[ORM\Column(type: 'string', length: 255)]
     private $docId;
 
-    /**
-     * @ORM\Column(type="json")
-     */
+    #[ORM\Column(type: 'json')]
     private $data = [];
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Archiver")
-     *
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: Archiver::class)]
+    #[ORM\JoinColumn(nullable: false)]
     private $archiver;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $shareFileItemId;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $shareFileItemStreamId;
 
     public function __construct()
@@ -147,7 +130,7 @@ class Document
             $base = log($size, 1024);
             $suffixes = ['', 'K', 'M', 'G', 'T'];
 
-            return trim(round(pow(1024, $base - floor($base)), $precision).' '.$suffixes[floor($base)]);
+            return trim(round(1024 ** ($base - floor($base)), $precision).' '.$suffixes[floor($base)]);
         };
 
         return sprintf(

@@ -12,13 +12,8 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class DocumentHelper
 {
-    private DocumentRepository $documentRepository;
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(DocumentRepository $documentRepository, EntityManagerInterface $entityManager)
+    public function __construct(private readonly DocumentRepository $documentRepository, private readonly EntityManagerInterface $entityManager)
     {
-        $this->documentRepository = $documentRepository;
-        $this->entityManager = $entityManager;
     }
 
     public function created(GetOrganizedCase $case, GetOrganizedDocument $document, Item $item, array $metadata, Archiver $archiver): Document

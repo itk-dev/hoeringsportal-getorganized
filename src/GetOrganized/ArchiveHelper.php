@@ -27,30 +27,12 @@ class ArchiveHelper implements LoggerAwareInterface
 
     protected static string $archiverType = Archiver::TYPE_SHAREFILE2GETORGANIZED;
 
-    private ShareFileService $shareFile;
-
-    private GetOrganizedService $getOrganized;
-
-    private DocumentRepository $documentRepository;
-
-    private EntityManagerInterface $entityManager;
-
-    private TemplateHelper $templateHelper;
-
-    private MailerInterface $mailer;
-
     private array $options;
 
-    private const GET_ORGANIZED_CASE_ID_TICKET_KEY = 'go_case_id';
+    private const string GET_ORGANIZED_CASE_ID_TICKET_KEY = 'go_case_id';
 
-    public function __construct(ShareFileService $shareFile, GetOrganizedService $getOrganized, DocumentRepository $documentRepository, EntityManagerInterface $entityManager, TemplateHelper $templateHelper, MailerInterface $mailer)
+    public function __construct(private ShareFileService $shareFile, private GetOrganizedService $getOrganized, private DocumentRepository $documentRepository, private EntityManagerInterface $entityManager, private TemplateHelper $templateHelper, private MailerInterface $mailer)
     {
-        $this->shareFile = $shareFile;
-        $this->getOrganized = $getOrganized;
-        $this->documentRepository = $documentRepository;
-        $this->entityManager = $entityManager;
-        $this->templateHelper = $templateHelper;
-        $this->mailer = $mailer;
         $this->setLogger(new NullLogger());
     }
 
@@ -154,9 +136,7 @@ class ArchiveHelper implements LoggerAwareInterface
                     $pattern = $this->archiver->getConfigurationValue('[getorganized][sharefile_file_name_pattern]');
                     $sourceFiles = array_filter(
                         $files,
-                        static function (Item $file) use ($pattern) {
-                            return null === $pattern || fnmatch($pattern, $file->name);
-                        }
+                        static fn (Item $file) => null === $pattern || fnmatch($pattern, $file->name)
                     );
                     if (null !== $pattern && empty($sourceFiles)) {
                         throw new RuntimeException(sprintf('Cannot find file matching pattern %s for item %s', $pattern, $shareFileResponse->id));
@@ -377,7 +357,7 @@ class ArchiveHelper implements LoggerAwareInterface
             throw new RuntimeException(sprintf('Cannot get file contents for item %s', $sourceFile->id));
         }
 
-        $this->debug(sprintf('File size: %d', strlen($fileContents)));
+        $this->debug(sprintf('File size: %d', strlen((string) $fileContents)));
 
         return $fileContents;
     }
@@ -420,7 +400,7 @@ class ArchiveHelper implements LoggerAwareInterface
                     $this->mailer->send($email);
                 }
             }
-        } catch (\Throwable $throwable) {
+        } catch (\Throwable) {
             // Ignore errors related to sending mails.
         }
     }

@@ -20,6 +20,7 @@ class DocumentCrudController extends AbstractCrudController
         return Document::class;
     }
 
+    #[\Override]
     public function configureCrud(Crud $crud): Crud
     {
         return parent::configureCrud($crud)
@@ -28,6 +29,7 @@ class DocumentCrudController extends AbstractCrudController
         ;
     }
 
+    #[\Override]
     public function configureActions(Actions $actions): Actions
     {
         return parent::configureActions($actions)
@@ -35,6 +37,7 @@ class DocumentCrudController extends AbstractCrudController
             ->add(Crud::PAGE_INDEX, Action::DETAIL);
     }
 
+    #[\Override]
     public function configureFields(string $pageName): iterable
     {
         yield AssociationField::new('archiver');

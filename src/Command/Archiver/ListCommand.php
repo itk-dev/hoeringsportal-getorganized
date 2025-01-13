@@ -18,12 +18,9 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 )]
 class ListCommand extends Command
 {
-    private ArchiverRepository $archiverRepository;
-
-    public function __construct(ArchiverRepository $archiverRepository)
+    public function __construct(private readonly ArchiverRepository $archiverRepository)
     {
         parent::__construct();
-        $this->archiverRepository = $archiverRepository;
     }
 
     public function configure()
@@ -41,9 +38,7 @@ class ListCommand extends Command
         $enabled = $input->getOption('enabled');
 
         if (empty($fields)) {
-            $fields = array_map(function (\ReflectionProperty $property) {
-                return $property->name;
-            }, (new \ReflectionClass(Archiver::class))->getProperties());
+            $fields = array_map(fn (\ReflectionProperty $property) => $property->name, (new \ReflectionClass(Archiver::class))->getProperties());
         }
 
         $criteria = [];
@@ -69,18 +64,14 @@ class ListCommand extends Command
             $table->setHorizontal();
             $first = true;
             foreach ($archivers as $archiver) {
-                $values = array_map(function ($field) use ($archiver, $propertyAccessor) {
-                    return $propertyAccessor->getValue($archiver, $field);
-                }, $fields);
+                $values = array_map(fn ($field) => $propertyAccessor->getValue($archiver, $field), $fields);
 
                 if ($first) {
                     $table->setHeaders($fields);
                     $first = false;
                 }
 
-                $table->addRow(array_map(function ($value) {
-                    return is_scalar($value) ? $value : json_encode($value);
-                }, $values));
+                $table->addRow(array_map(fn ($value) => is_scalar($value) ? $value : json_encode($value), $values));
             }
             $table->render();
         }

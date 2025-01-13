@@ -101,7 +101,7 @@ class DeskproService
             // https://github.com/deskpro/deskpro-api-client-php
             $client = new Client(['connect_timeout' => 2]);
             $this->client = new DeskproClient($this->options['deskpro_url'], $client);
-            $authKey = explode(':', $this->options['deskpro_api_code_key']);
+            $authKey = explode(':', (string) $this->options['deskpro_api_code_key']);
             $this->client->setAuthKey(...$authKey);
         }
 

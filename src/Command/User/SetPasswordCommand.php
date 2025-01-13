@@ -19,14 +19,9 @@ class SetPasswordCommand extends Command
     protected static $defaultName = 'app:user:set-password';
     protected static $defaultDescription = 'Set user password';
 
-    private UserPasswordHasherInterface $passwordHasher;
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager)
+    public function __construct(private readonly UserPasswordHasherInterface $passwordHasher, private readonly EntityManagerInterface $entityManager)
     {
         parent::__construct();
-        $this->passwordHasher = $passwordHasher;
-        $this->entityManager = $entityManager;
     }
 
     protected function configure(): void

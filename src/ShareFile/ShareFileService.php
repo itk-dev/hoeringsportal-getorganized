@@ -14,8 +14,8 @@ class ShareFileService implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    private const SHAREFILE_FOLDER = 'ShareFile.Api.Models.Folder';
-    private const SHAREFILE_FILE = 'ShareFile.Api.Models.File';
+    private const string SHAREFILE_FOLDER = 'ShareFile.Api.Models.Folder';
+    private const string SHAREFILE_FILE = 'ShareFile.Api.Models.File';
 
     private array $configuration;
 
@@ -184,9 +184,7 @@ class ShareFileService implements LoggerAwareInterface
         $metadata = $this->client()->getItemMetadataList($itemId);
 
         if (null !== $names) {
-            $metadata['value'] = array_filter($metadata['value'], function ($item) use ($names) {
-                return isset($item['Name']) && \in_array($item['Name'], $names, true);
-            });
+            $metadata['value'] = array_filter($metadata['value'], fn ($item) => isset($item['Name']) && \in_array($item['Name'], $names, true));
         }
 
         $result = [];
@@ -213,7 +211,7 @@ class ShareFileService implements LoggerAwareInterface
 
             try {
                 return json_decode($value, true, 512, JSON_THROW_ON_ERROR);
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 return $value;
             }
         }, $metadata);
@@ -237,10 +235,8 @@ class ShareFileService implements LoggerAwareInterface
     {
         $itemId = $this->getItemId($item);
         $children = $this->getChildren($itemId, self::SHAREFILE_FILE, $changedAfter);
-        $files = array_filter($children ?? [], function ($item) use ($changedAfter) {
-            return !(null !== $changedAfter && isset($item['CreationDate'])
-                && new \DateTime($item['CreationDate']) < $changedAfter);
-        });
+        $files = array_filter($children ?? [], fn ($item) => !(null !== $changedAfter && isset($item['CreationDate'])
+            && new \DateTime($item['CreationDate']) < $changedAfter));
 
         return $this->construct(Item::class, $files);
     }
@@ -408,18 +404,16 @@ class ShareFileService implements LoggerAwareInterface
 
     private function isHearing(array $item)
     {
-        return preg_match('/^H([a-z-]+)?[0-9]+$/i', $item['Name']);
+        return preg_match('/^H([a-z-]+)?[0-9]+$/i', (string) $item['Name']);
     }
 
     private function isHearingResponse(array $item)
     {
-        return preg_match('/^HS[0-9]+$/', $item['Name']);
+        return preg_match('/^HS[0-9]+$/', (string) $item['Name']);
     }
 
     private function construct($class, array $items)
     {
-        return array_map(function (array $data) use ($class) {
-            return new $class($data);
-        }, $items);
+        return array_map(fn (array $data) => new $class($data), $items);
     }
 }

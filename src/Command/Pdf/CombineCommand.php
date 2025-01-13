@@ -16,18 +16,15 @@ class CombineCommand extends ArchiverCommand
     protected static $defaultName = 'app:pdf:combine';
     protected static string $archiverType = Archiver::TYPE_PDF_COMBINE;
 
-    private $helper;
-
-    private const ACTIONS = [
+    private const array ACTIONS = [
         'get-data',
         'combine',
         'share',
     ];
 
-    public function __construct(PdfHelper $pdfHelper, ArchiverRepository $archiverRepository)
+    public function __construct(private readonly PdfHelper $helper, ArchiverRepository $archiverRepository)
     {
         parent::__construct($archiverRepository);
-        $this->helper = $pdfHelper;
     }
 
     protected function doConfigure()
