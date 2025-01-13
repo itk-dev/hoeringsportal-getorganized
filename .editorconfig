@@ -13,5 +13,11 @@ charset = utf-8
 trim_trailing_whitespace = true
 insert_final_newline = true
 
-[*.{js,scss,yaml,yml}]
+[*.{js,scss}]
+indent_size = 2
+
+[docker-compose*.{yaml,yml}]
+indent_size = 2
+
+[.github/**.{yaml,yml}]
 indent_size = 2

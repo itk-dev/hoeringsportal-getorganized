@@ -7,29 +7,33 @@
         "php": "^8.3",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "deskpro/deskpro-api-client-php": "dev-master",
         "doctrine/doctrine-migrations-bundle": "^3.3.1",
         "easycorp/easyadmin-bundle": "^4.21",
+        "itk-dev/getorganized-api-client-php": "dev-feature/symfony-7",
         "kapersoft/sharefile-api": "dev-deltag.aarhus.dk",
         "mpdf/mpdf": "^8.2.5",
+        "phpoffice/phpspreadsheet": "^3.8",
         "stof/doctrine-extensions-bundle": "^1.13",
-        "symfony/console": "7.2.*",
-        "symfony/dotenv": "7.2.*",
+        "symfony/console": "~7.2.1",
+        "symfony/dotenv": "~7.2.0",
         "symfony/flex": "^2.4.7",
-        "symfony/framework-bundle": "7.2.*",
-        "symfony/mailer": "7.2.*",
-        "symfony/messenger": "7.2.*",
+        "symfony/framework-bundle": "~7.2.2",
+        "symfony/mailer": "~7.2.0",
+        "symfony/messenger": "~7.2.1",
         "symfony/monolog-bundle": "^3.10",
-        "symfony/runtime": "7.2.*",
+        "symfony/runtime": "~7.2.0",
         "symfony/webpack-encore-bundle": "^2.2",
-        "symfony/yaml": "7.2.*"
+        "symfony/yaml": "~7.2.0"
     },
     "require-dev": {
         "ergebnis/composer-normalize": "^2.45",
         "friendsofphp/php-cs-fixer": "^3.67.1",
         "rector/rector": "^2.0.6",
         "symfony/maker-bundle": ">=1.61",
-        "symfony/stopwatch": "7.2.*",
-        "symfony/web-profiler-bundle": "7.2.*"
+        "symfony/stopwatch": "~7.2.2",
+        "symfony/web-profiler-bundle": "~7.2.2",
+        "vincentlanglet/twig-cs-fixer": "^3.5"
     },
     "replace": {
         "symfony/polyfill-ctype": "*",
@@ -45,9 +49,9 @@
         "symfony/symfony": "*"
     },
     "repositories": {
-        "itk-dev/getorganized-api-client-php": {
+        "deskpro/deskpro-api-client-php": {
             "type": "vcs",
-            "url": "https://github.com/itk-dev/getorganized-api-client-php"
+            "url": "https://github.com/itk-dev/deskpro-api-client-php"
         },
         "kapersoft/sharefile-api": {
             "type": "git",
@@ -79,8 +83,8 @@
     "extra": {
         "symfony": {
             "allow-contrib": true,
-            "require": "7.2.*",
-            "docker": true
+            "docker": true,
+            "require": "7.2.*"
         }
     },
     "scripts": {
@@ -118,6 +122,9 @@
         ],
         "coding-standards-check/php": [
             "@coding-standards-check/php-cs-fixer"
+        ],
+        "coding-standards-check/php-cs-fixer": [
+            "vendor/bin/php-cs-fixer check"
         ],
         "coding-standards-check/twig-cs-fixer": [
             "vendor/bin/twig-cs-fixer fix templates"

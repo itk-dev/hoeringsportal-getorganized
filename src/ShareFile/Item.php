@@ -65,7 +65,6 @@ class Item extends Entity
 
     protected function build(array $data)
     {
-        parent::build($data);
         $this->id = $data['Id'];
         $this->streamId = $data['StreamID'];
         $this->name = $data['Name'];

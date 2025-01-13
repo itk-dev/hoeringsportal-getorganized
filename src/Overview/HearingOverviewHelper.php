@@ -111,12 +111,12 @@ class HearingOverviewHelper
             foreach ($values as $index => $value) {
                 if (\is_array($value)) {
                     // value, number format
-                    $sheet->setCellValueByColumnAndRow($index + 1, $row, $value[0]);
-                    $sheet->getStyleByColumnAndRow($index + 1, $row)
+                    $sheet->setCellValue([$index + 1, $row], $value[0]);
+                    $sheet->getStyle([$index + 1, $row])
                         ->getNumberFormat()
                         ->setFormatCode($value[1]);
                 } else {
-                    $sheet->setCellValueByColumnAndRow($index + 1, $row, $value);
+                    $sheet->setCellValue([$index + 1, $row], $value);
                 }
             }
             ++$row;
