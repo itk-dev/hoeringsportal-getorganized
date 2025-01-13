@@ -15,12 +15,9 @@ class HearingOverviewCommand extends ArchiverCommand
     protected static $defaultName = 'app:overview:hearing';
     protected static string $archiverType = Archiver::TYPE_HEARING_OVERVIEW;
 
-    private HearingOverviewHelper $helper;
-
-    public function __construct(HearingOverviewHelper $helper, ArchiverRepository $archiverRepository)
+    public function __construct(private readonly HearingOverviewHelper $helper, ArchiverRepository $archiverRepository)
     {
         parent::__construct($archiverRepository);
-        $this->helper = $helper;
     }
 
     public function doConfigure()

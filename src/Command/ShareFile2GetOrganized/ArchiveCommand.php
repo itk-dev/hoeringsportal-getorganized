@@ -15,12 +15,9 @@ class ArchiveCommand extends ArchiverCommand
     protected static $defaultDescription = 'Archive files from ShareFile in GetOrganized';
     protected static string $archiverType = Archiver::TYPE_SHAREFILE2GETORGANIZED;
 
-    private ArchiveHelper $helper;
-
-    public function __construct(ArchiverRepository $archiverRepository, ArchiveHelper $helper)
+    public function __construct(ArchiverRepository $archiverRepository, private readonly ArchiveHelper $helper)
     {
         parent::__construct($archiverRepository);
-        $this->helper = $helper;
     }
 
     protected function doConfigure()

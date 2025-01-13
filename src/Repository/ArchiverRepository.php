@@ -25,7 +25,7 @@ class ArchiverRepository extends ServiceEntityRepository
         $valueId = $value;
         try {
             $valueId = (new Uuid($value))->toBinary();
-        } catch (\InvalidArgumentException $exception) {
+        } catch (\InvalidArgumentException) {
         }
 
         return $this->createQueryBuilder('s')

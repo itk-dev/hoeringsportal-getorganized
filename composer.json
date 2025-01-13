@@ -23,6 +23,8 @@
     },
     "require-dev": {
         "ergebnis/composer-normalize": "^2.45",
+        "friendsofphp/php-cs-fixer": "^3.67",
+        "rector/rector": "^2.0",
         "symfony/maker-bundle": "*",
         "symfony/stopwatch": "7.2.*",
         "symfony/web-profiler-bundle": "7.2.*"
@@ -89,6 +91,34 @@
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
-        }
+        },
+        "code-analysis": [
+            "@code-analysis/phpstan"
+        ],
+        "code-analysis/phpstan": [
+            "phpstan analyse --level=5 src"
+        ],
+        "coding-standards-apply/php": [
+            "@coding-standards-apply/php-cs-fixer"
+        ],
+        "coding-standards-apply/php-cs-fixer": [
+            "vendor/bin/php-cs-fixer --allow-risky=yes fix"
+        ],
+        "coding-standards-apply/twig": [
+            "@coding-standards-apply/twig-cs-fixer"
+        ],
+        "coding-standards-apply/twig-cs-fixer": [
+            "vendor/bin/twig-cs-fixer fix templates"
+        ],
+        "coding-standards-check": [
+            "@coding-standards-check/php",
+            "@coding-standards-check/twig"
+        ],
+        "coding-standards-check/php": [
+            "@coding-standards-check/php-cs-fixer"
+        ],
+        "coding-standards-check/twig-cs-fixer": [
+            "vendor/bin/twig-cs-fixer fix templates"
+        ]
     }
 }

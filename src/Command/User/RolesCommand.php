@@ -17,12 +17,9 @@ class RolesCommand extends Command
     protected static $defaultName = 'app:user:roles';
     protected static $defaultDescription = 'Edit user roles';
 
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(private readonly EntityManagerInterface $entityManager)
     {
         parent::__construct();
-        $this->entityManager = $entityManager;
     }
 
     protected function configure(): void

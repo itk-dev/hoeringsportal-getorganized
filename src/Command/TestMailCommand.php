@@ -18,12 +18,9 @@ use Symfony\Component\Mime\Email;
 )]
 class TestMailCommand extends Command
 {
-    private MailerInterface $mailer;
-
-    public function __construct(MailerInterface $mailer)
+    public function __construct(private readonly MailerInterface $mailer)
     {
         parent::__construct(null);
-        $this->mailer = $mailer;
     }
 
     protected function configure(): void

@@ -15,16 +15,12 @@ use Symfony\Component\Translation\TranslatableMessage;
 
 class DashboardController extends AbstractDashboardController
 {
-    private $adminUrlGenerator;
-
-    public function __construct(AdminUrlGenerator $adminUrlGenerator)
+    public function __construct(private readonly AdminUrlGenerator $adminUrlGenerator)
     {
-        $this->adminUrlGenerator = $adminUrlGenerator;
     }
 
-    /**
-     * @Route("/admin", name="admin")
-     */
+    #[\Override]
+    #[Route(path: '/admin', name: 'admin')]
     public function index(): Response
     {
         return $this->redirect($this->adminUrlGenerator
@@ -32,12 +28,14 @@ class DashboardController extends AbstractDashboardController
             ->generateUrl());
     }
 
+    #[\Override]
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
             ->setTitle('Sharefile2go');
     }
 
+    #[\Override]
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToCrud(new TranslatableMessage('Archiver'), 'fas fa-list', Archiver::class);

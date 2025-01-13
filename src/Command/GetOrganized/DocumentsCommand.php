@@ -18,12 +18,9 @@ class DocumentsCommand extends ArchiverCommand
     protected static $defaultDescription = 'Info on GetOrganized documents';
     protected static string $archiverType = Archiver::TYPE_SHAREFILE2GETORGANIZED;
 
-    private GetOrganizedService $getOrganized;
-
-    public function __construct(ArchiverRepository $archiverRepository, GetOrganizedService $getOrganized)
+    public function __construct(ArchiverRepository $archiverRepository, private readonly GetOrganizedService $getOrganized)
     {
         parent::__construct($archiverRepository);
-        $this->getOrganized = $getOrganized;
     }
 
     protected function doConfigure()

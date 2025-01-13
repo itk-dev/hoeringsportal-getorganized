@@ -21,18 +21,21 @@ class ArchiverCrudController extends AbstractCrudController
         return Archiver::class;
     }
 
+    #[\Override]
     public function configureCrud(Crud $crud): Crud
     {
         return parent::configureCrud($crud)
             ->showEntityActionsInlined();
     }
 
+    #[\Override]
     public function configureActions(Actions $actions): Actions
     {
         return parent::configureActions($actions)
             ->disable(Action::DELETE);
     }
 
+    #[\Override]
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')
