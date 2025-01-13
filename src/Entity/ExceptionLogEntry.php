@@ -8,23 +8,23 @@ use Symfony\Component\Yaml\Yaml;
 #[ORM\Entity(repositoryClass: \App\Repository\ExceptionLogEntryRepository::class)]
 class ExceptionLogEntry
 {
-    // @phpstan-ignore-next-line
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    // @phpstan-ignore-next-line
+    private ?int $id;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $message;
+    private string $message;
 
     #[ORM\Column(type: 'datetime')]
-    private $createdAt;
+    private \DateTime $createdAt;
 
     #[ORM\Column(type: 'json')]
-    private $data;
+    private array $data;
 
     #[ORM\Column(type: 'boolean')]
-    private $hidden = false;
+    private bool $hidden = false;
 
     public function __construct(\Throwable $t, array $context = [])
     {
