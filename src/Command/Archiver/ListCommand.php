@@ -4,6 +4,7 @@ namespace App\Command\Archiver;
 
 use App\Entity\Archiver;
 use App\Repository\ArchiverRepository;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -11,11 +12,12 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
+#[AsCommand(
+    name: 'app:archiver:list',
+    description: 'List archivers',
+)]
 class ListCommand extends Command
 {
-    protected static $defaultName = 'app:archiver:list';
-    protected static $defaultDescription = 'List archivers';
-
     private ArchiverRepository $archiverRepository;
 
     public function __construct(ArchiverRepository $archiverRepository)
@@ -32,7 +34,7 @@ class ListCommand extends Command
             ->addOption('enabled', null, InputOption::VALUE_REQUIRED, 'If not set, all archivers will be listed.');
     }
 
-    public function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $types = $input->getOption('type');
         $fields = $input->getOption('field');
