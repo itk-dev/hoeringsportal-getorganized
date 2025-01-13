@@ -206,7 +206,7 @@ class ArchiveHelper implements LoggerAwareInterface
                     // $getOrganizedHearing = $this->getOrganized->getHearing($shareFileHearing);
                     // if (null === $getOrganizedHearing) {
                     throw new RuntimeException(sprintf('Cannot get GetOrganized case %s', $shareFileHearing->id));
-                    // }
+                // }
                 } else {
                     $getOrganizedCaseId = null;
                     foreach ($shareFileResponses as $shareFileResponse) {
