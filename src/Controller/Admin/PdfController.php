@@ -26,7 +26,7 @@ class PdfController extends AbstractController
     {
         $form = $this->createCombineForm();
 
-        return $this->renderForm('admin/pdf/combine.html.twig', ['form' => $form]);
+        return $this->render('admin/pdf/combine.html.twig', ['form' => $form]);
     }
 
     #[Route(path: '/admin/pdf/combine', name: 'admin_pdf_combine_run', methods: ['POST'])]

@@ -102,20 +102,20 @@ class ArchiveHelper implements LoggerAwareInterface
                             $this->info(sprintf('Getting hearing: %s', $shareFileHearing->name));
                             $shareFileHearing->metadata = $shareFileResponse->metadata;
 
-                            $metadata = [];
-                            // @todo
-                            // if (null !== $caseWorker) {
-                            //     $metadata['CaseFileManagerReference'] = $caseWorker['CaseWorkerId'];
-                            // }
-                            if (null !== $organisationReference) {
-                                $metadata['OrganisationReference'] = $organisationReference;
-                            }
+                            // @todo Implement creating hearing.
+                            // $metadata = [
+                            //     'OrganisationReference' => $organisationReference,
+                            // ];
+                            // // @todo
+                            // // if (null !== $caseWorker) {
+                            // //     $metadata['CaseFileManagerReference'] = $caseWorker['CaseWorkerId'];
+                            // // }
 
-                            // @todo
+                            // // @todo
                             // $getOrganizedHearing = $this->getOrganized->getHearing($shareFileHearing, true, $metadata);
-                            if (null === $getOrganizedHearing) {
-                                throw new RuntimeException(sprintf('Error creating hearing: %s', $shareFileHearing->name));
-                            }
+                            // if (null === $getOrganizedHearing) {
+                            throw new RuntimeException(sprintf('Error creating hearing: %s', $shareFileHearing->name));
+                            // }
                         } else {
                             $this->info(sprintf('Getting hearing for response %s', $shareFileResponse->name));
                             $getOrganizedCaseId = $shareFileResponse->metadata['ticket_data'][self::GET_ORGANIZED_CASE_ID_TICKET_KEY] ?? null;
@@ -204,9 +204,9 @@ class ArchiveHelper implements LoggerAwareInterface
                 if ($this->archiver->getCreateHearing()) {
                     // @todo
                     // $getOrganizedHearing = $this->getOrganized->getHearing($shareFileHearing);
-                    if (null === $getOrganizedHearing) {
-                        throw new RuntimeException(sprintf('Cannot get GetOrganized case %s', $shareFileHearing->id));
-                    }
+                    // if (null === $getOrganizedHearing) {
+                    throw new RuntimeException(sprintf('Cannot get GetOrganized case %s', $shareFileHearing->id));
+                    // }
                 } else {
                     $getOrganizedCaseId = null;
                     foreach ($shareFileResponses as $shareFileResponse) {

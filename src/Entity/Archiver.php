@@ -59,7 +59,7 @@ class Archiver implements Loggable, \JsonSerializable, \Stringable
 
     public function __toString(): string
     {
-        return (string) $this->name ?? self::class;
+        return $this->name;
     }
 
     public function getId(): ?Uuid
