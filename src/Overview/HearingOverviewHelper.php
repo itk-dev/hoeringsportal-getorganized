@@ -78,19 +78,43 @@ class HearingOverviewHelper
         }
     }
 
+    /**
+     * @throws \DateMalformedStringException
+     */
     public function run(int $hearingId, array $hearing)
     {
         if (null === $this->getArchiver()) {
             throw new \RuntimeException('No archiver');
         }
 
-        $this->logger->debug(sprintf('Getting ShareFile folder for hearing %d', $hearingId));
+        $filename = $this->createOverview($hearingId);
+
+        $this->logger->info(sprintf('Getting ShareFile folder for hearing %d', $hearingId));
         $hearingFolder = $this->shareFileService->findHearing('H'.$hearingId);
 
-        $this->logger->debug(sprintf('Getting Deskpro tickets for hearing %d', $hearingId));
+        $result = $this->shareFileService->uploadFile($filename, $hearingFolder->getId());
+
+        $this->logger->info(sprintf(
+            'File %s uploaded to ShareFile folder %s',
+            basename($filename),
+            $hearingFolder->getId()
+        ));
+    }
+
+    /**
+     * Create overview.
+     *
+     * @return string
+     *                The overview filename
+     *
+     * @throws \DateMalformedStringException
+     */
+    public function createOverview(int $hearingId): string
+    {
+        $this->logger->info(sprintf('Getting Deskpro tickets for hearing %d', $hearingId));
         $tickets = $this->deskproService->getHearingTickets($hearingId);
 
-        $this->logger->debug(sprintf('Generating overview spreadsheet hearing %d', $hearingId));
+        $this->logger->info(sprintf('Generating overview spreadsheet hearing %d', $hearingId));
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
@@ -202,13 +226,7 @@ class HearingOverviewHelper
         $writer->save($filename);
         $this->logger->info(sprintf('Overview written to file %s', $filename));
 
-        $result = $this->shareFileService->uploadFile($filename, $hearingFolder->getId());
-
-        $this->logger->info(sprintf(
-            'File %s uploaded to ShareFile folder %s',
-            basename($filename),
-            $hearingFolder->getId()
-        ));
+        return $filename;
     }
 
     public function log($level, $message, array $context = []): void
