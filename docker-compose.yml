@@ -22,10 +22,6 @@ services:
 
   phpfpm:
     image: itkdev/php8.3-fpm:latest
-    # https://docs.docker.com/reference/compose-file/services/#user
-    # https://docs.docker.com/compose/how-tos/environment-variables/variable-interpolation/#interpolation-syntax
-    # (used in .github/workflows/pr.yaml to run service as root)
-    user: ${COMPOSE_USER:-deploy}
     networks:
       - app
     extra_hosts:
