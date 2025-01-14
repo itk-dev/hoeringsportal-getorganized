@@ -12,6 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Client;
 use Mpdf\Mpdf;
 use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
@@ -49,6 +50,12 @@ class PdfHelper
         $resolver = new OptionsResolver();
         $this->configureOptions($resolver);
         $this->options = $resolver->resolve($options);
+    }
+
+    public function setLogger(LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
+        $this->shareFileService->setLogger($logger);
     }
 
     public function process()
@@ -102,7 +109,6 @@ class PdfHelper
         $this->debug('Getting hearing '.$hearingId);
         $hearing = $this->shareFileService->findHearing($hearingId);
         $hearing->metadata['api_data'] = $metadata;
-        $this->debug('Getting responses');
         $responses = $this->getResponses($hearing);
 
         $this->debug('Getting file data');
@@ -455,6 +461,8 @@ class PdfHelper
      */
     private function getResponses(Item $hearing): array
     {
+        $this->debug('Getting responses');
+
         $responses = $this->shareFileService->getResponses($hearing);
 
         // Remove responses that are marked as unpublished.

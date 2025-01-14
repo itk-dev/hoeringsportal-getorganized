@@ -1,5 +1,7 @@
 require("../../css/pdf/combine.scss");
 
+let interval = null;
+
 const scrollConsole = () => {
   document.querySelector("iframe").contentWindow.scrollTo(0, 99999999);
 };
@@ -22,7 +24,6 @@ const setMessage = (info) => {
   }
 };
 
-const interval = setInterval(scrollConsole, 100);
 window.processCompleted = (info) => {
   setMessage(info);
   clearInterval(interval);
@@ -31,8 +32,9 @@ window.processCompleted = (info) => {
 
 document.querySelector("form").addEventListener("submit", () => {
   setMessage({
-    message: "Running command. Please be patient.",
+    message: "Running command. Please be very patient …",
   });
+  interval = setInterval(scrollConsole, 100);
 });
 
 // @todo Set this dynamically

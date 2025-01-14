@@ -19,7 +19,7 @@ class CombineCommand extends ArchiverCommand
 {
     protected static string $archiverType = Archiver::TYPE_PDF_COMBINE;
 
-    private const array ACTIONS = [
+    public const array ACTIONS = [
         'get-data',
         'combine',
         'share',
