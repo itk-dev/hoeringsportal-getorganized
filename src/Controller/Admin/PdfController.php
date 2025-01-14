@@ -142,6 +142,7 @@ class PdfController extends AbstractController
                 'label' => new TranslatableMessage('Hearing id'),
             ])
             ->add('archiver', EntityType::class, [
+                'label' => new TranslatableMessage('Archiver'),
                 'class' => Archiver::class,
                 'query_builder' => fn (EntityRepository $er) => $er->createQueryBuilder('a')
                     ->where('a.type = :type')
@@ -149,11 +150,13 @@ class PdfController extends AbstractController
                     ->andWhere('a.enabled = :enabled')
                     ->setParameter('enabled', true)
                     ->orderBy('a.name', 'ASC'),
-                'label' => new TranslatableMessage('Archiver'),
             ])
             ->add('action', ChoiceType::class, [
+                'label' => new TranslatableMessage('Action'),
                 'choices' => array_combine($actions, $actions),
                 'placeholder' => '',
+                // https://symfony.com/doc/current/reference/forms/types/choice.html#choice-translation-domain
+                'choice_translation_domain' => false,
             ])
             ->add('start', SubmitType::class, [
                 'label' => new TranslatableMessage('Start'),

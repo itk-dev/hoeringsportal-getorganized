@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="en" target-language="da" datatype="plaintext" original="file.ext">
+    <header>
+      <tool tool-id="symfony" tool-name="Symfony"/>
+    </header>
+    <body>
+      <trans-unit id="1cIPLAf" resname="Hearing id">
+        <source>Hearing id</source>
+        <target state="needs-l10n">__Hearing id</target>
+      </trans-unit>
+      <trans-unit id="p_Pb7bK" resname="Archiver">
+        <source>Archiver</source>
+        <target state="needs-l10n">__Archiver</target>
+      </trans-unit>
+      <trans-unit id="qpMwoA4" resname="Start">
+        <source>Start</source>
+        <target state="needs-l10n">__Start</target>
+      </trans-unit>
+      <trans-unit id="iwiNFRM" resname="Error log">
+        <source>Error log</source>
+        <target state="needs-l10n">__Error log</target>
+      </trans-unit>
+      <trans-unit id=".Wco9Gc" resname="Document">
+        <source>Document</source>
+        <target state="needs-l10n">__Document</target>
+      </trans-unit>
+      <trans-unit id="wzN5tX." resname="Combine">
+        <source>Combine</source>
+        <target state="needs-l10n">__Combine</target>
+      </trans-unit>
+      <trans-unit id="RIxdXOY" resname="PDF Combine">
+        <source>PDF Combine</source>
+        <target state="needs-l10n">__PDF Combine</target>
+      </trans-unit>
+      <trans-unit id="oAlgClu" resname="GetOrganized">
+        <source>GetOrganized</source>
+        <target state="needs-l10n">__GetOrganized</target>
+      </trans-unit>
+      <trans-unit id="0iVXk20" resname="PDF">
+        <source>PDF</source>
+        <target state="needs-l10n">__PDF</target>
+      </trans-unit>
+      <trans-unit id="hm.JYE2" resname="Id">
+        <source>Id</source>
+        <target state="needs-l10n">__Id</target>
+      </trans-unit>
+      <trans-unit id="wbMeKOh" resname="Name">
+        <source>Name</source>
+        <target state="needs-l10n">__Name</target>
+      </trans-unit>
+      <trans-unit id="DL_wAnF" resname="Type">
+        <source>Type</source>
+        <target state="needs-l10n">__Type</target>
+      </trans-unit>
+      <trans-unit id="kWZrGZn" resname="Last run at">
+        <source>Last run at</source>
+        <target state="needs-l10n">__Last run at</target>
+      </trans-unit>
+      <trans-unit id="FdpiKgY" resname="Enabled">
+        <source>Enabled</source>
+        <target state="needs-l10n">__Enabled</target>
+      </trans-unit>
+      <trans-unit id="nkUQV2V" resname="Configuration">
+        <source>Configuration</source>
+        <target state="needs-l10n">__Configuration</target>
+      </trans-unit>
+      <trans-unit id=".jhcwBR" resname="File">
+        <source>File</source>
+        <target state="needs-l10n">__File</target>
+      </trans-unit>
+      <trans-unit id="Ca4aWzd" resname="Case id">
+        <source>Case id</source>
+        <target state="needs-l10n">__Case id</target>
+      </trans-unit>
+      <trans-unit id="lgEryTO" resname="Document id">
+        <source>Document id</source>
+        <target state="needs-l10n">__Document id</target>
+      </trans-unit>
+      <trans-unit id="P8EnEPY" resname="ShareFile item id">
+        <source>ShareFile item id</source>
+        <target state="needs-l10n">__ShareFile item id</target>
+      </trans-unit>
+      <trans-unit id="LVVWz4T" resname="Created at">
+        <source>Created at</source>
+        <target state="needs-l10n">__Created at</target>
+      </trans-unit>
+      <trans-unit id="E6miBl5" resname="Updated at">
+        <source>Updated at</source>
+        <target state="needs-l10n">__Updated at</target>
+      </trans-unit>
+      <trans-unit id="EAXCyuR" resname="Data">
+        <source>Data</source>
+        <target state="needs-l10n">__Data</target>
+      </trans-unit>
+      <trans-unit id="vtsk56f" resname="Message">
+        <source>Message</source>
+        <target state="needs-l10n">__Message</target>
+      </trans-unit>
+      <trans-unit id="_yf7vrc" resname="Trace">
+        <source>Trace</source>
+        <target state="needs-l10n">__Trace</target>
+      </trans-unit>
+      <trans-unit id="ms66Sj7" resname="Context">
+        <source>Context</source>
+        <target state="needs-l10n">__Context</target>
+      </trans-unit>
+      <trans-unit id="CArzEJx" resname="sharefile2getorganized">
+        <source>sharefile2getorganized</source>
+        <target state="needs-l10n">__sharefile2getorganized</target>
+      </trans-unit>
+      <trans-unit id="aPJU0eY" resname="hearing overview">
+        <source>hearing overview</source>
+        <target state="needs-l10n">__hearing overview</target>
+      </trans-unit>
+      <trans-unit id="aJV854N" resname="pdfcombine">
+        <source>pdfcombine</source>
+        <target state="needs-l10n">__pdfcombine</target>
+      </trans-unit>
+      <trans-unit id="KyWwelJ" resname="Archivers">
+        <source>Archivers</source>
+        <target state="needs-l10n">__Archivers</target>
+      </trans-unit>
+      <trans-unit id="Ahtz04L" resname="Documents">
+        <source>Documents</source>
+        <target state="needs-l10n">__Documents</target>
+      </trans-unit>
+      <trans-unit id="wjdOzw0" resname="Error log entry">
+        <source>Error log entry</source>
+        <target state="needs-l10n">__Error log entry</target>
+      </trans-unit>
+      <trans-unit id="_KQNe3A" resname="Error log entries">
+        <source>Error log entries</source>
+        <target state="needs-l10n">__Error log entries</target>
+      </trans-unit>
+      <trans-unit id="BUIQ..a" resname="Action">
+        <source>Action</source>
+        <target state="needs-l10n">__Action</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

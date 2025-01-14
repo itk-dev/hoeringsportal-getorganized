@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Repository\ArchiverRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Loggable\Loggable;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -14,7 +15,7 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * @Gedmo\Loggable()
  */
-#[ORM\Entity(repositoryClass: \App\Repository\ArchiverRepository::class)]
+#[ORM\Entity(repositoryClass: ArchiverRepository::class)]
 #[UniqueEntity('name')]
 class Archiver implements Loggable, \JsonSerializable, \Stringable
 {

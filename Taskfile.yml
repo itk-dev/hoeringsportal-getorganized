@@ -153,3 +153,7 @@ tasks:
       - docker pull jauderho/prettier
       - docker pull peterdavehello/markdownlint
       - task compose -- pull
+
+  translations-update:
+    cmds:
+      - task composer -- translations-update
