@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cbdb15252afdc25e02929253dcc4f735",
+    "content-hash": "338b9b8273cc293ef558bc9bce462dfd",
     "packages": [
         {
             "name": "behat/transliterator",
@@ -1414,16 +1414,16 @@
         },
         {
             "name": "easycorp/easyadmin-bundle",
-            "version": "v4.21.0",
+            "version": "v4.21.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/EasyCorp/EasyAdminBundle.git",
-                "reference": "c0da0bf125be98d3482b6c440e363532d871f7a1"
+                "reference": "7f9a74f6329d347737cdf75c3e89f8c3a088904e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/EasyCorp/EasyAdminBundle/zipball/c0da0bf125be98d3482b6c440e363532d871f7a1",
-                "reference": "c0da0bf125be98d3482b6c440e363532d871f7a1",
+                "url": "https://api.github.com/repos/EasyCorp/EasyAdminBundle/zipball/7f9a74f6329d347737cdf75c3e89f8c3a088904e",
+                "reference": "7f9a74f6329d347737cdf75c3e89f8c3a088904e",
                 "shasum": ""
             },
             "require": {
@@ -1503,7 +1503,7 @@
             ],
             "support": {
                 "issues": "https://github.com/EasyCorp/EasyAdminBundle/issues",
-                "source": "https://github.com/EasyCorp/EasyAdminBundle/tree/v4.21.0"
+                "source": "https://github.com/EasyCorp/EasyAdminBundle/tree/v4.21.1"
             },
             "funding": [
                 {
@@ -1511,7 +1511,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-01-12T11:03:13+00:00"
+            "time": "2025-01-13T18:32:44+00:00"
         },
         {
             "name": "egulias/email-validator",
@@ -9475,16 +9475,16 @@
         },
         {
             "name": "friendsofphp/php-cs-fixer",
-            "version": "v3.67.1",
+            "version": "v3.68.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer.git",
-                "reference": "db533e9aeb19c33033b6a1b734c8de4f4ebaa7dc"
+                "reference": "73f78d8b2b34a0dd65fedb434a602ee4c2c8ad4c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/db533e9aeb19c33033b6a1b734c8de4f4ebaa7dc",
-                "reference": "db533e9aeb19c33033b6a1b734c8de4f4ebaa7dc",
+                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/73f78d8b2b34a0dd65fedb434a602ee4c2c8ad4c",
+                "reference": "73f78d8b2b34a0dd65fedb434a602ee4c2c8ad4c",
                 "shasum": ""
             },
             "require": {
@@ -9566,7 +9566,7 @@
             ],
             "support": {
                 "issues": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/issues",
-                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.67.1"
+                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.68.0"
             },
             "funding": [
                 {
@@ -9574,7 +9574,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-01-12T12:20:47+00:00"
+            "time": "2025-01-13T17:01:01+00:00"
         },
         {
             "name": "icecave/parity",

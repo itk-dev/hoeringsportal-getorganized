@@ -9,7 +9,7 @@
         "ext-iconv": "*",
         "deskpro/deskpro-api-client-php": "dev-master",
         "doctrine/doctrine-migrations-bundle": "^3.3.1",
-        "easycorp/easyadmin-bundle": "^4.21",
+        "easycorp/easyadmin-bundle": "^4.21.1",
         "itk-dev/getorganized-api-client-php": "dev-feature/symfony-7",
         "kapersoft/sharefile-api": "dev-deltag.aarhus.dk",
         "mpdf/mpdf": "^8.2.5",
@@ -28,7 +28,7 @@
     },
     "require-dev": {
         "ergebnis/composer-normalize": "^2.45",
-        "friendsofphp/php-cs-fixer": "^3.67.1",
+        "friendsofphp/php-cs-fixer": "^3.68.0",
         "rector/rector": "^2.0.6",
         "symfony/maker-bundle": ">=1.61",
         "symfony/stopwatch": "~7.2.2",
