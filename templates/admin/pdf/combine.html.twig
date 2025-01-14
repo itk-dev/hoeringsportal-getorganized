@@ -3,15 +3,7 @@
 
 {% block page_title %}{{ 'PDF Combine'|trans }}{% endblock %}
 
-{% block head_stylesheets %}
-    {{ parent() }}
-    {{ encore_entry_link_tags('pdf/combine') }}
-{% endblock %}
-
-{% block head_javascript %}
-    {{ parent() }}
-    {{ encore_entry_script_tags('pdf/combine') }}
-{% endblock %}
+{% block importmap %}{{ importmap('pdf_combine') }}{% endblock %}
 
 {% block page_content %}
     {% form_theme form '@EasyAdmin/crud/form_theme.html.twig' %}

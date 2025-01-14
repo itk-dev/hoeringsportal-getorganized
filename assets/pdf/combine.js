@@ -1,4 +1,4 @@
-require("../../css/pdf/combine.scss");
+import "../styles/pdf/combine.css";
 
 let interval = null;
 
