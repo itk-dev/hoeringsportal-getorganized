@@ -6,6 +6,7 @@ use App\Entity\Archiver;
 use Kapersoft\ShareFile\Client;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerTrait;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -13,6 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ShareFileService implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
+    use LoggerTrait;
 
     private const string SHAREFILE_FOLDER = 'ShareFile.Api.Models.Folder';
     private const string SHAREFILE_FILE = 'ShareFile.Api.Models.File';
@@ -109,6 +111,8 @@ class ShareFileService implements LoggerAwareInterface
 
     public function findHearing($name)
     {
+        $this->debug(sprintf('%s(%s)', __METHOD__, json_encode(func_get_args())));
+
         $itemId = $this->configuration['root_id'];
 
         $result = $this->client()->getChildren(
@@ -143,6 +147,8 @@ class ShareFileService implements LoggerAwareInterface
      */
     public function getResponses(Item $hearing, ?\DateTimeInterface $changedAfter = null)
     {
+        $this->debug(sprintf('%s(%s)', __METHOD__, json_encode(func_get_args())));
+
         $folders = $this->getFolders($hearing, $changedAfter);
         $responses = array_filter($folders ?? [], function ($item) use ($changedAfter) {
             if ($changedAfter && isset($item['ProgenyEditDate'])
@@ -180,6 +186,8 @@ class ShareFileService implements LoggerAwareInterface
      */
     public function getMetadata($item, ?array $names = null)
     {
+        $this->debug(sprintf('%s(%s)', __METHOD__, json_encode(func_get_args())));
+
         $itemId = $this->getItemId($item);
         $metadata = $this->client()->getItemMetadataList($itemId);
 
@@ -243,6 +251,8 @@ class ShareFileService implements LoggerAwareInterface
 
     public function getFolders($item, ?\DateTimeInterface $changedAfter = null)
     {
+        $this->debug(sprintf('%s(%s)', __METHOD__, json_encode(func_get_args())));
+
         $itemId = $this->getItemId($item);
 
         $folders = $this->getChildren($itemId, self::SHAREFILE_FOLDER, $changedAfter);
@@ -344,6 +354,8 @@ class ShareFileService implements LoggerAwareInterface
 
     private function getChildren(string $itemId, string $type, ?\DateTimeInterface $changedAfter = null)
     {
+        $this->debug(sprintf('%s(%s)', __METHOD__, json_encode(func_get_args())));
+
         $query = [
             '$filter' => 'isof(\''.$type.'\')',
         ];
@@ -358,6 +370,8 @@ class ShareFileService implements LoggerAwareInterface
      */
     private function getAllChildren(string $itemId, array $query)
     {
+        $this->debug(sprintf('%s(%s)', __METHOD__, json_encode(func_get_args())));
+
         $result = $this->client()->getChildren($itemId, $query);
 
         if (!isset($result['value'])) {
@@ -415,5 +429,10 @@ class ShareFileService implements LoggerAwareInterface
     private function construct($class, array $items)
     {
         return array_map(fn (array $data) => new $class($data), $items);
+    }
+
+    public function log($level, $message, array $context = []): void
+    {
+        $this->logger->log($level, $message, $context);
     }
 }
