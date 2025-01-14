@@ -16,8 +16,8 @@ insert_final_newline = true
 [*.{js,scss}]
 indent_size = 2
 
-[docker-compose*.{yaml,yml}]
+[*.{yaml,yml}]
 indent_size = 2
 
-[.github/**.{yaml,yml}]
-indent_size = 2
+[config/**.{yaml,yml}]
+indent_size = 4
