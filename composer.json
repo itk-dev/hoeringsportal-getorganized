@@ -25,6 +25,7 @@
         "symfony/messenger": "~7.2.1",
         "symfony/monolog-bundle": "^3.10",
         "symfony/runtime": "~7.2.0",
+        "symfony/translation": "7.2.*",
         "symfony/twig-bundle": "7.2.*",
         "symfony/yaml": "~7.2.0",
         "twig/extra-bundle": "^2.12|^3.0",
@@ -133,6 +134,13 @@
         ],
         "coding-standards-check/twig-cs-fixer": [
             "vendor/bin/twig-cs-fixer fix templates"
+        ],
+        "translations-update": [
+            "# We need a translation from en to en (!) (without prefix) to be able to process placeholders in en.",
+            "DEFAULT_LOCALE=en bin/console translation:extract --clean --force en --prefix=''",
+            "DEFAULT_LOCALE=en bin/console translation:extract --clean --force da",
+            "# Mark default translations (prefixed with `__`) as “Needs work” in Danish translations",
+            "sed --in-place='' 's/<target>__/<target state=\"needs-l10n\">__/' translations/*.da.*xlf"
         ]
     }
 }

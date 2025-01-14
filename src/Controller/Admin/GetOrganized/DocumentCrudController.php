@@ -12,6 +12,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use Symfony\Component\Translation\TranslatableMessage;
 
 class DocumentCrudController extends AbstractCrudController
 {
@@ -24,7 +25,8 @@ class DocumentCrudController extends AbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return parent::configureCrud($crud)
-            ->showEntityActionsInlined()
+            ->setEntityLabelInSingular(new TranslatableMessage('Document'))
+            ->setEntityLabelInPlural(new TranslatableMessage('Documents'))
             ->setDefaultSort(['updatedAt' => Criteria::DESC])
         ;
     }
@@ -40,19 +42,19 @@ class DocumentCrudController extends AbstractCrudController
     #[\Override]
     public function configureFields(string $pageName): iterable
     {
-        yield AssociationField::new('archiver');
-        yield TextField::new('fileInfo', 'File')
+        yield AssociationField::new('archiver', new TranslatableMessage('Archiver'));
+        yield TextField::new('fileInfo', new TranslatableMessage('File'))
             ->onlyOnIndex();
-        yield TextField::new('caseId');
-        yield TextField::new('docId');
-        yield TextField::new('shareFileItemId');
-        yield DateField::new('createdAt')
+        yield TextField::new('caseId', new TranslatableMessage('Case id'));
+        yield TextField::new('docId', new TranslatableMessage('Document id'));
+        yield TextField::new('shareFileItemId', new TranslatableMessage('ShareFile item id'));
+        yield DateField::new('createdAt', new TranslatableMessage('Created at'))
             ->setFormat($this->getParameter('display_datetime_format'))
             ->setTimezone($this->getParameter('display_datetime_timezone'));
-        yield DateField::new('updatedAt')
+        yield DateField::new('updatedAt', new TranslatableMessage('Updated at'))
             ->setFormat($this->getParameter('display_datetime_format'))
             ->setTimezone($this->getParameter('display_datetime_timezone'));
-        yield JsonField::new('data')
+        yield JsonField::new('data', new TranslatableMessage('Data'))
             ->onlyOnDetail();
     }
 }

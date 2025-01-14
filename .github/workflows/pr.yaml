@@ -82,8 +82,7 @@ jobs:
 
       - name: Build assets
         run: |
-          docker compose run --rm node yarn install
-          docker compose run --rm node yarn build
+          docker compose exec phpfpm php bin/console asset-map:compile
 
       - name: Clean up root stuff
         run: |
@@ -110,5 +109,21 @@ jobs:
 
       - name: Build assets
         run: |
-          docker compose run --rm node yarn install
-          docker compose run --rm node yarn build
+          docker compose exec phpfpm php bin/console asset-map:compile
+
+  translations:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    name: Check translations are up to date
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Update translations
+        run: |
+          docker network create frontend
+          docker compose run --rm phpfpm composer install --no-scripts
+          docker compose run --rm phpfpm composer translations-update
+      - name: Check for changes in translation files
+        run: |
+          git diff --diff-filter=ACMRT --exit-code translations

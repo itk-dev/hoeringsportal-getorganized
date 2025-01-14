@@ -32,7 +32,7 @@ class DashboardController extends AbstractDashboardController
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('Sharefile2go');
+            ->setTitle($this->getParameter('site_name'));
     }
 
     #[\Override]
@@ -41,10 +41,10 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud(new TranslatableMessage('Archiver'), 'fas fa-list', Archiver::class);
         yield MenuItem::linkToCrud(new TranslatableMessage('Error log'), 'fas fa-list', ExceptionLogEntry::class);
 
-        yield MenuItem::section('GetOrganized');
+        yield MenuItem::section(new TranslatableMessage('GetOrganized'));
         yield MenuItem::linkToCrud(new TranslatableMessage('Document'), 'fas fa-list', Document::class);
 
-        yield MenuItem::section('PDF');
+        yield MenuItem::section(new TranslatableMessage('PDF'));
         yield MenuItem::linkToRoute(new TranslatableMessage('Combine'), 'fas fa-list', 'admin_pdf_combine');
     }
 }
