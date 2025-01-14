@@ -2,19 +2,13 @@
 framework:
     secret: '%env(APP_SECRET)%'
 
-    # Enables session support. Note that the session will ONLY be started if you read or write from it.
-    # Remove or comment this section to explicitly disable session support.
-    session:
-        handler_id: null
-        cookie_secure: auto
-        cookie_samesite: lax
-        storage_factory_id: session.storage.factory.native
+    # Note that the session will be started ONLY if you read or write from it.
+    session: true
 
     #esi: true
     #fragments: true
 
-    # trust *all* requests (the 'REMOTE_ADDR' string is replaced at
-    # runtime by $_SERVER['REMOTE_ADDR'])
+    # https://symfony.com/doc/current/deployment/proxies.html#but-what-if-the-ip-of-my-reverse-proxy-changes-constantly
     trusted_proxies: '127.0.0.1,REMOTE_ADDR'
 
 when@test:
