@@ -14,6 +14,8 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Document|null findOneBy(array $criteria, array $orderBy = null)
  * @method Document[]    findAll()
  * @method Document[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ *
+ * @extends ServiceEntityRepository<Document>
  */
 class DocumentRepository extends ServiceEntityRepository
 {
@@ -22,7 +24,7 @@ class DocumentRepository extends ServiceEntityRepository
         parent::__construct($registry, Document::class);
     }
 
-    public function findOneByItemAndArchiver(Item $item, Archiver $archiver)
+    public function findOneByItemAndArchiver(Item $item, Archiver $archiver): ?Document
     {
         return $this->findOneBy([
             'shareFileItemStreamId' => $item->streamId,
@@ -30,7 +32,7 @@ class DocumentRepository extends ServiceEntityRepository
         ]);
     }
 
-    public function findOneByDocumentAndArchiver(GetOrganizedDocument $document, Archiver $archiver)
+    public function findOneByDocumentAndArchiver(GetOrganizedDocument $document, Archiver $archiver): ?Document
     {
         return $this->findOneBy([
             'docId' => $document->docId,

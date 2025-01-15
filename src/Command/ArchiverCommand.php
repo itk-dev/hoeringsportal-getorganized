@@ -30,11 +30,11 @@ abstract class ArchiverCommand extends Command
 
     abstract protected function doExecute(): int;
 
-    protected function doConfigure()
+    protected function doConfigure(): void
     {
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addArgument('archiver', InputArgument::REQUIRED, 'Archiver to run (name or id)')
@@ -72,7 +72,7 @@ abstract class ArchiverCommand extends Command
         return $this->doExecute();
     }
 
-    protected function writeTable($data, $vertical = false)
+    protected function writeTable(mixed $data, bool $vertical = false): void
     {
         $isAssoc = function (array $arr) {
             if ([] === $arr) {

@@ -160,7 +160,7 @@ tasks:
 
   code-analysis:
     cmds:
-      - task composer -- code-analysis
+      - task composer -- code-analysis {{.CLI_ARGS}}
 
   docker-pull:
     desc: "Pull all development docker images"

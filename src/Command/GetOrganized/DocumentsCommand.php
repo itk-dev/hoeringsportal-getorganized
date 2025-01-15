@@ -26,12 +26,12 @@ class DocumentsCommand extends ArchiverCommand
         parent::__construct($archiverRepository);
     }
 
-    protected function doConfigure()
+    protected function doConfigure(): void
     {
         $this
-            ->addArgument('action', InputArgument::REQUIRED, 'The action')
-            ->addOption('case-id', null, InputOption::VALUE_REQUIRED, 'The case id')
-            ->addOption('field', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Field to include in list');
+           ->addArgument('action', InputArgument::REQUIRED, 'The action')
+           ->addOption('case-id', null, InputOption::VALUE_REQUIRED, 'The case id')
+           ->addOption('field', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Field to include in list');
     }
 
     protected function doExecute(): int
@@ -43,7 +43,7 @@ class DocumentsCommand extends ArchiverCommand
         return $this->{$action}();
     }
 
-    private function list()
+    private function list(): int
     {
         $io = new SymfonyStyle($this->input, $this->output);
 

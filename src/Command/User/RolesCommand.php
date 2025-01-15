@@ -69,7 +69,7 @@ class RolesCommand extends Command
         return Command::SUCCESS;
     }
 
-    private function listRoles(SymfonyStyle $io, User $user, ?string $header = null)
+    private function listRoles(SymfonyStyle $io, User $user, ?string $header = null): void
     {
         if (null !== $header) {
             $io->writeln($header);

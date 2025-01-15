@@ -21,37 +21,37 @@ class Archiver implements Loggable, \JsonSerializable, \Stringable
 {
     use TimestampableEntity;
 
-    public const TYPE_SHAREFILE2GETORGANIZED = 'sharefile2getorganized';
-    public const TYPE_PDF_COMBINE = 'pdfcombine';
-    public const TYPE_HEARING_OVERVIEW = 'hearing overview';
+    public const string TYPE_SHAREFILE2GETORGANIZED = 'sharefile2getorganized';
+    public const string TYPE_PDF_COMBINE = 'pdfcombine';
+    public const string TYPE_HEARING_OVERVIEW = 'hearing overview';
 
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true)]
-    private $id;
+    private ?Uuid $id = null;
 
     /**
      * @Gedmo\Versioned()
      */
     #[ORM\Column(type: 'string', length: 255)]
-    private $name;
+    private ?string $name = null;
 
     /**
      * @Gedmo\Versioned()
      */
     #[ORM\Column(type: 'text')]
-    private $configuration;
+    private ?string $configuration = null;
 
     /**
      * @Gedmo\Versioned()
      */
     #[ORM\Column(type: 'boolean')]
-    private $enabled;
+    private bool $enabled = false;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private $lastRunAt;
+    private ?\DateTimeInterface $lastRunAt = null;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $type;
+    private ?string $type = null;
 
     public function __construct()
     {
@@ -116,7 +116,7 @@ class Archiver implements Loggable, \JsonSerializable, \Stringable
         return $this;
     }
 
-    public function getConfigurationValue(?string $key = null, $default = null)
+    public function getConfigurationValue(?string $key = null, mixed $default = null): mixed
     {
         $configuration = Yaml::parse($this->getConfiguration());
 

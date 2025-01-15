@@ -31,12 +31,18 @@ class ArchiveHelper implements LoggerAwareInterface
 
     private const string GET_ORGANIZED_CASE_ID_TICKET_KEY = 'go_case_id';
 
-    public function __construct(private ShareFileService $shareFile, private GetOrganizedService $getOrganized, private DocumentRepository $documentRepository, private EntityManagerInterface $entityManager, private TemplateHelper $templateHelper, private MailerInterface $mailer)
-    {
+    public function __construct(
+        private readonly ShareFileService $shareFile,
+        private readonly GetOrganizedService $getOrganized,
+        private readonly DocumentRepository $documentRepository,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly TemplateHelper $templateHelper,
+        private readonly MailerInterface $mailer,
+    ) {
         $this->setLogger(new NullLogger());
     }
 
-    public function archive(Archiver $archiver, $hearingItemId = null, array $options = [])
+    public function archive(Archiver $archiver, ?string $hearingItemId = null, array $options = []): void
     {
         $this->setArchiver($archiver);
         $resolver = new OptionsResolver();
@@ -66,12 +72,12 @@ class ArchiveHelper implements LoggerAwareInterface
         }
     }
 
-    public function log($level, $message, array $context = []): void
+    public function log(mixed $level, string|\Stringable $message, array $context = []): void
     {
         $this->logger->log($level, $message, $context);
     }
 
-    private function archiveResponses(?string $hearingItemId = null)
+    private function archiveResponses(?string $hearingItemId = null): void
     {
         if (null !== $hearingItemId) {
             $this->info(sprintf('Getting hearing %s', $hearingItemId));
@@ -156,7 +162,7 @@ class ArchiveHelper implements LoggerAwareInterface
         }
     }
 
-    private function archiveOverviews(?string $hearingItemId = null)
+    private function archiveOverviews(?string $hearingItemId = null): void
     {
         $overviews = $this->archiver->getConfigurationValue('[getorganized][overview][items]');
         if (empty($overviews)) {
@@ -268,7 +274,7 @@ class ArchiveHelper implements LoggerAwareInterface
         }
     }
 
-    private function archiveDocument(Item $sourceFile, CaseEntity $getOrganizedHearing, ?string $title = null, array $options = [])
+    private function archiveDocument(Item $sourceFile, CaseEntity $getOrganizedHearing, ?string $title = null, array $options = []): void
     {
         $metadata = [];
 
@@ -342,19 +348,18 @@ class ArchiveHelper implements LoggerAwareInterface
 
         unset($fileContents);
 
-        if (null === $document) {
-            throw new RuntimeException(sprintf('Error creating document in GetOrganized (%s; %s)', $title, $sourceFile->id));
-        }
+        // @todo
+        // throw new RuntimeException(sprintf('Error creating document in GetOrganized (%s; %s)', $title, $sourceFile->id));
     }
 
-    private function getFileContents(Item $sourceFile)
+    private function getFileContents(Item $sourceFile): string
     {
         $this->info(sprintf('Getting file contents from ShareFile (%s; %s)', $sourceFile->id, $sourceFile->fileName));
 
-        $fileContents = $this->shareFile->downloadFile($sourceFile);
-
-        if (null === $fileContents) {
-            throw new RuntimeException(sprintf('Cannot get file contents for item %s', $sourceFile->id));
+        try {
+            $fileContents = $this->shareFile->downloadFile($sourceFile);
+        } catch (\Exception $exception) {
+            throw new RuntimeException(sprintf('Cannot get file contents for item %s', $sourceFile->id), $exception->getCode(), $exception);
         }
 
         $this->debug(sprintf('File size: %d', strlen((string) $fileContents)));
@@ -362,7 +367,7 @@ class ArchiveHelper implements LoggerAwareInterface
         return $fileContents;
     }
 
-    private function configureOptions(OptionsResolver $resolver)
+    private function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'force' => false,
@@ -374,7 +379,7 @@ class ArchiveHelper implements LoggerAwareInterface
         return true === $this->options['force'];
     }
 
-    private function logException(\Throwable $t, array $context = [])
+    private function logException(\Throwable $t, array $context = []): void
     {
         $this->emergency($t->getMessage(), $context);
         $logEntry = new ExceptionLogEntry($t, $context);

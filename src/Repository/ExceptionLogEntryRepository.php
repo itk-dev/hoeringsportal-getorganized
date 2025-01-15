@@ -11,6 +11,8 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method ExceptionLogEntry|null findOneBy(array $criteria, array $orderBy = null)
  * @method ExceptionLogEntry[]    findAll()
  * @method ExceptionLogEntry[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ *
+ * @extends ServiceEntityRepository<ExceptionLogEntry>
  */
 class ExceptionLogEntryRepository extends ServiceEntityRepository
 {

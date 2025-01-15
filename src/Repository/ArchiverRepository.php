@@ -12,6 +12,8 @@ use Symfony\Component\Uid\Uuid;
  * @method Archiver|null findOneBy(array $criteria, array $orderBy = null)
  * @method Archiver[]    findAll()
  * @method Archiver[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ *
+ * @extends ServiceEntityRepository<Archiver>
  */
 class ArchiverRepository extends ServiceEntityRepository
 {
@@ -20,7 +22,7 @@ class ArchiverRepository extends ServiceEntityRepository
         parent::__construct($registry, Archiver::class);
     }
 
-    public function findOneByNameOrId($value): ?Archiver
+    public function findOneByNameOrId(string $value): ?Archiver
     {
         $valueId = $value;
         try {

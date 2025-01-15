@@ -30,7 +30,7 @@ class CombineCommand extends ArchiverCommand
         parent::__construct($archiverRepository);
     }
 
-    protected function doConfigure()
+    protected function doConfigure(): void
     {
         $this
             ->addArgument('action', InputArgument::REQUIRED, sprintf('One of %s', implode(', ', self::ACTIONS)))
@@ -63,7 +63,7 @@ class CombineCommand extends ArchiverCommand
         return self::SUCCESS;
     }
 
-    private function getCommandName(string $name)
+    private function getCommandName(string $name): string
     {
         return lcfirst(str_replace('-', '', ucwords($name, '-')));
     }

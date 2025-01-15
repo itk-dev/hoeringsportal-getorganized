@@ -108,7 +108,7 @@
             "@code-analysis/phpstan"
         ],
         "code-analysis/phpstan": [
-            "phpstan analyse --level=5 src"
+            "phpstan analyse"
         ],
         "coding-standards-apply/php": [
             "@coding-standards-apply/php-cs-fixer"

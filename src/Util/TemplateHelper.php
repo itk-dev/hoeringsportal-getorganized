@@ -10,7 +10,10 @@ class TemplateHelper
     {
     }
 
-    public function render(string $template, array $data)
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function render(string $template, array $data): string
     {
         return $this->twig->createTemplate($template)->render($data);
     }

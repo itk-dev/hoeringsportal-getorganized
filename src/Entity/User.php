@@ -13,19 +13,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true)]
-    private $id;
+    private ?Uuid $id = null;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
-    private $email;
+    private ?string $email = null;
 
     #[ORM\Column(type: 'json')]
-    private $roles = [];
+    private array $roles = [];
 
     /**
      * @var string The hashed password
      */
     #[ORM\Column(type: 'string')]
-    private $password;
+    private ?string $password = null;
 
     public function __construct()
     {

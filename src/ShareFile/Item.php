@@ -18,37 +18,35 @@ class Item extends Entity
      * created.
      *
      * @see https://api.sharefile.com/rest/docs/resource.aspx?name=ShareFile.Api.Models.Item
-     *
-     * @var string
      */
-    public $streamId;
+    public string $streamId;
 
-    public $name;
+    public string $name;
 
-    public $progenyEditDate;
+    public ?string $progenyEditDate;
 
-    public $creationDate;
+    public string $creationDate;
 
-    public $metadata;
+    public ?array $metadata;
 
-    public $fileName;
+    public ?string $fileName;
 
     /**
      * @var Item[]
      */
     protected $children;
 
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    public function setChildren(array $children)
+    public function setChildren(array $children): static
     {
         $this->children = $children;
 
@@ -63,7 +61,7 @@ class Item extends Entity
         return $this->children;
     }
 
-    protected function build(array $data)
+    protected function build(array $data): void
     {
         $this->id = $data['Id'];
         $this->streamId = $data['StreamID'];

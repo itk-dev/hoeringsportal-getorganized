@@ -24,9 +24,10 @@ class HearingOverviewCreateCommand extends ArchiverCommand
         parent::__construct($archiverRepository);
     }
 
-    public function doConfigure()
+    public function doConfigure(): void
     {
-        $this->addArgument('hearing-id', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, 'The hearing id');
+        $this
+           ->addArgument('hearing-id', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, 'The hearing id');
     }
 
     protected function doExecute(): int

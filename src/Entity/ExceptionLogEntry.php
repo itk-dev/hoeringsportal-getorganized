@@ -12,16 +12,16 @@ class ExceptionLogEntry
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     // @phpstan-ignore-next-line
-    private ?int $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private string $message;
+    private ?string $message = null;
 
     #[ORM\Column(type: 'datetime')]
-    private \DateTime $createdAt;
+    private ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(type: 'json')]
-    private array $data;
+    private ?array $data = null;
 
     #[ORM\Column(type: 'boolean')]
     private bool $hidden = false;

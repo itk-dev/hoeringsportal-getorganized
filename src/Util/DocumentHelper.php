@@ -12,8 +12,10 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class DocumentHelper
 {
-    public function __construct(private readonly DocumentRepository $documentRepository, private readonly EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private readonly DocumentRepository $documentRepository,
+        private readonly EntityManagerInterface $entityManager,
+    ) {
     }
 
     public function created(GetOrganizedCase $case, GetOrganizedDocument $document, Item $item, array $metadata, Archiver $archiver): Document
@@ -51,7 +53,7 @@ class DocumentHelper
         return $entity;
     }
 
-    public function updated(GetOrganizedCase $case, GetOrganizedDocument $document, Item $item, array $metadata, Archiver $archiver)
+    public function updated(GetOrganizedCase $case, GetOrganizedDocument $document, Item $item, array $metadata, Archiver $archiver): Document
     {
         return $this->created($case, $document, $item, $metadata, $archiver);
     }

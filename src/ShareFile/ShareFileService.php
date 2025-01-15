@@ -39,7 +39,7 @@ class ShareFileService implements LoggerAwareInterface
     /**
      * Check that we can connect to ShareFile.
      */
-    public function connect()
+    public function connect(): void
     {
         $this->client()->getItemById($this->configuration['root_id']);
     }
@@ -47,7 +47,7 @@ class ShareFileService implements LoggerAwareInterface
     /**
      * @return Item[]
      */
-    public function getUpdatedFiles(\DateTimeInterface $changedAfter)
+    public function getUpdatedFiles(\DateTimeInterface $changedAfter): array
     {
         $hearings = $this->getHearings($changedAfter);
         foreach ($hearings as &$hearing) {
@@ -65,7 +65,7 @@ class ShareFileService implements LoggerAwareInterface
     /**
      * @return Item[]
      */
-    public function getUpdatedOverviewFiles(\DateTimeInterface $changedAfter)
+    public function getUpdatedOverviewFiles(\DateTimeInterface $changedAfter): array
     {
         $hearings = $this->getHearings($changedAfter);
         foreach ($hearings as &$hearing) {
@@ -76,16 +76,11 @@ class ShareFileService implements LoggerAwareInterface
         return $hearings;
     }
 
-    /**
-     * @return Item[]
-     */
-    public function getHearingOverviewFiles($hearingItemId)
+    public function getHearingOverviewFiles(string $hearingItemId): Item
     {
         $hearing = $this->getHearing($hearingItemId);
-        if (null !== $hearing) {
-            $files = $this->getFiles($hearing);
-            $hearing->setChildren($files);
-        }
+        $files = $this->getFiles($hearing);
+        $hearing->setChildren($files);
 
         return $hearing;
     }
@@ -93,11 +88,11 @@ class ShareFileService implements LoggerAwareInterface
     /**
      * @return Item[]
      */
-    public function getHearings(?\DateTimeInterface $changedAfter = null)
+    public function getHearings(?\DateTimeInterface $changedAfter = null): array
     {
         $itemId = $this->configuration['root_id'];
         $folders = $this->getFolders($itemId, $changedAfter);
-        $hearings = array_filter($folders ?? [], function ($item) use ($changedAfter) {
+        $hearings = array_filter($folders, function ($item) use ($changedAfter) {
             if ($changedAfter && isset($item['ProgenyEditDate'])
                 && new \DateTime($item['ProgenyEditDate']) < $changedAfter) {
                 return false;
@@ -109,7 +104,7 @@ class ShareFileService implements LoggerAwareInterface
         return $this->construct(Item::class, $hearings);
     }
 
-    public function findHearing($name)
+    public function findHearing(string $name): Item
     {
         $this->debug(sprintf('%s(%s)', __METHOD__, json_encode(func_get_args())));
 
@@ -129,7 +124,7 @@ class ShareFileService implements LoggerAwareInterface
         return new Item(reset($result['value']));
     }
 
-    public function getHearing($itemId)
+    public function getHearing(string $itemId): Item
     {
         $hearing = $this->getItem($itemId);
         $responses = $this->getResponses($hearing);
@@ -145,12 +140,12 @@ class ShareFileService implements LoggerAwareInterface
     /**
      * @return Item[]
      */
-    public function getResponses(Item $hearing, ?\DateTimeInterface $changedAfter = null)
+    public function getResponses(Item $hearing, ?\DateTimeInterface $changedAfter = null): array
     {
         $this->debug(sprintf('%s(%s)', __METHOD__, json_encode(func_get_args())));
 
         $folders = $this->getFolders($hearing, $changedAfter);
-        $responses = array_filter($folders ?? [], function ($item) use ($changedAfter) {
+        $responses = array_filter($folders, function ($item) use ($changedAfter) {
             if ($changedAfter && isset($item['ProgenyEditDate'])
                     && new \DateTime($item['ProgenyEditDate']) < $changedAfter) {
                 return false;
@@ -164,10 +159,8 @@ class ShareFileService implements LoggerAwareInterface
 
     /**
      * @param string|Item $item
-     *
-     * @return Item
      */
-    public function getItem($item)
+    public function getItem($item): Item
     {
         $itemId = $this->getItemId($item);
         $item = $this->client()->getItemById($itemId);
@@ -205,12 +198,8 @@ class ShareFileService implements LoggerAwareInterface
 
     /**
      * Get all metadata values.
-     *
-     * @param string|Item $item
-     *
-     * @return array
      */
-    public function getMetadataValues($item, ?array $names = null)
+    public function getMetadataValues(string|Item $item, ?array $names = null): array
     {
         $metadata = $this->getMetadata($item, $names);
 
@@ -227,29 +216,25 @@ class ShareFileService implements LoggerAwareInterface
 
     /**
      * Get a single metadata value.
-     *
-     * @param string|Item $item
-     *
-     * @return mixed|null
      */
-    public function getMetadataValue($item, string $name)
+    public function getMetadataValue(string|Item $item, string $name): mixed
     {
         $metadata = $this->getMetadataValues($item, [$name]);
 
         return $metadata[$name] ?? null;
     }
 
-    public function getFiles($item, ?\DateTimeInterface $changedAfter = null)
+    public function getFiles(Item $item, ?\DateTimeInterface $changedAfter = null): array
     {
         $itemId = $this->getItemId($item);
         $children = $this->getChildren($itemId, self::SHAREFILE_FILE, $changedAfter);
-        $files = array_filter($children ?? [], fn ($item) => !(null !== $changedAfter && isset($item['CreationDate'])
+        $files = array_filter($children, fn ($item) => !(null !== $changedAfter && isset($item['CreationDate'])
             && new \DateTime($item['CreationDate']) < $changedAfter));
 
         return $this->construct(Item::class, $files);
     }
 
-    public function getFolders($item, ?\DateTimeInterface $changedAfter = null)
+    public function getFolders(Item $item, ?\DateTimeInterface $changedAfter = null): array
     {
         $this->debug(sprintf('%s(%s)', __METHOD__, json_encode(func_get_args())));
 
@@ -265,21 +250,21 @@ class ShareFileService implements LoggerAwareInterface
         return $folders;
     }
 
-    public function downloadFile($item)
+    public function downloadFile(Item $item): string
     {
         $itemId = $this->getItemId($item);
 
         return $this->client()->getItemContents($itemId);
     }
 
-    public function uploadFile(string $filename, string $folderId, bool $unzip = false, bool $overwrite = true, bool $notify = true)
+    public function uploadFile(string $filename, string $folderId, bool $unzip = false, bool $overwrite = true, bool $notify = true): string
     {
         $result = $this->client()->uploadFileStandard($filename, $folderId, $unzip, $overwrite, $notify);
 
         return $result;
     }
 
-    public function findFile(string $filename, string $folderId)
+    public function findFile(string $filename, string $folderId): Item
     {
         $result = $this->client()->getChildren(
             $folderId,
@@ -298,7 +283,7 @@ class ShareFileService implements LoggerAwareInterface
     /**
      * @param Item[] $hearings
      */
-    public function dump(array $hearings, OutputInterface $output)
+    public function dump(array $hearings, OutputInterface $output): void
     {
         $table = new Table($output);
 
@@ -327,12 +312,12 @@ class ShareFileService implements LoggerAwareInterface
         $table->render();
     }
 
-    private function setMetadata(array &$item)
+    private function setMetadata(array &$item): void
     {
         $item['_metadata'] = $this->getMetadataValues($item['Id'], ['agent_data', 'ticket_data', 'user_data']);
     }
 
-    private function validateConfiguration()
+    private function validateConfiguration(): void
     {
         $requiredFields = ['hostname', 'client_id', 'secret', 'username', 'password', 'root_id'];
         foreach ($requiredFields as $field) {
@@ -342,17 +327,12 @@ class ShareFileService implements LoggerAwareInterface
         }
     }
 
-    /**
-     * @param string|Item $item
-     *
-     * @return string
-     */
-    private function getItemId($item)
+    private function getItemId(string|Item $item): string
     {
         return $item instanceof Item ? $item->id : $item;
     }
 
-    private function getChildren(string $itemId, string $type, ?\DateTimeInterface $changedAfter = null)
+    private function getChildren(string $itemId, string $type, ?\DateTimeInterface $changedAfter = null): array
     {
         $this->debug(sprintf('%s(%s)', __METHOD__, json_encode(func_get_args())));
 
@@ -365,10 +345,8 @@ class ShareFileService implements LoggerAwareInterface
 
     /**
      * Get all children by following "nextlink" in result.
-     *
-     * @return array
      */
-    private function getAllChildren(string $itemId, array $query)
+    private function getAllChildren(string $itemId, array $query): array
     {
         $this->debug(sprintf('%s(%s)', __METHOD__, json_encode(func_get_args())));
 
@@ -396,12 +374,7 @@ class ShareFileService implements LoggerAwareInterface
         return array_merge(...$values);
     }
 
-    /**
-     * @return Client
-     *
-     * @throws \Exception
-     */
-    private function client()
+    private function client(): Client
     {
         if (empty($this->client)) {
             $this->client = new ShareFileClient(
@@ -416,22 +389,22 @@ class ShareFileService implements LoggerAwareInterface
         return $this->client;
     }
 
-    private function isHearing(array $item)
+    private function isHearing(array $item): bool
     {
-        return preg_match('/^H([a-z-]+)?[0-9]+$/i', (string) $item['Name']);
+        return (bool) preg_match('/^H([a-z-]+)?[0-9]+$/i', (string) $item['Name']);
     }
 
-    private function isHearingResponse(array $item)
+    private function isHearingResponse(array $item): bool
     {
-        return preg_match('/^HS[0-9]+$/', (string) $item['Name']);
+        return (bool) preg_match('/^HS[0-9]+$/', (string) $item['Name']);
     }
 
-    private function construct($class, array $items)
+    private function construct(string $class, array $items): array
     {
         return array_map(fn (array $data) => new $class($data), $items);
     }
 
-    public function log($level, $message, array $context = []): void
+    public function log(mixed $level, string|\Stringable $message, array $context = []): void
     {
         $this->logger->log($level, $message, $context);
     }

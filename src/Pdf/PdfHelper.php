@@ -58,7 +58,7 @@ class PdfHelper
         $this->shareFileService->setLogger($logger);
     }
 
-    public function process()
+    public function process(): void
     {
         if (null === $this->getArchiver()) {
             throw new \RuntimeException('No archiver');
@@ -83,25 +83,25 @@ class PdfHelper
         }
     }
 
-    public function run($hearingId, ?array $metadata = null)
+    public function run(string $hearingId, ?array $metadata = null): string|Item
     {
         if (null === $this->getArchiver()) {
             throw new \RuntimeException('No archiver');
         }
 
         $result = $this->getData($hearingId, $metadata);
-        $this->info('get-data: '.(is_scalar($result) ? $result : json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)));
+        $this->info('get-data: '.$result);
 
         $result = $this->combine($hearingId);
-        $this->info('combine: '.(is_scalar($result) ? $result : json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)));
+        $this->info('combine: '.$result);
 
         $result = $this->share($hearingId);
-        $this->info('share: '.(is_scalar($result) ? $result : json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)));
+        $this->info('share: '.json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
         return $result;
     }
 
-    public function getData($hearingId, ?array $metadata = null)
+    public function getData(string $hearingId, ?array $metadata = null): string
     {
         if (null === $this->getArchiver()) {
             throw new \RuntimeException('No archiver');
@@ -149,7 +149,7 @@ class PdfHelper
         return $filename;
     }
 
-    public function combine($hearingId)
+    public function combine(string $hearingId): string
     {
         $data = $this->getHearingData($hearingId);
         $archiver = $this->loadArchiver($data);
@@ -158,7 +158,7 @@ class PdfHelper
         return $this->buildCombinedPdf($data);
     }
 
-    public function share($hearingId)
+    public function share(string $hearingId): Item
     {
         $data = $this->getHearingData($hearingId);
         $archiver = $this->loadArchiver($data);
@@ -188,7 +188,7 @@ class PdfHelper
         return $result;
     }
 
-    public function buildCombinedPdf(array $data)
+    public function buildCombinedPdf(array $data): string
     {
         $this->debug('Downloading pdf files');
         $dirname = $this->downloadFiles($data);
@@ -204,7 +204,7 @@ class PdfHelper
         return $filename;
     }
 
-    public function setArchiver($archiver)
+    public function setArchiver(string|Archiver $archiver): void
     {
         if (\is_string($archiver)) {
             $archiver = $this->archiverRepository->find($archiver);
@@ -216,14 +216,14 @@ class PdfHelper
         $this->shareFileService->setArchiver($archiver);
     }
 
-    public function log($level, $message, array $context = []): void
+    public function log(mixed $level, string|\Stringable $message, array $context = []): void
     {
         if (null !== $this->logger) {
             $this->logger->log($level, $message, $context);
         }
     }
 
-    public function getLogFilename($hearingId, $id)
+    public function getLogFilename(string $hearingId, string $id): string
     {
         return $this->getDataFilename($hearingId, '-'.$id.'.log');
     }
@@ -241,7 +241,7 @@ class PdfHelper
         return $filename;
     }
 
-    private function getHearingData($hearingId)
+    private function getHearingData(string $hearingId): array
     {
         $filename = $this->getDataFilename($hearingId);
         if (!$this->filesystem->exists($filename)) {
@@ -252,10 +252,10 @@ class PdfHelper
         return json_decode($data, true);
     }
 
-    private function loadArchiver($id)
+    private function loadArchiver(string|array $id): Archiver
     {
-        if (isset($id['archiver']['id'])) {
-            $id = $id['archiver']['id'];
+        if (is_array($id)) {
+            $id = $id['archiver']['id'] ?? 'invalid id';
         }
 
         $archiver = $this->archiverRepository->findOneByNameOrId($id);
@@ -270,11 +270,9 @@ class PdfHelper
     /**
      * Download files from ShareFile.
      *
-     * @return string|null
-     *
      * @throws \Exception
      */
-    private function downloadFiles(array $data)
+    private function downloadFiles(array $data): ?string
     {
         try {
             $hearingId = $this->getHearingValue($data, 'Name');
@@ -318,7 +316,7 @@ class PdfHelper
                 $this->filesystem->dumpFile($filename, $contents);
             }
 
-            return rtrim((string) $dirname, '/');
+            return rtrim($dirname, '/');
         } catch (IOExceptionInterface $exception) {
             $this->log(
                 LogLevel::EMERGENCY,
@@ -329,7 +327,7 @@ class PdfHelper
         return null;
     }
 
-    private function getDataDirectory($path = null)
+    private function getDataDirectory(?string $path = null): string
     {
         $directory = $this->options['project_dir'].'/var/pdf';
 
@@ -340,14 +338,14 @@ class PdfHelper
         return $directory;
     }
 
-    private function getPdfFilename(string $directory, $item)
+    private function getPdfFilename(string $directory, string|Item $item): string
     {
         $id = $item instanceof Item ? $item->getId() : $item;
 
         return $directory.'/'.$id.'.pdf';
     }
 
-    private function getHearingValue(array $data, $key = null)
+    private function getHearingValue(array $data, ?string $key = null): mixed
     {
         if (null !== $key) {
             if (!isset($data['hearing'][$key])) {
@@ -360,7 +358,7 @@ class PdfHelper
         return $data['hearing'];
     }
 
-    private function combineFiles(array $data, string $directory)
+    private function combineFiles(array $data, string $directory): string
     {
         $hearingId = $this->getHearingValue($data, 'Name');
 
@@ -386,13 +384,8 @@ class PdfHelper
         ]);
 
         $index = 0;
-        $tocGroup = null;
         foreach ($groups as $group => $responses) {
             $this->debug(sprintf('Group: %s', $group));
-            $tocName = $this->getTOCName($group);
-            if ($tocGroup !== $group) {
-                $mpdf->TOC_Entry($group, 0);
-            }
 
             foreach ($responses as $response) {
                 ++$index;
@@ -403,10 +396,10 @@ class PdfHelper
                 }
 
                 $reader = StreamReader::createByFile($filename);
-                $pagecount = $mpdf->setSourceFile($reader);
+                $pageCount = $mpdf->setSourceFile($reader);
                 $this->debug(sprintf('% 4d/%d Adding file %s', $index, $total, $filename));
 
-                for ($p = 1; $p <= $pagecount; ++$p) {
+                for ($p = 1; $p <= $pageCount; ++$p) {
                     $tplId = $mpdf->ImportPage($p);
                     $size = $mpdf->GetTemplateSize($tplId);
 
@@ -418,7 +411,7 @@ class PdfHelper
                         ]);
                     }
                     if (1 === $p) {
-                        $title = $this->getTitle($response) ?? $response->getName() ?? $response->getId();
+                        $title = $this->getTitle($response) ?? $response->getName();
                         $title .= ' – '.$this->getHearingReplyId($response);
                         $mpdf->TOC_Entry($title, 1);
                     }
@@ -435,12 +428,7 @@ class PdfHelper
         return $filename;
     }
 
-    private function getTOCName($name)
-    {
-        return base64_encode((string) $name);
-    }
-
-    private function getTitle($response)
+    private function getTitle(array|Item $response): ?string
     {
         if (!isset($response['_metadata']['user_data']['name'])) {
             return null;
@@ -451,7 +439,7 @@ class PdfHelper
             : $response['_metadata']['user_data']['name'];
     }
 
-    private function getHearingReplyId($response)
+    private function getHearingReplyId(array|Item $response): ?string
     {
         return $response['_metadata']['ticket_data']['ref'] ?? null;
     }
@@ -476,7 +464,10 @@ class PdfHelper
         );
     }
 
-    private function getResponseGroups(array $responses)
+    /**
+     * @return array<string, array>
+     */
+    private function getResponseGroups(array $responses): array
     {
         $groups = [];
         foreach ($responses as $response) {
@@ -509,18 +500,14 @@ class PdfHelper
         return $groups;
     }
 
-    private function isOrganizationResponse($response)
+    private function isOrganizationResponse(array|Item $response): bool
     {
-        if (\is_array($response)) {
-            return isset($response['_metadata']['ticket_data']['on_behalf_organization']);
-        } elseif ($response instanceof Item) {
-            return isset($response->metadata['ticket_data']['on_behalf_organization']);
-        }
-
-        return false;
+        return \is_array($response)
+            ? isset($response['_metadata']['ticket_data']['on_behalf_organization'])
+            : isset($response->metadata['ticket_data']['on_behalf_organization']);
     }
 
-    private function generateFrontPage(array $data)
+    private function generateFrontPage(array $data): string
     {
         $template = 'pdf/frontpage.html.twig';
         $data['context'] = [
@@ -531,7 +518,7 @@ class PdfHelper
         return $this->twig->render($template, $data);
     }
 
-    private function logException(\Throwable $t, array $context = [])
+    private function logException(\Throwable $t, array $context = []): void
     {
         $this->emergency($t->getMessage(), $context);
         $logEntry = new ExceptionLogEntry($t, $context);
@@ -562,7 +549,10 @@ class PdfHelper
         }
     }
 
-    private function getHearings(?array $hearingIds = null)
+    /**
+     * @return array<array>
+     */
+    private function getHearings(?array $hearingIds = null): array
     {
         $this->logger->info('Getting all hearings');
         $config = $this->archiver->getConfigurationValue('hearings');
@@ -603,7 +593,7 @@ class PdfHelper
         return $hearings;
     }
 
-    private function getFinishedHearings()
+    private function getFinishedHearings(): array
     {
         $hearings = $this->getHearings();
 
@@ -645,7 +635,7 @@ class PdfHelper
         return $hearings;
     }
 
-    private function getHearing($hearingId)
+    private function getHearing(string $hearingId): ?array
     {
         $hearings = $this->getHearings();
         $id = (int) preg_replace('/^[^\d]+/', '', (string) $hearingId);
@@ -659,7 +649,7 @@ class PdfHelper
         return null;
     }
 
-    private function configureOptions(OptionsResolver $resolver)
+    private function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired([
             'project_dir',

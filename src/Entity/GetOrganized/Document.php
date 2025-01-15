@@ -15,32 +15,32 @@ class Document
 
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true)]
-    private $id;
+    private Uuid $id;
 
     /**
      * The GetOrganized case id.
      */
     #[ORM\Column(type: 'string', length: 255)]
-    private $caseId;
+    private string $caseId;
 
     /**
      * The GetOrganized document id.
      */
     #[ORM\Column(type: 'string', length: 255)]
-    private $docId;
+    private string $docId;
 
     #[ORM\Column(type: 'json')]
-    private $data = [];
+    private array $data = [];
 
     #[ORM\ManyToOne(targetEntity: Archiver::class)]
     #[ORM\JoinColumn(nullable: false)]
-    private $archiver;
+    private Archiver $archiver;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $shareFileItemId;
+    private string $shareFileItemId;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $shareFileItemStreamId;
+    private string $shareFileItemStreamId;
 
     public function __construct()
     {
@@ -93,7 +93,7 @@ class Document
         return $this->archiver;
     }
 
-    public function setArchiver(?Archiver $archiver): self
+    public function setArchiver(Archiver $archiver): self
     {
         $this->archiver = $archiver;
 

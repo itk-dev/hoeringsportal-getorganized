@@ -23,7 +23,7 @@ class ArchiveCommand extends ArchiverCommand
         parent::__construct($archiverRepository);
     }
 
-    protected function doConfigure()
+    protected function doConfigure(): void
     {
         $this
             ->addOption('hearing-item-id', null, InputOption::VALUE_REQUIRED, 'Hearing item id to archive')

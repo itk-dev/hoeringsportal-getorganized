@@ -52,7 +52,7 @@ class HearingOverviewHelper
         $this->options = $resolver->resolve($options);
     }
 
-    public function process(?array $hearingsIds = null)
+    public function process(?array $hearingsIds = null): void
     {
         if (null === $this->getArchiver()) {
             throw new \RuntimeException('No archiver');
@@ -65,7 +65,7 @@ class HearingOverviewHelper
             foreach ($hearings as $hearing) {
                 try {
                     $hearingId = (int) $hearing['hearing_id'];
-                    $this->run($hearingId, $hearing);
+                    $this->run($hearingId);
                 } catch (\Throwable $t) {
                     $this->logException($t, ['hearing' => $hearing]);
                 }
@@ -81,7 +81,7 @@ class HearingOverviewHelper
     /**
      * @throws \DateMalformedStringException
      */
-    public function run(int $hearingId, array $hearing)
+    public function run(int $hearingId): void
     {
         if (null === $this->getArchiver()) {
             throw new \RuntimeException('No archiver');
@@ -229,14 +229,14 @@ class HearingOverviewHelper
         return $filename;
     }
 
-    public function log($level, $message, array $context = []): void
+    public function log(mixed $level, string|\Stringable $message, array $context = []): void
     {
         if (null !== $this->logger) {
             $this->logger->log($level, $message, $context);
         }
     }
 
-    private function getHearings(?array $hearingIds = null)
+    private function getHearings(?array $hearingIds = null): array
     {
         $this->logger->info('Getting all hearings');
         $config = $this->archiver->getConfigurationValue('hearings');
@@ -277,7 +277,7 @@ class HearingOverviewHelper
         return $hearings;
     }
 
-    private function getFinishedHearings(?array $hearingIds = null)
+    private function getFinishedHearings(?array $hearingIds = null): array
     {
         $hearings = $this->getHearings($hearingIds);
 
@@ -321,7 +321,7 @@ class HearingOverviewHelper
         return $hearings;
     }
 
-    private function logException(\Throwable $t, array $context = [])
+    private function logException(\Throwable $t, array $context = []): void
     {
         $this->emergency($t->getMessage(), $context);
         $logEntry = new ExceptionLogEntry($t, $context);
@@ -352,7 +352,7 @@ class HearingOverviewHelper
         }
     }
 
-    private function configureOptions(OptionsResolver $resolver)
+    private function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired([
             'project_dir',
