@@ -78,11 +78,10 @@ jobs:
           DESKPRO_API_CODE_KEY=
           EOF
 
-          # Important: Use --no-interaction to make https://getcomposer.org/doc/06-config.md#discard-changes have effect.
-          docker compose exec --user root phpfpm composer install --no-interaction --ignore-platform-req=php
-
       - name: Install site
         run: |
+          # Important: Use --no-interaction to make https://getcomposer.org/doc/06-config.md#discard-changes have effect.
+          docker compose exec --user root phpfpm composer install --no-interaction --ignore-platform-req=php
           docker compose exec phpfpm bin/console doctrine:migrations:migrate --no-interaction
 
       - name: Build assets
@@ -92,6 +91,11 @@ jobs:
       - name: Clean up root stuff
         run: |
           sudo chown -Rv $USER:$USER vendor/ node_modules/ || true
+
+      - name: Prepare for upgrade
+        run: |
+          # Prepare for upgrade by clearing cache and NOT warming it up.
+          docker compose exec phpfpm bin/console cache:clear --no-warmup
 
       # Install site with our current ref
       - uses: actions/checkout@v4
@@ -105,11 +109,10 @@ jobs:
           docker compose pull
           docker compose up --detach
 
-          # Important: Use --no-interaction to make https://getcomposer.org/doc/06-config.md#discard-changes have effect.
-          docker compose exec phpfpm composer install --no-interaction
-
       - name: Update site
         run: |
+          # Important: Use --no-interaction to make https://getcomposer.org/doc/06-config.md#discard-changes have effect.
+          docker compose exec phpfpm composer install --no-interaction
           docker compose exec phpfpm bin/console doctrine:migrations:migrate --no-interaction
 
       - name: Build assets
