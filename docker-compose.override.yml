@@ -7,5 +7,4 @@ services:
 
     environment:
       - PHP_MAX_EXECUTION_TIME=300
-      - PHP_MEMORY_LIMIT=512M
-
+      - PHP_MEMORY_LIMIT=1024M
