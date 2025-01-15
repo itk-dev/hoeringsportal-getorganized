@@ -8,7 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 * [PR-13](https://github.com/itk-dev/hoeringsportal-getorganized/pull/13)
-  Database migration cleanup
+  Database migration cleanup.
+  Re-enabled timestampable and loggable.
+  Added indexes on exception log table.
 
 ## [1.0.0] - 2024-01-15
 

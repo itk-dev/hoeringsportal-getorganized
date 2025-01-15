@@ -8,6 +8,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Yaml\Yaml;
 
 #[ORM\Entity(repositoryClass: ExceptionLogEntryRepository::class)]
+#[ORM\Index(name: 'exception_log_entry_id', columns: ['id'])]
+#[ORM\Index(name: 'exception_log_entry_created_at', columns: ['created_at'])]
 class ExceptionLogEntry
 {
     #[ORM\Id]
