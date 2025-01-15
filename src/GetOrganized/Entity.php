@@ -2,17 +2,18 @@
 
 namespace App\GetOrganized;
 
+/**
+ * @implements \ArrayAccess<string, mixed>
+ */
 abstract class Entity implements \ArrayAccess, \JsonSerializable
 {
-    private array $data;
-
-    public function __construct(array $data)
-    {
-        $this->data = $data;
-        $this->build($data);
+    public function __construct(
+        private readonly array $data,
+    ) {
+        $this->build($this->data);
     }
 
-    public function __get($name)
+    public function __get(string $name): mixed
     {
         if (\array_key_exists($name, $this->data)) {
             return $this->data[$name];
@@ -21,7 +22,7 @@ abstract class Entity implements \ArrayAccess, \JsonSerializable
         throw new \OutOfBoundsException(sprintf('Undefined property: %s', $name));
     }
 
-    public function __set($name, $value)
+    public function __set(string $name, mixed $value): void
     {
         throw new \RuntimeException(sprintf('%s not implemented', __METHOD__));
     }
@@ -51,12 +52,12 @@ abstract class Entity implements \ArrayAccess, \JsonSerializable
         return $this->data;
     }
 
-    public function getData()
+    public function getData(): array
     {
         return $this->data;
     }
 
-    protected function build(array $data)
+    protected function build(array $data): void
     {
     }
 }

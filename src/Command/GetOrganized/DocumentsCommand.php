@@ -6,32 +6,32 @@ use App\Command\ArchiverCommand;
 use App\Entity\Archiver;
 use App\GetOrganized\GetOrganizedService;
 use App\Repository\ArchiverRepository;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+#[AsCommand(
+    name: 'app:getorganized:documents',
+    description: 'app:getorganized:documents',
+)]
 class DocumentsCommand extends ArchiverCommand
 {
-    protected static $defaultName = 'app:getorganized:documents';
-    protected static $defaultDescription = 'Info on GetOrganized documents';
     protected static string $archiverType = Archiver::TYPE_SHAREFILE2GETORGANIZED;
 
-    private GetOrganizedService $getOrganized;
-
-    public function __construct(ArchiverRepository $archiverRepository, GetOrganizedService $getOrganized)
+    public function __construct(ArchiverRepository $archiverRepository, private readonly GetOrganizedService $getOrganized)
     {
         parent::__construct($archiverRepository);
-        $this->getOrganized = $getOrganized;
     }
 
-    protected function doConfigure()
+    protected function doConfigure(): void
     {
         $this
-            ->addArgument('action', InputArgument::REQUIRED, 'The action')
-            ->addOption('case-id', null, InputOption::VALUE_REQUIRED, 'The case id')
-            ->addOption('field', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Field to include in list');
+           ->addArgument('action', InputArgument::REQUIRED, 'The action')
+           ->addOption('case-id', null, InputOption::VALUE_REQUIRED, 'The case id')
+           ->addOption('field', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Field to include in list');
     }
 
     protected function doExecute(): int
@@ -43,7 +43,7 @@ class DocumentsCommand extends ArchiverCommand
         return $this->{$action}();
     }
 
-    private function list()
+    private function list(): int
     {
         $io = new SymfonyStyle($this->input, $this->output);
 

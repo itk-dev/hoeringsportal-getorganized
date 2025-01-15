@@ -16,28 +16,29 @@ class YamlEditorType extends AbstractType
 {
     private array $options;
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $this->options = $options;
 
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $e) {
-            $this->validateData($e->getData(), $e->getForm());
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $e): void {
+            $this->validateData((string) $e->getData(), $e->getForm());
         });
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'schema' => null,
         ]);
     }
 
-    public function getParent()
+    #[\Override]
+    public function getParent(): string
     {
         return CodeEditorType::class;
     }
 
-    private function validateData($input, FormInterface $form)
+    private function validateData(string $input, FormInterface $form): void
     {
         try {
             $data = Yaml::parse($input, Yaml::PARSE_OBJECT_FOR_MAP);

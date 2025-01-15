@@ -21,23 +21,20 @@ abstract class ArchiverCommand extends Command
 
     protected OutputInterface $output;
 
-    private ArchiverRepository $archiverRepository;
+    protected ?Archiver $archiver = null;
 
-    protected ?Archiver $archiver;
-
-    public function __construct(ArchiverRepository $archiverRepository)
+    public function __construct(private readonly ArchiverRepository $archiverRepository)
     {
         parent::__construct();
-        $this->archiverRepository = $archiverRepository;
     }
 
     abstract protected function doExecute(): int;
 
-    protected function doConfigure()
+    protected function doConfigure(): void
     {
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addArgument('archiver', InputArgument::REQUIRED, 'Archiver to run (name or id)')
@@ -67,7 +64,7 @@ abstract class ArchiverCommand extends Command
         if ($lastRunAt = $input->getOption('last-run-at')) {
             try {
                 $this->archiver->setLastRunAt(new \DateTime($lastRunAt));
-            } catch (\Exception $ex) {
+            } catch (\Exception) {
                 throw new RuntimeException('Invalid last-run-at value: '.$lastRunAt);
             }
         }
@@ -75,7 +72,7 @@ abstract class ArchiverCommand extends Command
         return $this->doExecute();
     }
 
-    protected function writeTable($data, $vertical = false)
+    protected function writeTable(mixed $data, bool $vertical = false): void
     {
         $isAssoc = function (array $arr) {
             if ([] === $arr) {
@@ -94,9 +91,7 @@ abstract class ArchiverCommand extends Command
 
         foreach ($data as $item) {
             // Clean up item.
-            $item = array_map(function ($value) {
-                return json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-            }, json_decode(json_encode($item ?? []), true));
+            $item = array_map(fn ($value) => json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), json_decode(json_encode($item ?? []), true));
 
             if ($vertical) {
                 if ($rowCount > 0) {

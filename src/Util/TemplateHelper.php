@@ -6,14 +6,14 @@ use Twig\Environment;
 
 class TemplateHelper
 {
-    private Environment $twig;
-
-    public function __construct(Environment $twig)
+    public function __construct(private readonly Environment $twig)
     {
-        $this->twig = $twig;
     }
 
-    public function render(string $template, array $data)
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function render(string $template, array $data): string
     {
         return $this->twig->createTemplate($template)->render($data);
     }

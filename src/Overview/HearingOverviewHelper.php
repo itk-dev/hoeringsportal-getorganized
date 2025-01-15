@@ -34,32 +34,17 @@ class HearingOverviewHelper
 
     protected static string $archiverType = Archiver::TYPE_HEARING_OVERVIEW;
 
-    private DeskproService $deskproService;
-
-    private ShareFileService $shareFileService;
-
-    private EntityManagerInterface $entityManager;
-
-    private MailerInterface $mailer;
-
-    private Filesystem $filesystem;
-
     private array $options;
 
     public function __construct(
-        DeskproService $deskproService,
-        ShareFileService $shareFileService,
-        EntityManagerInterface $entityManager,
-        MailerInterface $mailer,
-        Filesystem $filesystem,
+        private DeskproService $deskproService,
+        private ShareFileService $shareFileService,
+        private EntityManagerInterface $entityManager,
+        private MailerInterface $mailer,
+        private Filesystem $filesystem,
         ?LoggerInterface $logger,
-        array $options
+        array $options,
     ) {
-        $this->deskproService = $deskproService;
-        $this->shareFileService = $shareFileService;
-        $this->entityManager = $entityManager;
-        $this->mailer = $mailer;
-        $this->filesystem = $filesystem;
         $this->setLogger($logger ?? new NullLogger());
 
         $resolver = new OptionsResolver();
@@ -67,7 +52,7 @@ class HearingOverviewHelper
         $this->options = $resolver->resolve($options);
     }
 
-    public function process(?array $hearingsIds = null)
+    public function process(?array $hearingsIds = null): void
     {
         if (null === $this->getArchiver()) {
             throw new \RuntimeException('No archiver');
@@ -80,7 +65,7 @@ class HearingOverviewHelper
             foreach ($hearings as $hearing) {
                 try {
                     $hearingId = (int) $hearing['hearing_id'];
-                    $this->run($hearingId, $hearing);
+                    $this->run($hearingId);
                 } catch (\Throwable $t) {
                     $this->logException($t, ['hearing' => $hearing]);
                 }
@@ -93,19 +78,43 @@ class HearingOverviewHelper
         }
     }
 
-    public function run(int $hearingId, array $hearing)
+    /**
+     * @throws \DateMalformedStringException
+     */
+    public function run(int $hearingId): void
     {
         if (null === $this->getArchiver()) {
             throw new \RuntimeException('No archiver');
         }
 
-        $this->logger->debug(sprintf('Getting ShareFile folder for hearing %d', $hearingId));
+        $filename = $this->createOverview($hearingId);
+
+        $this->logger->info(sprintf('Getting ShareFile folder for hearing %d', $hearingId));
         $hearingFolder = $this->shareFileService->findHearing('H'.$hearingId);
 
-        $this->logger->debug(sprintf('Getting Deskpro tickets for hearing %d', $hearingId));
+        $result = $this->shareFileService->uploadFile($filename, $hearingFolder->getId());
+
+        $this->logger->info(sprintf(
+            'File %s uploaded to ShareFile folder %s',
+            basename($filename),
+            $hearingFolder->getId()
+        ));
+    }
+
+    /**
+     * Create overview.
+     *
+     * @return string
+     *                The overview filename
+     *
+     * @throws \DateMalformedStringException
+     */
+    public function createOverview(int $hearingId): string
+    {
+        $this->logger->info(sprintf('Getting Deskpro tickets for hearing %d', $hearingId));
         $tickets = $this->deskproService->getHearingTickets($hearingId);
 
-        $this->logger->debug(sprintf('Generating overview spreadsheet hearing %d', $hearingId));
+        $this->logger->info(sprintf('Generating overview spreadsheet hearing %d', $hearingId));
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
@@ -122,16 +131,16 @@ class HearingOverviewHelper
         ];
 
         $row = 1;
-        $addRow = function (array $values) use ($sheet, &$row) {
+        $addRow = function (array $values) use ($sheet, &$row): void {
             foreach ($values as $index => $value) {
                 if (\is_array($value)) {
                     // value, number format
-                    $sheet->setCellValueByColumnAndRow($index + 1, $row, $value[0]);
-                    $sheet->getStyleByColumnAndRow($index + 1, $row)
+                    $sheet->setCellValue([$index + 1, $row], $value[0]);
+                    $sheet->getStyle([$index + 1, $row])
                         ->getNumberFormat()
                         ->setFormatCode($value[1]);
                 } else {
-                    $sheet->setCellValueByColumnAndRow($index + 1, $row, $value);
+                    $sheet->setCellValue([$index + 1, $row], $value);
                 }
             }
             ++$row;
@@ -217,23 +226,17 @@ class HearingOverviewHelper
         $writer->save($filename);
         $this->logger->info(sprintf('Overview written to file %s', $filename));
 
-        $result = $this->shareFileService->uploadFile($filename, $hearingFolder->getId());
-
-        $this->logger->info(sprintf(
-            'File %s uploaded to ShareFile folder %s',
-            basename($filename),
-            $hearingFolder->getId()
-        ));
+        return $filename;
     }
 
-    public function log($level, $message, array $context = [])
+    public function log(mixed $level, string|\Stringable $message, array $context = []): void
     {
         if (null !== $this->logger) {
             $this->logger->log($level, $message, $context);
         }
     }
 
-    private function getHearings(?array $hearingIds = null)
+    private function getHearings(?array $hearingIds = null): array
     {
         $this->logger->info('Getting all hearings');
         $config = $this->archiver->getConfigurationValue('hearings');
@@ -251,18 +254,14 @@ class HearingOverviewHelper
             $response = $client->get($url);
             $data = json_decode((string) $response->getBody(), true);
 
-            $hearings[] = array_map(function ($feature) {
-                return $feature['properties'];
-            }, $data['features']);
+            $hearings[] = array_map(fn ($feature) => $feature['properties'], $data['features']);
 
             // Parse link header (cf. https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Link).
             $next = null;
             $link = $response->getHeader('link');
             $rels = reset($link);
-            if ($rels && preg_match_all('/<(?P<url>[^>]+)>; rel="(?P<rel>[^"]+)"/', $rels, $matches, PREG_SET_ORDER)) {
-                $next = array_values(array_filter($matches, static function ($match) {
-                    return 'next' === $match['rel'];
-                }))[0] ?? null;
+            if ($rels && preg_match_all('/<(?P<url>[^>]+)>; rel="(?P<rel>[^"]+)"/', (string) $rels, $matches, PREG_SET_ORDER)) {
+                $next = array_values(array_filter($matches, static fn ($match) => 'next' === $match['rel']))[0] ?? null;
             }
 
             $url = $next['url'] ?? null;
@@ -272,15 +271,13 @@ class HearingOverviewHelper
         $hearings = array_merge(...$hearings);
 
         if (!empty($hearingIds)) {
-            $hearings = array_filter($hearings, static function ($properties) use ($hearingIds) {
-                return \in_array($properties['hearing_id'], $hearingIds, true);
-            });
+            $hearings = array_filter($hearings, static fn ($properties) => \in_array($properties['hearing_id'], $hearingIds, true));
         }
 
         return $hearings;
     }
 
-    private function getFinishedHearings(?array $hearingIds = null)
+    private function getFinishedHearings(?array $hearingIds = null): array
     {
         $hearings = $this->getHearings($hearingIds);
 
@@ -290,7 +287,7 @@ class HearingOverviewHelper
         // Allow changes on hearings after reply deadline.
         try {
             $from->modify($this->options['hearing_reply_deadline_offset']);
-        } catch (\Throwable $t) {
+        } catch (\Throwable) {
         }
 
         $this->logger->info(sprintf('Getting hearings finished after %s', $from->format(\DateTimeImmutable::ATOM)));
@@ -315,7 +312,7 @@ class HearingOverviewHelper
                     $lastChangeAt = new \DateTime($hearing['ProgenyEditDate']);
 
                     return $lastChangeAt >= $lastRunAt;
-                } catch (\Throwable $t) {
+                } catch (\Throwable) {
                     return false;
                 }
             }
@@ -324,7 +321,7 @@ class HearingOverviewHelper
         return $hearings;
     }
 
-    private function logException(\Throwable $t, array $context = [])
+    private function logException(\Throwable $t, array $context = []): void
     {
         $this->emergency($t->getMessage(), $context);
         $logEntry = new ExceptionLogEntry($t, $context);
@@ -350,12 +347,12 @@ class HearingOverviewHelper
                     $this->mailer->send($email);
                 }
             }
-        } catch (\Throwable $throwable) {
+        } catch (\Throwable) {
             // Ignore errors related to sending mails.
         }
     }
 
-    private function configureOptions(OptionsResolver $resolver)
+    private function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired([
             'project_dir',

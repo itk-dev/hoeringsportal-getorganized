@@ -1,15 +1,35 @@
 # Hoeringsportal – GetOrganized
 
-```sh
+## Production
+
+``` shell
 docker compose pull
 docker compose up --detach
-# We use kapersoft/sharefile-api which does not officially support PHP 8.1 (hence --ignore-platform-req=php)
-docker compose exec phpfpm composer install --ignore-platform-req=php
+docker compose exec phpfpm composer install
+docker compose exec phpfpm bin/console doctrine:migrations:migrate --no-interaction
+docker compose exec phpfpm php bin/console asset-map:compile
 ```
 
-```sh
-docker compose run --rm node yarn install
-docker compose run --rm node yarn build
+### Cron jobs
 
-docker compose run --rm node yarn watch
+Update paths to match your actual setup.
+
+``` shell
+# Archive files every hour.
+0 * * * * (cd … && docker compose exec phpfpm bin/console app:sharefile2getorganized:archive …) > /dev/null 2>&1
+# Generate overviews daily at 0200
+0 2 * * * (cd … && docker compose exec phpfpm bin/console app:overview:hearing …) > /dev/null 2>&1
+# Combine PDFs daily at 0300
+0 3 * * * (cd … && docker compose exec phpfpm bin/console app:pdf:cron …) > /dev/null 2>&1
+```
+
+## Development
+
+``` shell name=site-install
+task site-install
+```
+
+``` shell name=code-checks
+task coding-standards:check
+task code-analysis
 ```

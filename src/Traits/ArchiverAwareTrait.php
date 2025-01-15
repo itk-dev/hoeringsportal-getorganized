@@ -6,9 +6,9 @@ use App\Entity\Archiver;
 
 trait ArchiverAwareTrait
 {
-    private Archiver $archiver;
+    private ?Archiver $archiver;
 
-    public function setArchiver(Archiver $archiver)
+    public function setArchiver(Archiver $archiver): static
     {
         $this->archiver = $archiver;
 
@@ -24,6 +24,8 @@ trait ArchiverAwareTrait
         if (!$archiver->isEnabled()) {
             throw new \RuntimeException(sprintf('Archiver %s is not enabled.', $archiver));
         }
+
+        return $this;
     }
 
     public function getArchiver(): ?Archiver

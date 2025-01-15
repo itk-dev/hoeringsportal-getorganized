@@ -6,31 +6,31 @@ use App\Command\ArchiverCommand;
 use App\Entity\Archiver;
 use App\Pdf\PdfHelper;
 use App\Repository\ArchiverRepository;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 
+#[AsCommand(
+    name: 'app:pdf:combine',
+)]
 class CombineCommand extends ArchiverCommand
 {
-    protected static $defaultName = 'app:pdf:combine';
     protected static string $archiverType = Archiver::TYPE_PDF_COMBINE;
 
-    private $helper;
-
-    private const ACTIONS = [
+    public const array ACTIONS = [
         'get-data',
         'combine',
         'share',
     ];
 
-    public function __construct(PdfHelper $pdfHelper, ArchiverRepository $archiverRepository)
+    public function __construct(private readonly PdfHelper $helper, ArchiverRepository $archiverRepository)
     {
         parent::__construct($archiverRepository);
-        $this->helper = $pdfHelper;
     }
 
-    protected function doConfigure()
+    protected function doConfigure(): void
     {
         $this
             ->addArgument('action', InputArgument::REQUIRED, sprintf('One of %s', implode(', ', self::ACTIONS)))
@@ -63,7 +63,7 @@ class CombineCommand extends ArchiverCommand
         return self::SUCCESS;
     }
 
-    private function getCommandName(string $name)
+    private function getCommandName(string $name): string
     {
         return lcfirst(str_replace('-', '', ucwords($name, '-')));
     }

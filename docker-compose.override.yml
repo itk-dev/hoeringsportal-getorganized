@@ -1,6 +1,11 @@
 services:
-  node:
-    image: node:16
-    volumes:
-      - .:/app
-    working_dir: /app
+  phpfpm:
+    # https://docs.docker.com/reference/compose-file/services/#user
+    # https://docs.docker.com/compose/how-tos/environment-variables/variable-interpolation/#interpolation-syntax
+    # (used in .github/workflows/pr.yaml to run service as root)
+    user: ${COMPOSE_USER:-deploy}
+
+    environment:
+      - PHP_MAX_EXECUTION_TIME=300
+      - PHP_MEMORY_LIMIT=512M
+

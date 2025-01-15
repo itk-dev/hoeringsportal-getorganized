@@ -5,40 +5,26 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Yaml\Yaml;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\ExceptionLogEntryRepository")
- */
+#[ORM\Entity(repositoryClass: \App\Repository\ExceptionLogEntryRepository::class)]
 class ExceptionLogEntry
 {
-    /**
-     * @ORM\Id()
-     *
-     * @ORM\GeneratedValue()
-     *
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     // @phpstan-ignore-next-line
-    private $id;
+    private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $message;
+    #[ORM\Column(type: 'string', length: 255)]
+    private ?string $message = null;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    private $createdAt;
+    #[ORM\Column(type: 'datetime')]
+    private ?\DateTimeInterface $createdAt = null;
 
-    /**
-     * @ORM\Column(type="json")
-     */
-    private $data;
+    #[ORM\Column(type: 'json')]
+    private ?array $data = null;
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private $hidden = false;
+    #[ORM\Column(type: 'boolean')]
+    private bool $hidden = false;
 
     public function __construct(\Throwable $t, array $context = [])
     {

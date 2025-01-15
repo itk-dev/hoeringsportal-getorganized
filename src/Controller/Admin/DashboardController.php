@@ -15,16 +15,12 @@ use Symfony\Component\Translation\TranslatableMessage;
 
 class DashboardController extends AbstractDashboardController
 {
-    private $adminUrlGenerator;
-
-    public function __construct(AdminUrlGenerator $adminUrlGenerator)
+    public function __construct(private readonly AdminUrlGenerator $adminUrlGenerator)
     {
-        $this->adminUrlGenerator = $adminUrlGenerator;
     }
 
-    /**
-     * @Route("/admin", name="admin")
-     */
+    #[\Override]
+    #[Route(path: '/admin', name: 'admin')]
     public function index(): Response
     {
         return $this->redirect($this->adminUrlGenerator
@@ -32,21 +28,23 @@ class DashboardController extends AbstractDashboardController
             ->generateUrl());
     }
 
+    #[\Override]
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('Sharefile2go');
+            ->setTitle($this->getParameter('site_name'));
     }
 
+    #[\Override]
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToCrud(new TranslatableMessage('Archiver'), 'fas fa-list', Archiver::class);
         yield MenuItem::linkToCrud(new TranslatableMessage('Error log'), 'fas fa-list', ExceptionLogEntry::class);
 
-        yield MenuItem::section('GetOrganized');
+        yield MenuItem::section(new TranslatableMessage('GetOrganized'));
         yield MenuItem::linkToCrud(new TranslatableMessage('Document'), 'fas fa-list', Document::class);
 
-        yield MenuItem::section('PDF');
+        yield MenuItem::section(new TranslatableMessage('PDF'));
         yield MenuItem::linkToRoute(new TranslatableMessage('Combine'), 'fas fa-list', 'admin_pdf_combine');
     }
 }
