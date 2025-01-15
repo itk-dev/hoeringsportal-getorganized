@@ -51,12 +51,18 @@ jobs:
           - coding-standards-check/twig
     steps:
       - uses: actions/checkout@v4
-      - uses: pnorton5432/setup-task@v1
       - run: |
           docker network create frontend
           docker compose run --rm phpfpm composer install
       - run: |
           docker compose run --rm phpfpm composer ${{ matrix.script }}
+
+  coding-standards-markdown:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          docker run --rm --volume "$PWD:/md" peterdavehello/markdownlint markdownlint --ignore '**/vendor/**' '**.md'
 
   site-update:
     name: Check that site can be updated
