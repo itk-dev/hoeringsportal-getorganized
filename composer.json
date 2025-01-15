@@ -83,6 +83,7 @@
             "symfony/runtime": true
         },
         "bump-after-update": true,
+        "optimize-autoloader": true,
         "sort-packages": true
     },
     "extra": {

@@ -90,7 +90,7 @@ jobs:
 
       - name: Clean up root stuff
         run: |
-          sudo chown -Rv $USER:$USER vendor/ node_modules/ || true
+          sudo chown -Rv $USER:$USER vendor/ || true
 
       - name: Prepare for upgrade
         run: |

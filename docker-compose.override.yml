@@ -9,8 +9,3 @@ services:
       - PHP_MAX_EXECUTION_TIME=300
       - PHP_MEMORY_LIMIT=512M
 
-  node:
-    image: node:22
-    volumes:
-      - .:/app
-    working_dir: /app
