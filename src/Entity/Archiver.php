@@ -3,20 +3,20 @@
 namespace App\Entity;
 
 use App\Repository\ArchiverRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Loggable\Loggable;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
+use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Yaml\Yaml;
 
-/**
- * @Gedmo\Loggable()
- */
 #[ORM\Entity(repositoryClass: ArchiverRepository::class)]
 #[UniqueEntity('name')]
+#[Gedmo\Loggable]
 class Archiver implements Loggable, \JsonSerializable, \Stringable
 {
     use TimestampableEntity;
@@ -26,31 +26,25 @@ class Archiver implements Loggable, \JsonSerializable, \Stringable
     public const string TYPE_HEARING_OVERVIEW = 'hearing overview';
 
     #[ORM\Id]
-    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
     private ?Uuid $id = null;
 
-    /**
-     * @Gedmo\Versioned()
-     */
-    #[ORM\Column(type: 'string', length: 255)]
+    #[Gedmo\Versioned]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     private ?string $name = null;
 
-    /**
-     * @Gedmo\Versioned()
-     */
-    #[ORM\Column(type: 'text')]
+    #[Gedmo\Versioned]
+    #[ORM\Column(type: Types::TEXT)]
     private ?string $configuration = null;
 
-    /**
-     * @Gedmo\Versioned()
-     */
-    #[ORM\Column(type: 'boolean')]
+    #[Gedmo\Versioned]
+    #[ORM\Column(type: Types::BOOLEAN)]
     private bool $enabled = false;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTime $lastRunAt = null;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     private ?string $type = null;
 
     public function __construct()

@@ -7,9 +7,12 @@
         "php": "^8.3",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "cweagans/composer-patches": "^1.7.3",
         "deskpro/deskpro-api-client-php": "dev-master",
+        "doctrine/doctrine-bundle": "^2.13.1",
         "doctrine/doctrine-migrations-bundle": "^3.3.1",
-        "easycorp/easyadmin-bundle": "^4.22.0",
+        "doctrine/orm": "^3.3.1",
+        "easycorp/easyadmin-bundle": "^4.22.1",
         "itk-dev/getorganized-api-client-php": "dev-feature/symfony-7",
         "kapersoft/sharefile-api": "dev-deltag.aarhus.dk",
         "mpdf/mpdf": "^8.2.5",
@@ -77,6 +80,7 @@
     },
     "config": {
         "allow-plugins": {
+            "cweagans/composer-patches": true,
             "ergebnis/composer-normalize": true,
             "php-http/discovery": true,
             "symfony/flex": true,
@@ -87,6 +91,11 @@
         "sort-packages": true
     },
     "extra": {
+        "patches": {
+            "gedmo/doctrine-extensions": {
+                "https://github.com/doctrine-extensions/DoctrineExtensions/issues/2883": "patches/gedmo/doctrine-extensions/issue-2883.patch"
+            }
+        },
         "symfony": {
             "allow-contrib": true,
             "docker": true,
