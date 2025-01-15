@@ -3,13 +3,14 @@
 namespace App\Entity\GetOrganized;
 
 use App\Entity\Archiver;
+use App\Repository\GetOrganized\DocumentRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
-#[ORM\Entity(repositoryClass: \App\Repository\GetOrganized\DocumentRepository::class)]
+#[ORM\Entity(repositoryClass: DocumentRepository::class)]
 #[ORM\Table(name: 'get_organized_document')]
 class Document
 {

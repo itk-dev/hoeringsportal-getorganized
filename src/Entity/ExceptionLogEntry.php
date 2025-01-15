@@ -2,11 +2,12 @@
 
 namespace App\Entity;
 
+use App\Repository\ExceptionLogEntryRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Yaml\Yaml;
 
-#[ORM\Entity(repositoryClass: \App\Repository\ExceptionLogEntryRepository::class)]
+#[ORM\Entity(repositoryClass: ExceptionLogEntryRepository::class)]
 class ExceptionLogEntry
 {
     #[ORM\Id]
