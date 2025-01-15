@@ -104,8 +104,7 @@ class HearingOverviewHelper
     /**
      * Create overview.
      *
-     * @return string
-     *                The overview filename
+     * @return string The overview filename
      *
      * @throws \DateMalformedStringException
      */

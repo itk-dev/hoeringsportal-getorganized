@@ -9,10 +9,7 @@ final class JsonField implements FieldInterface
 {
     use FieldTrait;
 
-    /**
-     * @param string|false|null $label
-     */
-    public static function new(string $propertyName, $label = null): self
+    public static function new(string $propertyName, ?string /* TranslatableInterface|string|false|null */ $label = null): self
     {
         return (new self())
             ->setProperty($propertyName)

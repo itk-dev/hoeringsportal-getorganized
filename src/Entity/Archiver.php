@@ -147,10 +147,8 @@ class Archiver implements Loggable, \JsonSerializable, \Stringable
 
     /**
      * Get GetOrganized organization reference (id) from Deskpro department id.
-     *
-     * @return int|null
      */
-    public function getGetOrganizedOrganizationReference(?string $id)
+    public function getGetOrganizedOrganizationReference(?string $id): ?int
     {
         $map = $this->getConfigurationValue('[getorganized][organizations]') ?? [];
 
