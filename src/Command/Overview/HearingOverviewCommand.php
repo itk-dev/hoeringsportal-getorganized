@@ -6,26 +6,27 @@ use App\Command\ArchiverCommand;
 use App\Entity\Archiver;
 use App\Overview\HearingOverviewHelper;
 use App\Repository\ArchiverRepository;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 
+#[AsCommand(
+    name: 'app:overview:hearing',
+)]
 class HearingOverviewCommand extends ArchiverCommand
 {
-    protected static $defaultName = 'app:overview:hearing';
     protected static string $archiverType = Archiver::TYPE_HEARING_OVERVIEW;
 
-    private HearingOverviewHelper $helper;
-
-    public function __construct(HearingOverviewHelper $helper, ArchiverRepository $archiverRepository)
+    public function __construct(private readonly HearingOverviewHelper $helper, ArchiverRepository $archiverRepository)
     {
         parent::__construct($archiverRepository);
-        $this->helper = $helper;
     }
 
-    public function doConfigure()
+    public function doConfigure(): void
     {
-        $this->addArgument('hearing-id', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, 'The hearing id');
+        $this
+            ->addArgument('hearing-id', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, 'The hearing id');
     }
 
     protected function doExecute(): int

@@ -4,10 +4,12 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    env(SITE_NAME): 'ShareFile2go'
     env(HEARING_REPLY_DEADLINE_OFFSET): '-30 days'
     env(DISPLAY_DATETIME_FORMAT): 'yyyy-MM-dd HH:mm:ss'
     env(DISPLAY_DATETIME_TIMEZONE): 'UTC'
 
+    site_name: '%env(SITE_NAME)%'
     display_datetime_format: '%env(DISPLAY_DATETIME_FORMAT)%'
     display_datetime_timezone: '%env(DISPLAY_DATETIME_TIMEZONE)%'
 

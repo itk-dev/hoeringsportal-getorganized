@@ -4,6 +4,7 @@ namespace App\Command\Archiver;
 
 use App\Entity\Archiver;
 use App\Repository\ArchiverRepository;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -11,20 +12,18 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
+#[AsCommand(
+    name: 'app:archiver:list',
+    description: 'List archivers',
+)]
 class ListCommand extends Command
 {
-    protected static $defaultName = 'app:archiver:list';
-    protected static $defaultDescription = 'List archivers';
-
-    private ArchiverRepository $archiverRepository;
-
-    public function __construct(ArchiverRepository $archiverRepository)
+    public function __construct(private readonly ArchiverRepository $archiverRepository)
     {
         parent::__construct();
-        $this->archiverRepository = $archiverRepository;
     }
 
-    public function configure()
+    public function configure(): void
     {
         $this->setName('app:archiver:list')
             ->addOption('type', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'The types to list')
@@ -32,16 +31,14 @@ class ListCommand extends Command
             ->addOption('enabled', null, InputOption::VALUE_REQUIRED, 'If not set, all archivers will be listed.');
     }
 
-    public function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $types = $input->getOption('type');
         $fields = $input->getOption('field');
         $enabled = $input->getOption('enabled');
 
         if (empty($fields)) {
-            $fields = array_map(function (\ReflectionProperty $property) {
-                return $property->name;
-            }, (new \ReflectionClass(Archiver::class))->getProperties());
+            $fields = array_map(fn (\ReflectionProperty $property) => $property->name, (new \ReflectionClass(Archiver::class))->getProperties());
         }
 
         $criteria = [];
@@ -67,18 +64,14 @@ class ListCommand extends Command
             $table->setHorizontal();
             $first = true;
             foreach ($archivers as $archiver) {
-                $values = array_map(function ($field) use ($archiver, $propertyAccessor) {
-                    return $propertyAccessor->getValue($archiver, $field);
-                }, $fields);
+                $values = array_map(fn ($field) => $propertyAccessor->getValue($archiver, $field), $fields);
 
                 if ($first) {
                     $table->setHeaders($fields);
                     $first = false;
                 }
 
-                $table->addRow(array_map(function ($value) {
-                    return is_scalar($value) ? $value : json_encode($value);
-                }, $values));
+                $table->addRow(array_map(fn ($value) => is_scalar($value) ? $value : json_encode($value), $values));
             }
             $table->render();
         }

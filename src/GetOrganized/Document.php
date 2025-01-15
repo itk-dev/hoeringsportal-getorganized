@@ -7,7 +7,7 @@ class Document extends Entity
     /** @var string */
     public $docId;
 
-    protected function build(array $data)
+    protected function build(array $data): void
     {
         $this->docId = $data['DocId'];
     }

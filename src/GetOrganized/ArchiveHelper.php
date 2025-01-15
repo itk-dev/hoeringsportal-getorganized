@@ -27,34 +27,22 @@ class ArchiveHelper implements LoggerAwareInterface
 
     protected static string $archiverType = Archiver::TYPE_SHAREFILE2GETORGANIZED;
 
-    private ShareFileService $shareFile;
-
-    private GetOrganizedService $getOrganized;
-
-    private DocumentRepository $documentRepository;
-
-    private EntityManagerInterface $entityManager;
-
-    private TemplateHelper $templateHelper;
-
-    private MailerInterface $mailer;
-
     private array $options;
 
-    private const GET_ORGANIZED_CASE_ID_TICKET_KEY = 'go_case_id';
+    private const string GET_ORGANIZED_CASE_ID_TICKET_KEY = 'go_case_id';
 
-    public function __construct(ShareFileService $shareFile, GetOrganizedService $getOrganized, DocumentRepository $documentRepository, EntityManagerInterface $entityManager, TemplateHelper $templateHelper, MailerInterface $mailer)
-    {
-        $this->shareFile = $shareFile;
-        $this->getOrganized = $getOrganized;
-        $this->documentRepository = $documentRepository;
-        $this->entityManager = $entityManager;
-        $this->templateHelper = $templateHelper;
-        $this->mailer = $mailer;
+    public function __construct(
+        private readonly ShareFileService $shareFile,
+        private readonly GetOrganizedService $getOrganized,
+        private readonly DocumentRepository $documentRepository,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly TemplateHelper $templateHelper,
+        private readonly MailerInterface $mailer,
+    ) {
         $this->setLogger(new NullLogger());
     }
 
-    public function archive(Archiver $archiver, $hearingItemId = null, array $options = [])
+    public function archive(Archiver $archiver, ?string $hearingItemId = null, array $options = []): void
     {
         $this->setArchiver($archiver);
         $resolver = new OptionsResolver();
@@ -84,12 +72,12 @@ class ArchiveHelper implements LoggerAwareInterface
         }
     }
 
-    public function log($level, $message, array $context = [])
+    public function log(mixed $level, string|\Stringable $message, array $context = []): void
     {
         $this->logger->log($level, $message, $context);
     }
 
-    private function archiveResponses(?string $hearingItemId = null)
+    private function archiveResponses(?string $hearingItemId = null): void
     {
         if (null !== $hearingItemId) {
             $this->info(sprintf('Getting hearing %s', $hearingItemId));
@@ -120,20 +108,20 @@ class ArchiveHelper implements LoggerAwareInterface
                             $this->info(sprintf('Getting hearing: %s', $shareFileHearing->name));
                             $shareFileHearing->metadata = $shareFileResponse->metadata;
 
-                            $metadata = [];
-                            // @todo
-                            // if (null !== $caseWorker) {
-                            //     $metadata['CaseFileManagerReference'] = $caseWorker['CaseWorkerId'];
-                            // }
-                            if (null !== $organisationReference) {
-                                $metadata['OrganisationReference'] = $organisationReference;
-                            }
+                            // @todo Implement creating hearing.
+                            // $metadata = [
+                            //     'OrganisationReference' => $organisationReference,
+                            // ];
+                            // // @todo
+                            // // if (null !== $caseWorker) {
+                            // //     $metadata['CaseFileManagerReference'] = $caseWorker['CaseWorkerId'];
+                            // // }
 
-                            // @todo
+                            // // @todo
                             // $getOrganizedHearing = $this->getOrganized->getHearing($shareFileHearing, true, $metadata);
-                            if (null === $getOrganizedHearing) {
-                                throw new RuntimeException(sprintf('Error creating hearing: %s', $shareFileHearing->name));
-                            }
+                            // if (null === $getOrganizedHearing) {
+                            throw new RuntimeException(sprintf('Error creating hearing: %s', $shareFileHearing->name));
+                        // }
                         } else {
                             $this->info(sprintf('Getting hearing for response %s', $shareFileResponse->name));
                             $getOrganizedCaseId = $shareFileResponse->metadata['ticket_data'][self::GET_ORGANIZED_CASE_ID_TICKET_KEY] ?? null;
@@ -154,9 +142,7 @@ class ArchiveHelper implements LoggerAwareInterface
                     $pattern = $this->archiver->getConfigurationValue('[getorganized][sharefile_file_name_pattern]');
                     $sourceFiles = array_filter(
                         $files,
-                        static function (Item $file) use ($pattern) {
-                            return null === $pattern || fnmatch($pattern, $file->name);
-                        }
+                        static fn (Item $file) => null === $pattern || fnmatch($pattern, $file->name)
                     );
                     if (null !== $pattern && empty($sourceFiles)) {
                         throw new RuntimeException(sprintf('Cannot find file matching pattern %s for item %s', $pattern, $shareFileResponse->id));
@@ -176,7 +162,7 @@ class ArchiveHelper implements LoggerAwareInterface
         }
     }
 
-    private function archiveOverviews(?string $hearingItemId = null)
+    private function archiveOverviews(?string $hearingItemId = null): void
     {
         $overviews = $this->archiver->getConfigurationValue('[getorganized][overview][items]');
         if (empty($overviews)) {
@@ -224,9 +210,9 @@ class ArchiveHelper implements LoggerAwareInterface
                 if ($this->archiver->getCreateHearing()) {
                     // @todo
                     // $getOrganizedHearing = $this->getOrganized->getHearing($shareFileHearing);
-                    if (null === $getOrganizedHearing) {
-                        throw new RuntimeException(sprintf('Cannot get GetOrganized case %s', $shareFileHearing->id));
-                    }
+                    // if (null === $getOrganizedHearing) {
+                    throw new RuntimeException(sprintf('Cannot get GetOrganized case %s', $shareFileHearing->id));
+                // }
                 } else {
                     $getOrganizedCaseId = null;
                     foreach ($shareFileResponses as $shareFileResponse) {
@@ -288,7 +274,7 @@ class ArchiveHelper implements LoggerAwareInterface
         }
     }
 
-    private function archiveDocument(Item $sourceFile, CaseEntity $getOrganizedHearing, ?string $title = null, array $options = [])
+    private function archiveDocument(Item $sourceFile, CaseEntity $getOrganizedHearing, ?string $title = null, array $options = []): void
     {
         $metadata = [];
 
@@ -362,27 +348,26 @@ class ArchiveHelper implements LoggerAwareInterface
 
         unset($fileContents);
 
-        if (null === $document) {
-            throw new RuntimeException(sprintf('Error creating document in GetOrganized (%s; %s)', $title, $sourceFile->id));
-        }
+        // @todo
+        // throw new RuntimeException(sprintf('Error creating document in GetOrganized (%s; %s)', $title, $sourceFile->id));
     }
 
-    private function getFileContents(Item $sourceFile)
+    private function getFileContents(Item $sourceFile): string
     {
         $this->info(sprintf('Getting file contents from ShareFile (%s; %s)', $sourceFile->id, $sourceFile->fileName));
 
-        $fileContents = $this->shareFile->downloadFile($sourceFile);
-
-        if (null === $fileContents) {
-            throw new RuntimeException(sprintf('Cannot get file contents for item %s', $sourceFile->id));
+        try {
+            $fileContents = $this->shareFile->downloadFile($sourceFile);
+        } catch (\Exception $exception) {
+            throw new RuntimeException(sprintf('Cannot get file contents for item %s', $sourceFile->id), $exception->getCode(), $exception);
         }
 
-        $this->debug(sprintf('File size: %d', strlen($fileContents)));
+        $this->debug(sprintf('File size: %d', strlen((string) $fileContents)));
 
         return $fileContents;
     }
 
-    private function configureOptions(OptionsResolver $resolver)
+    private function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'force' => false,
@@ -394,7 +379,7 @@ class ArchiveHelper implements LoggerAwareInterface
         return true === $this->options['force'];
     }
 
-    private function logException(\Throwable $t, array $context = [])
+    private function logException(\Throwable $t, array $context = []): void
     {
         $this->emergency($t->getMessage(), $context);
         $logEntry = new ExceptionLogEntry($t, $context);
@@ -420,7 +405,7 @@ class ArchiveHelper implements LoggerAwareInterface
                     $this->mailer->send($email);
                 }
             }
-        } catch (\Throwable $throwable) {
+        } catch (\Throwable) {
             // Ignore errors related to sending mails.
         }
     }

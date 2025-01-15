@@ -6,24 +6,24 @@ use App\Command\ArchiverCommand;
 use App\Entity\Archiver;
 use App\GetOrganized\ArchiveHelper;
 use App\Repository\ArchiverRepository;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 
+#[AsCommand(
+    name: 'app:sharefile2getorganized:archive',
+    description: 'Archive files from ShareFile in GetOrganized',
+)]
 class ArchiveCommand extends ArchiverCommand
 {
-    protected static $defaultName = 'app:sharefile2getorganized:archive';
-    protected static $defaultDescription = 'Archive files from ShareFile in GetOrganized';
     protected static string $archiverType = Archiver::TYPE_SHAREFILE2GETORGANIZED;
 
-    private ArchiveHelper $helper;
-
-    public function __construct(ArchiverRepository $archiverRepository, ArchiveHelper $helper)
+    public function __construct(ArchiverRepository $archiverRepository, private readonly ArchiveHelper $helper)
     {
         parent::__construct($archiverRepository);
-        $this->helper = $helper;
     }
 
-    protected function doConfigure()
+    protected function doConfigure(): void
     {
         $this
             ->addOption('hearing-item-id', null, InputOption::VALUE_REQUIRED, 'Hearing item id to archive')

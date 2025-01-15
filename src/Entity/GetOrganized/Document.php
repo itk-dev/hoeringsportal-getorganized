@@ -7,57 +7,40 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Symfony\Component\Uid\Uuid;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\GetOrganized\DocumentRepository")
- *
- * @ORM\Table(name="get_organized_document")
- */
+#[ORM\Entity(repositoryClass: \App\Repository\GetOrganized\DocumentRepository::class)]
+#[ORM\Table(name: 'get_organized_document')]
 class Document
 {
     use TimestampableEntity;
 
-    /**
-     * @ORM\Id()
-     *
-     * @ORM\Column(type="uuid", unique=true)
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\Column(type: 'uuid', unique: true)]
+    private Uuid $id;
 
     /**
      * The GetOrganized case id.
-     *
-     * @ORM\Column(type="string", length=255)
      */
-    private $caseId;
+    #[ORM\Column(type: 'string', length: 255)]
+    private string $caseId;
 
     /**
      * The GetOrganized document id.
-     *
-     * @ORM\Column(type="string", length=255)
      */
-    private $docId;
+    #[ORM\Column(type: 'string', length: 255)]
+    private string $docId;
 
-    /**
-     * @ORM\Column(type="json")
-     */
-    private $data = [];
+    #[ORM\Column(type: 'json')]
+    private array $data = [];
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Archiver")
-     *
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $archiver;
+    #[ORM\ManyToOne(targetEntity: Archiver::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private Archiver $archiver;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $shareFileItemId;
+    #[ORM\Column(type: 'string', length: 255)]
+    private string $shareFileItemId;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $shareFileItemStreamId;
+    #[ORM\Column(type: 'string', length: 255)]
+    private string $shareFileItemStreamId;
 
     public function __construct()
     {
@@ -110,7 +93,7 @@ class Document
         return $this->archiver;
     }
 
-    public function setArchiver(?Archiver $archiver): self
+    public function setArchiver(Archiver $archiver): self
     {
         $this->archiver = $archiver;
 
@@ -147,7 +130,7 @@ class Document
             $base = log($size, 1024);
             $suffixes = ['', 'K', 'M', 'G', 'T'];
 
-            return trim(round(pow(1024, $base - floor($base)), $precision).' '.$suffixes[floor($base)]);
+            return trim(round(1024 ** ($base - floor($base)), $precision).' '.$suffixes[floor($base)]);
         };
 
         return sprintf(

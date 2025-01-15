@@ -39,7 +39,7 @@ class DeskproService
         $this->options = $resolver->resolve($options);
     }
 
-    public function getReplyData($replyId)
+    public function getReplyData(string $replyId): array
     {
         $response = $this->client()->get('/ticket_custom_fields/{id}', ['id' => $replyId]);
 
@@ -95,20 +95,20 @@ class DeskproService
     /**
      * Get a Deskpro client.
      */
-    private function client()
+    private function client(): DeskproClient
     {
         if (null === $this->client) {
             // https://github.com/deskpro/deskpro-api-client-php
             $client = new Client(['connect_timeout' => 2]);
             $this->client = new DeskproClient($this->options['deskpro_url'], $client);
-            $authKey = explode(':', $this->options['deskpro_api_code_key']);
+            $authKey = explode(':', (string) $this->options['deskpro_api_code_key']);
             $this->client->setAuthKey(...$authKey);
         }
 
         return $this->client;
     }
 
-    private function configureOptions(OptionsResolver $resolver)
+    private function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired([
             'deskpro_url',

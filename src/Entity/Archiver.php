@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Repository\ArchiverRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Loggable\Loggable;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -12,66 +13,54 @@ use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\ArchiverRepository")
- *
  * @Gedmo\Loggable()
- *
- * @UniqueEntity("name")
  */
-class Archiver implements Loggable, \JsonSerializable
+#[ORM\Entity(repositoryClass: ArchiverRepository::class)]
+#[UniqueEntity('name')]
+class Archiver implements Loggable, \JsonSerializable, \Stringable
 {
     use TimestampableEntity;
 
-    public const TYPE_SHAREFILE2GETORGANIZED = 'sharefile2getorganized';
-    public const TYPE_PDF_COMBINE = 'pdfcombine';
-    public const TYPE_HEARING_OVERVIEW = 'hearing overview';
+    public const string TYPE_SHAREFILE2GETORGANIZED = 'sharefile2getorganized';
+    public const string TYPE_PDF_COMBINE = 'pdfcombine';
+    public const string TYPE_HEARING_OVERVIEW = 'hearing overview';
+
+    #[ORM\Id]
+    #[ORM\Column(type: 'uuid', unique: true)]
+    private ?Uuid $id = null;
 
     /**
-     * @ORM\Id()
-     *
-     * @ORM\Column(type="uuid", unique=true)
-     */
-    private $id;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     *
      * @Gedmo\Versioned()
      */
-    private $name;
+    #[ORM\Column(type: 'string', length: 255)]
+    private ?string $name = null;
 
     /**
-     * @ORM\Column(type="text")
-     *
      * @Gedmo\Versioned()
      */
-    private $configuration;
+    #[ORM\Column(type: 'text')]
+    private ?string $configuration = null;
 
     /**
-     * @ORM\Column(type="boolean")
-     *
      * @Gedmo\Versioned()
      */
-    private $enabled;
+    #[ORM\Column(type: 'boolean')]
+    private bool $enabled = false;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private $lastRunAt;
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $lastRunAt = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $type;
+    #[ORM\Column(type: 'string', length: 255)]
+    private ?string $type = null;
 
     public function __construct()
     {
         $this->id = Uuid::v4();
     }
 
-    public function __toString()
+    public function __toString(): string
     {
-        return $this->name ?? self::class;
+        return $this->name;
     }
 
     public function getId(): ?Uuid
@@ -127,7 +116,7 @@ class Archiver implements Loggable, \JsonSerializable
         return $this;
     }
 
-    public function getConfigurationValue(?string $key = null, $default = null)
+    public function getConfigurationValue(?string $key = null, mixed $default = null): mixed
     {
         $configuration = Yaml::parse($this->getConfiguration());
 

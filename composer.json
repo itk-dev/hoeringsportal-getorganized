@@ -1,74 +1,70 @@
 {
     "name": "itk-dev/hoeringsportal-getorganized",
     "description": "Archiving documents in GetOrganized",
-    "type": "project",
     "license": "proprietary",
-    "minimum-stability": "stable",
-    "prefer-stable": true,
+    "type": "project",
     "require": {
         "php": "^8.3",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "deskpro/deskpro-api-client-php": "^2.1",
-        "doctrine/annotations": "^1.0",
-        "doctrine/doctrine-bundle": "^2.6",
-        "doctrine/doctrine-migrations-bundle": "^3.2",
-        "doctrine/orm": "^2.11",
-        "easycorp/easyadmin-bundle": "^3.5",
-        "itk-dev/database-bundle": "^1.3",
-        "itk-dev/getorganized-api-client-php": "^1.0",
+        "deskpro/deskpro-api-client-php": "dev-master",
+        "doctrine/doctrine-migrations-bundle": "^3.3.1",
+        "easycorp/easyadmin-bundle": "^4.22.0",
+        "itk-dev/getorganized-api-client-php": "dev-feature/symfony-7",
         "kapersoft/sharefile-api": "dev-deltag.aarhus.dk",
-        "mpdf/mpdf": "^8.0",
-        "opis/json-schema": "^2.3",
-        "phpdocumentor/reflection-docblock": "^5.3",
-        "phpoffice/phpspreadsheet": "^1.22",
-        "phpstan/phpdoc-parser": "^1.4",
-        "sensio/framework-extra-bundle": "^6.2",
-        "stof/doctrine-extensions-bundle": "^1.7",
-        "symfony/asset": "5.4.*",
-        "symfony/console": "5.4.*",
-        "symfony/dotenv": "5.4.*",
-        "symfony/expression-language": "5.4.*",
-        "symfony/filesystem": "5.4.*",
-        "symfony/flex": "^1.18",
-        "symfony/form": "5.4.*",
-        "symfony/framework-bundle": "5.4.*",
-        "symfony/mailer": "5.4.*",
-        "symfony/messenger": "5.4.*",
-        "symfony/monolog-bundle": "^3.7",
-        "symfony/options-resolver": "5.4.*",
-        "symfony/process": "5.4.*",
-        "symfony/property-access": "5.4.*",
-        "symfony/property-info": "5.4.*",
-        "symfony/proxy-manager-bridge": "5.4.*",
-        "symfony/runtime": "5.4.*",
-        "symfony/security-bundle": "5.4.*",
-        "symfony/serializer": "5.4.*",
-        "symfony/translation": "5.4.*",
-        "symfony/twig-bundle": "5.4.*",
-        "symfony/uid": "5.4.*",
-        "symfony/validator": "5.4.*",
-        "symfony/web-link": "5.4.*",
-        "symfony/webpack-encore-bundle": "^1.14",
-        "symfony/yaml": "5.4.*"
+        "mpdf/mpdf": "^8.2.5",
+        "phpoffice/phpspreadsheet": "^3.8",
+        "stof/doctrine-extensions-bundle": "^1.13",
+        "symfony/asset": "~7.2.0",
+        "symfony/asset-mapper": "~7.2.0",
+        "symfony/console": "~7.2.1",
+        "symfony/dotenv": "~7.2.0",
+        "symfony/flex": "^2.4.7",
+        "symfony/framework-bundle": "~7.2.2",
+        "symfony/mailer": "~7.2.0",
+        "symfony/messenger": "~7.2.1",
+        "symfony/monolog-bundle": "^3.10",
+        "symfony/runtime": "~7.2.0",
+        "symfony/translation": "~7.2.2",
+        "symfony/twig-bundle": "~7.2.0",
+        "symfony/yaml": "~7.2.0",
+        "twig/extra-bundle": "^2.12 || ^3.18",
+        "twig/twig": "^2.12 || ^3.18"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.8",
-        "phpstan/phpstan": "^1.5",
-        "symfony/maker-bundle": "^1.38"
+        "ergebnis/composer-normalize": "^2.45",
+        "friendsofphp/php-cs-fixer": "^3.68.0",
+        "rector/rector": "^2.0.6",
+        "symfony/maker-bundle": ">=1.62.1",
+        "symfony/stopwatch": "~7.2.2",
+        "symfony/web-profiler-bundle": "~7.2.2",
+        "vincentlanglet/twig-cs-fixer": "^3.5"
     },
-    "config": {
-        "allow-plugins": {
-            "composer/package-versions-deprecated": true,
-            "symfony/flex": true,
-            "symfony/runtime": true
-        },
-        "optimize-autoloader": true,
-        "preferred-install": {
-            "*": "dist"
-        },
-        "sort-packages": true
+    "replace": {
+        "symfony/polyfill-ctype": "*",
+        "symfony/polyfill-iconv": "*",
+        "symfony/polyfill-php72": "*",
+        "symfony/polyfill-php73": "*",
+        "symfony/polyfill-php74": "*",
+        "symfony/polyfill-php80": "*",
+        "symfony/polyfill-php81": "*",
+        "symfony/polyfill-php82": "*"
     },
+    "conflict": {
+        "symfony/symfony": "*"
+    },
+    "repositories": {
+        "deskpro/deskpro-api-client-php": {
+            "type": "vcs",
+            "url": "https://github.com/itk-dev/deskpro-api-client-php"
+        },
+        "kapersoft/sharefile-api": {
+            "type": "git",
+            "url": "https://github.com/rimi-itk/sharefile-api"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
     "autoload": {
         "psr-4": {
             "App\\": "src/"
@@ -79,59 +75,72 @@
             "App\\Tests\\": "tests/"
         }
     },
-    "replace": {
-        "symfony/polyfill-ctype": "*",
-        "symfony/polyfill-iconv": "*",
-        "symfony/polyfill-php72": "*"
+    "config": {
+        "allow-plugins": {
+            "ergebnis/composer-normalize": true,
+            "php-http/discovery": true,
+            "symfony/flex": true,
+            "symfony/runtime": true
+        },
+        "bump-after-update": true,
+        "sort-packages": true
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": true,
+            "docker": true,
+            "require": "7.2.*"
+        }
     },
     "scripts": {
-        "auto-scripts": {
-            "cache:clear": "symfony-cmd",
-            "assets:install %PUBLIC_DIR%": "symfony-cmd"
-        },
         "post-install-cmd": [
             "@auto-scripts"
         ],
         "post-update-cmd": [
             "@auto-scripts"
         ],
-        "coding-standards-check/php-cs-fixer": [
-            "vendor/bin/php-cs-fixer fix --allow-risky=yes --dry-run"
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd",
+            "importmap:install": "symfony-cmd"
+        },
+        "code-analysis": [
+            "@code-analysis/phpstan"
         ],
-        "coding-standards-check": [
-            "@coding-standards-check/php-cs-fixer"
+        "code-analysis/phpstan": [
+            "phpstan analyse"
+        ],
+        "coding-standards-apply/php": [
+            "@coding-standards-apply/php-cs-fixer"
         ],
         "coding-standards-apply/php-cs-fixer": [
             "vendor/bin/php-cs-fixer --allow-risky=yes fix"
         ],
-        "coding-standards-apply": [
-            "@coding-standards-apply/php-cs-fixer"
+        "coding-standards-apply/twig": [
+            "@coding-standards-apply/twig-cs-fixer"
         ],
-        "code-analysis/phpstan": [
-            "phpstan analyse --level=5 src"
+        "coding-standards-apply/twig-cs-fixer": [
+            "vendor/bin/twig-cs-fixer fix templates"
         ],
-        "code-analysis": [
-            "@code-analysis/phpstan"
+        "coding-standards-check": [
+            "@coding-standards-check/php",
+            "@coding-standards-check/twig"
+        ],
+        "coding-standards-check/php": [
+            "@coding-standards-check/php-cs-fixer"
+        ],
+        "coding-standards-check/php-cs-fixer": [
+            "vendor/bin/php-cs-fixer check"
+        ],
+        "coding-standards-check/twig-cs-fixer": [
+            "vendor/bin/twig-cs-fixer fix templates"
+        ],
+        "translations-update": [
+            "# We need a translation from en to en (!) (without prefix) to be able to process placeholders in en.",
+            "DEFAULT_LOCALE=en bin/console translation:extract --clean --force en --prefix=''",
+            "DEFAULT_LOCALE=en bin/console translation:extract --clean --force da",
+            "# Mark default translations (prefixed with `__`) as “Needs work” in Danish translations",
+            "sed --in-place='' 's/<target>__/<target state=\"needs-l10n\">__/' translations/*.da.*xlf"
         ]
-    },
-    "conflict": {
-        "symfony/symfony": "*"
-    },
-    "extra": {
-        "symfony": {
-            "allow-contrib": true,
-            "require": "5.4.*",
-            "docker": true
-        }
-    },
-    "repositories": {
-        "itk-dev/getorganized-api-client-php": {
-            "type": "vcs",
-            "url": "https://github.com/itk-dev/getorganized-api-client-php"
-        },
-        "kapersoft/sharefile-api": {
-            "type": "git",
-            "url": "https://github.com/rimi-itk/sharefile-api"
-        }
     }
 }

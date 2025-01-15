@@ -1,15 +1,22 @@
 # Hoeringsportal – GetOrganized
 
-```sh
+``` shell
 docker compose pull
 docker compose up --detach
-# We use kapersoft/sharefile-api which does not officially support PHP 8.1 (hence --ignore-platform-req=php)
-docker compose exec phpfpm composer install --ignore-platform-req=php
+docker compose exec phpfpm composer install
+# For production (cf. https://symfony.com/doc/current/frontend/asset_mapper.html)
+docker compose exec phpfpm php bin/console asset-map:compile
 ```
 
-```sh
+``` shell name=site-install
+task site-install
+```
+
+``` shell name=assets-build
 docker compose run --rm node yarn install
 docker compose run --rm node yarn build
+```
 
+``` shell name=assets-watch
 docker compose run --rm node yarn watch
 ```

@@ -1,0 +1,174 @@
+version: '3'
+
+# https://taskfile.dev/usage/#env-files
+dotenv: ['.env.local', '.env']
+
+vars:
+  # https://taskfile.dev/reference/templating/
+  BASE_URL: 'https://{{.TASK_BASE_URL | default .COMPOSE_SERVER_DOMAIN | default .COMPOSE_DOMAIN | default "sharefile2go.local.itkdev.dk"}}'
+  DOCKER_COMPOSE: '{{.TASK_DOCKER_COMPOSE | default "docker compose"}}'
+  COMPOSER_INSTALL_ARGUMENTS: '{{.TASK_COMPOSER_INSTALL_ARGUMENTS | default ""}}'
+
+tasks:
+  default:
+    cmds:
+      - task --list-all
+    silent: true
+
+  site-install:
+    prompt: "This will reset your setup. Continue?"
+    cmds:
+      - task compose -- down
+      - task: site-update
+      - task site-open
+      # - task site-open:admin
+    silent: true
+
+  site-update:
+    cmds:
+      - task compose -- pull
+      - task compose-up
+      - task composer-install
+      - task console -- --no-interaction doctrine:migrations:migrate
+    silent: true
+
+  site-url:
+    cmds:
+      - echo {{.BASE_URL}}
+    silent: true
+
+  site-open:
+    cmds:
+      - if command -v open 2>&1 >/dev/null; then open "$(task site-url)"; else echo "$(task site-url)"; fi
+    silent: true
+
+  compose:
+    cmds:
+      - '{{.DOCKER_COMPOSE}} {{.CLI_ARGS}}'
+
+  compose-up:
+    cmds:
+      - task compose -- up --detach --remove-orphans
+    silent: true
+
+  composer:
+    cmds:
+      - task compose -- exec phpfpm composer {{.CLI_ARGS}}
+    silent: true
+
+  composer-install:
+    cmds:
+      - task composer -- install {{.COMPOSER_INSTALL_ARGUMENTS}} {{.CLI_ARGS}}
+    silent: true
+
+  console:
+    cmds:
+      # Check if we have content on stdin (cf.
+      # https://unix.stackexchange.com/questions/762992/bash-check-if-the-standard-input-contains-anything)
+      - >-
+        if [[ ! -t 0 ]]; then
+          task compose -- exec --no-TTY phpfpm bin/console {{.CLI_ARGS}};
+        else
+          task compose -- exec phpfpm bin/console {{.CLI_ARGS}};
+        fi
+    silent: true
+
+  coding-standards:apply:
+    desc: "Apply coding standards"
+    cmds:
+      - task: coding-standards:apply:assets
+      - task: coding-standards:apply:composer
+      - task: coding-standards:apply:markdown
+      - task: coding-standards:apply:php
+      - task: coding-standards:apply:twig
+    silent: true
+
+  coding-standards:check:
+    desc: "Apply coding standards"
+    cmds:
+      - task: coding-standards:check:assets
+      - task: coding-standards:check:composer
+      - task: coding-standards:check:markdown
+      - task: coding-standards:check:php
+      - task: coding-standards:check:twig
+    silent: true
+
+  coding-standards:apply:assets:
+    desc: "Apply coding standards for assets"
+    cmds:
+      # Prettier does not (yet, fcf.
+      # https://github.com/prettier/prettier/issues/15206) have an official
+      # docker image.
+      # https://hub.docker.com/r/jauderho/prettier is good candidate (cf. https://hub.docker.com/search?q=prettier&sort=updated_at&order=desc)
+      - docker run --rm --volume "$PWD:/work" jauderho/prettier --write assets
+
+  coding-standards:check:assets:
+    desc: "Apply and check coding standards for assets"
+    cmds:
+      - task: coding-standards:apply:assets
+      - docker run --rm --volume "$PWD:/work" jauderho/prettier --check assets
+
+  coding-standards:apply:composer:
+    desc: "Apply coding standards for Composer"
+    cmds:
+      - task composer -- normalize
+    silent: true
+
+  coding-standards:check:composer:
+    desc: "Apply and check coding standards for Composer"
+    cmds:
+      - task: coding-standards:apply:composer
+      - task composer -- normalize --dry-run
+    silent: true
+
+  coding-standards:apply:markdown:
+    desc: "Apply coding standards for Markdown"
+    cmds:
+      - docker run --rm --volume "$PWD:/md" peterdavehello/markdownlint markdownlint  --ignore '**/node_modules/**' --ignore '**/vendor/**' '*.md' 'web/*/custom/**/*.md' 'documentation/*.md' --fix
+
+  coding-standards:check:markdown:
+    desc: "Apply and check coding standards for Markdown"
+    cmds:
+      - task: coding-standards:apply:markdown
+      - docker run --rm --volume "$PWD:/md" peterdavehello/markdownlint markdownlint  --ignore '**/node_modules/**' --ignore '**/vendor/**' '*.md' 'web/*/custom/**/*.md' 'documentation/*.md'
+
+  coding-standards:apply:php:
+    desc: "Apply coding standards for PHP"
+    cmds:
+      - task composer -- coding-standards-apply/php
+    silent: true
+
+  coding-standards:check:php:
+    desc: "Apply and check coding standards for PHP"
+    cmds:
+      - task: coding-standards:apply:php
+      - task composer -- coding-standards-check/php
+    silent: true
+
+  coding-standards:apply:twig:
+    desc: "Apply coding standards for Twig"
+    cmds:
+      - task composer -- coding-standards-apply/twig
+    silent: true
+
+  coding-standards:check:twig:
+    desc: "Apply and check coding standards for Twig"
+    cmds:
+      - task: coding-standards:apply:twig
+      - task composer -- coding-standards-check/twig
+    silent: true
+
+  code-analysis:
+    cmds:
+      - task composer -- code-analysis {{.CLI_ARGS}}
+
+  docker-pull:
+    desc: "Pull all development docker images"
+    cmds:
+      - docker pull jauderho/prettier
+      - docker pull peterdavehello/markdownlint
+      - task compose -- pull
+
+  translations-update:
+    cmds:
+      - task composer -- translations-update

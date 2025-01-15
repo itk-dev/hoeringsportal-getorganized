@@ -22,12 +22,8 @@ class GetOrganizedService implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    public const CREATED = 'created';
-    public const UPDATED = 'updated';
-
-    private DocumentHelper $documentHelper;
-
-    private Filesystem $filesystem;
+    public const string CREATED = 'created';
+    public const string UPDATED = 'updated';
 
     private Archiver $archiver;
 
@@ -37,13 +33,11 @@ class GetOrganizedService implements LoggerAwareInterface
     private Cases $getOrganizedCases;
     private Documents $getOrganizedDocuments;
 
-    private TemplateHelper $templateHelper;
-
-    public function __construct(DocumentHelper $documentHelper, Filesystem $filesystem, TemplateHelper $templateHelper)
-    {
-        $this->documentHelper = $documentHelper;
-        $this->filesystem = $filesystem;
-        $this->templateHelper = $templateHelper;
+    public function __construct(
+        private readonly DocumentHelper $documentHelper,
+        private readonly Filesystem $filesystem,
+        private readonly TemplateHelper $templateHelper,
+    ) {
         $this->setLogger(new NullLogger());
     }
 
@@ -56,7 +50,10 @@ class GetOrganizedService implements LoggerAwareInterface
         return $this;
     }
 
-    public function getHearings()
+    /**
+     * @return GetOrganizedCase[]
+     */
+    public function getHearings(): array
     {
         return $this->getCases();
     }
@@ -154,23 +151,19 @@ class GetOrganizedService implements LoggerAwareInterface
         }
 
         // Process TWIG templates in metadata.
-        $metadata = array_map(function ($value) use ($itemMetadata) {
-            return false !== strpos($value, '{{') ? $this->templateHelper->render($value, ['item' => $itemMetadata]) : $value;
-        }, $metadata);
+        $metadata = array_map(fn ($value) => str_contains((string) $value, '{{') ? $this->templateHelper->render($value, ['item' => $itemMetadata]) : $value, $metadata);
 
         return $metadata;
     }
 
     /**
-     * @return array|CaseEntity[]
+     * @return GetOrganizedCase[]
      */
-    public function getCases(array $criteria = [])
+    public function getCases(array $criteria = []): array
     {
         $result = $this->getOrganizedCases()->FindCases($criteria);
 
-        return array_map(static function (array $data) {
-            return new GetOrganizedCase($data);
-        }, $result);
+        return array_map(static fn (array $data) => new GetOrganizedCase($data), $result);
     }
 
     public function getCaseById(string $id): ?GetOrganizedCase
@@ -184,39 +177,39 @@ class GetOrganizedService implements LoggerAwareInterface
         return 1 === \count($result) ? reset($result) : null;
     }
 
-    public function getCaseByName(string $name)
+    public function getCaseByName(string $name): ?GetOrganizedCase
     {
         $result = $this->getCases(['TitleText' => $name]);
 
         return 1 === \count($result) ? reset($result) : null;
     }
 
-    public function getDocumentsBy(array $criteria)
-    {
-        return $this->getOrganizedCases()->searchDocument($criteria);
-    }
+    // public function getDocumentsBy(array $criteria)
+    // {
+    //     return $this->getOrganizedCases()->searchDocument($criteria);
+    // }
 
-    public function getDocumentById(string $id)
-    {
-        $result = $this->getOrganizedCases()->searchDocument(['DocumentIdentifier' => $id]);
+    // public function getDocumentById(string $id)
+    // {
+    //     $result = $this->getOrganizedCases()->searchDocument(['DocumentIdentifier' => $id]);
+    //
+    //    return 1 === \count($result) ? reset($result) : null;
+    // }
 
-        return 1 === \count($result) ? reset($result) : null;
-    }
+    // public function getDocumentByNumber(string $number)
+    // {
+    //     $result = $this->getOrganizedCases()->searchDocument(['DocumentNumber' => $number]);
+    //
+    //     return 1 === \count($result) ? reset($result) : null;
+    // }
 
-    public function getDocumentByNumber(string $number)
-    {
-        $result = $this->getOrganizedCases()->searchDocument(['DocumentNumber' => $number]);
-
-        return 1 === \count($result) ? reset($result) : null;
-    }
-
-    public function getDocumentVersion(string $documentVersionIdentifier)
-    {
-        return $this->getOrganizedCases()->getDocumentVersion($documentVersionIdentifier);
-    }
+    // public function getDocumentVersion(string $documentVersionIdentifier)
+    // {
+    //     return $this->getOrganizedCases()->getDocumentVersion($documentVersionIdentifier);
+    // }
 
     // Temporary cache.
-    private $caseDocuments = [];
+    private array $caseDocuments = [];
 
     public function getDocumentsByCaseId(string $caseId): ?array
     {
@@ -236,7 +229,7 @@ class GetOrganizedService implements LoggerAwareInterface
                 if (isset($document['ListItemAllFields']['DocID'])) {
                     $editUrl = $document['odata.editLink'] ?? null;
                     // Extract filename from edit url, e.g. "Web/GetFileByServerRelativePath(decodedurl='/cases/GEO277/GEO-2021-019143/Dokumenter/HS2672873-internal.pdf')")
-                    if (preg_match('@decodedurl=[\'"][^\'"]*/(?P<filename>[^/]+)[\'"]@i', $editUrl, $matches)) {
+                    if (preg_match('@decodedurl=[\'"][^\'"]*/(?P<filename>[^/]+)[\'"]@i', (string) $editUrl, $matches)) {
                         if ($filename === $matches['filename']) {
                             return new GetOrganizedDocument(
                                 $document['ListItemAllFields'] + [
@@ -254,7 +247,7 @@ class GetOrganizedService implements LoggerAwareInterface
         return null;
     }
 
-    private function validateConfiguration()
+    private function validateConfiguration(): void
     {
         // @HACK
         if (empty($this->configuration)) {
@@ -270,25 +263,29 @@ class GetOrganizedService implements LoggerAwareInterface
         }
     }
 
-    private function getOrganizedCases()
+    private function getOrganizedCases(): Cases
     {
         if (empty($this->getOrganizedCases)) {
-            $this->getOrganizedCases = $this->client()->api('cases');
+            $service = $this->client()->api('cases');
+            assert($service instanceof Cases);
+            $this->getOrganizedCases = $service;
         }
 
         return $this->getOrganizedCases;
     }
 
-    private function getOrganizedDocuments()
+    private function getOrganizedDocuments(): Documents
     {
         if (empty($this->getOrganizedDocuments)) {
-            $this->getOrganizedDocuments = $this->client()->api('documents');
+            $service = $this->client()->api('documents');
+            assert($service instanceof Documents);
+            $this->getOrganizedDocuments = $service;
         }
 
         return $this->getOrganizedDocuments;
     }
 
-    private function client()
+    private function client(): Client
     {
         if (empty($this->client)) {
             $httpClient = new TraceableHttpClient(Client::createHttpClient(
