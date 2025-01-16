@@ -45,7 +45,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: |
-          docker run --rm --volume "$PWD:/md" peterdavehello/markdownlint markdownlint --ignore '**/vendor/**' '**.md'
+          docker run --rm --volume "$PWD:/md" peterdavehello/markdownlint markdownlint '**.md'
 
   site-update:
     name: Check that site can be updated
