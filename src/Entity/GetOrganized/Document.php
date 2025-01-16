@@ -3,43 +3,46 @@
 namespace App\Entity\GetOrganized;
 
 use App\Entity\Archiver;
+use App\Repository\GetOrganized\DocumentRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
+use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
-#[ORM\Entity(repositoryClass: \App\Repository\GetOrganized\DocumentRepository::class)]
+#[ORM\Entity(repositoryClass: DocumentRepository::class)]
 #[ORM\Table(name: 'get_organized_document')]
 class Document
 {
     use TimestampableEntity;
 
     #[ORM\Id]
-    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
     private Uuid $id;
 
     /**
      * The GetOrganized case id.
      */
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     private string $caseId;
 
     /**
      * The GetOrganized document id.
      */
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     private string $docId;
 
-    #[ORM\Column(type: 'json')]
+    #[ORM\Column(type: Types::JSON)]
     private array $data = [];
 
     #[ORM\ManyToOne(targetEntity: Archiver::class)]
     #[ORM\JoinColumn(nullable: false)]
     private Archiver $archiver;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     private string $shareFileItemId;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     private string $shareFileItemStreamId;
 
     public function __construct()
