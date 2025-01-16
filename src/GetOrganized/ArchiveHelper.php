@@ -57,7 +57,7 @@ class ArchiveHelper implements LoggerAwareInterface
                 ->setArchiver($archiver)
                 ->setLogger($this->logger);
 
-            $startTime = new \DateTimeImmutable();
+            $startTime = new \DateTime();
 
             $this->archiveResponses($hearingItemId);
             $this->archiveOverviews($hearingItemId);

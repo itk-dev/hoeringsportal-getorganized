@@ -157,10 +157,7 @@ class ShareFileService implements LoggerAwareInterface
         return $this->construct(Item::class, $responses);
     }
 
-    /**
-     * @param string|Item $item
-     */
-    public function getItem($item): Item
+    public function getItem(string|Item $item): Item
     {
         $itemId = $this->getItemId($item);
         $item = $this->client()->getItemById($itemId);
@@ -172,12 +169,8 @@ class ShareFileService implements LoggerAwareInterface
 
     /**
      * Get metadata list.
-     *
-     * @param string|Item $item
-     *
-     * @return array
      */
-    public function getMetadata($item, ?array $names = null)
+    public function getMetadata(string|Item $item, ?array $names = null): array
     {
         $this->debug(sprintf('%s(%s)', __METHOD__, json_encode(func_get_args())));
 
@@ -224,7 +217,7 @@ class ShareFileService implements LoggerAwareInterface
         return $metadata[$name] ?? null;
     }
 
-    public function getFiles(Item $item, ?\DateTimeInterface $changedAfter = null): array
+    public function getFiles(string|Item $item, ?\DateTimeInterface $changedAfter = null): array
     {
         $itemId = $this->getItemId($item);
         $children = $this->getChildren($itemId, self::SHAREFILE_FILE, $changedAfter);
@@ -234,7 +227,7 @@ class ShareFileService implements LoggerAwareInterface
         return $this->construct(Item::class, $files);
     }
 
-    public function getFolders(Item $item, ?\DateTimeInterface $changedAfter = null): array
+    public function getFolders(string|Item $item, ?\DateTimeInterface $changedAfter = null): array
     {
         $this->debug(sprintf('%s(%s)', __METHOD__, json_encode(func_get_args())));
 
@@ -250,7 +243,7 @@ class ShareFileService implements LoggerAwareInterface
         return $folders;
     }
 
-    public function downloadFile(Item $item): string
+    public function downloadFile(string|Item $item): string
     {
         $itemId = $this->getItemId($item);
 

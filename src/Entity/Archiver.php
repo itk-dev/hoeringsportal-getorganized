@@ -48,7 +48,7 @@ class Archiver implements Loggable, \JsonSerializable, \Stringable
     private bool $enabled = false;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?\DateTimeInterface $lastRunAt = null;
+    private ?\DateTime $lastRunAt = null;
 
     #[ORM\Column(type: 'string', length: 255)]
     private ?string $type = null;
@@ -104,12 +104,12 @@ class Archiver implements Loggable, \JsonSerializable, \Stringable
         return $this;
     }
 
-    public function getLastRunAt(): ?\DateTimeInterface
+    public function getLastRunAt(): ?\DateTime
     {
         return $this->lastRunAt;
     }
 
-    public function setLastRunAt(?\DateTimeInterface $lastRunAt): self
+    public function setLastRunAt(?\DateTime $lastRunAt): self
     {
         $this->lastRunAt = $lastRunAt;
 
@@ -147,10 +147,8 @@ class Archiver implements Loggable, \JsonSerializable, \Stringable
 
     /**
      * Get GetOrganized organization reference (id) from Deskpro department id.
-     *
-     * @return int|null
      */
-    public function getGetOrganizedOrganizationReference(?string $id)
+    public function getGetOrganizedOrganizationReference(?string $id): ?int
     {
         $map = $this->getConfigurationValue('[getorganized][organizations]') ?? [];
 
