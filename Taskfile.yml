@@ -124,13 +124,13 @@ tasks:
   coding-standards:apply:markdown:
     desc: "Apply coding standards for Markdown"
     cmds:
-      - docker run --rm --volume "$PWD:/md" peterdavehello/markdownlint markdownlint --ignore '**/vendor/**' '**.md' --fix
+      - docker run --rm --volume "$PWD:/md" itkdev/markdownlint '**.md' --fix
 
   coding-standards:check:markdown:
     desc: "Apply and check coding standards for Markdown"
     cmds:
       - task: coding-standards:apply:markdown
-      - docker run --rm --volume "$PWD:/md" peterdavehello/markdownlint markdownlint --ignore '**/vendor/**' '**.md'
+      - docker run --rm --volume "$PWD:/md" itkdev/markdownlint '**.md'
 
   coding-standards:apply:php:
     desc: "Apply coding standards for PHP"
@@ -166,7 +166,7 @@ tasks:
     desc: "Pull all development docker images"
     cmds:
       - docker pull jauderho/prettier
-      - docker pull peterdavehello/markdownlint
+      - docker pull itkdev/markdownlint
       - task compose -- pull
 
   translations-update:
