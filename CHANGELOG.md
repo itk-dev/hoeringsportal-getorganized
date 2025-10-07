@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+* [PR-16](https://github.com/itk-dev/hoeringsportal-getorganized/pull/16)
+  Added missing group TOC entry
+
 ## [1.1.0] - 2025-01-16
 
 * [PR-13](https://github.com/itk-dev/hoeringsportal-getorganized/pull/13)

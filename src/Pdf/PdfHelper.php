@@ -385,6 +385,7 @@ class PdfHelper
 
         $index = 0;
         foreach ($groups as $group => $responses) {
+            $tocGroupAdded = false;
             $this->debug(sprintf('Group: %s', $group));
 
             foreach ($responses as $response) {
@@ -411,6 +412,10 @@ class PdfHelper
                         ]);
                     }
                     if (1 === $p) {
+                        if (!$tocGroupAdded) {
+                            $mpdf->TOC_Entry($group, 0);
+                            $tocGroupAdded = true;
+                        }
                         $title = $this->getTitle($response) ?? $response->getName();
                         $title .= ' – '.$this->getHearingReplyId($response);
                         $mpdf->TOC_Entry($title, 1);
