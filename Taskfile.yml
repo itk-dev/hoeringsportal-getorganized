@@ -1,7 +1,7 @@
-version: '3'
+version: "3"
 
 # https://taskfile.dev/usage/#env-files
-dotenv: ['.env.local', '.env']
+dotenv: [".env.local", ".env"]
 
 vars:
   # https://taskfile.dev/reference/templating/
@@ -44,7 +44,7 @@ tasks:
 
   compose:
     cmds:
-      - '{{.DOCKER_COMPOSE}} {{.CLI_ARGS}}'
+      - "{{.DOCKER_COMPOSE}} {{.CLI_ARGS}}"
 
   compose-up:
     cmds:
