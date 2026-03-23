@@ -3,3 +3,9 @@ services:
     environment:
       - PHP_MAX_EXECUTION_TIME=300
       - PHP_MEMORY_LIMIT=1024M
+
+    # We need to open a lot of files when combining PDFs …
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536

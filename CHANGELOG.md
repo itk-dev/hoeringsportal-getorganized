@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-03-23
+
+* [PR-18](https://github.com/itk-dev/hoeringsportal-getorganized/pull/18)
+  Increased max number of opened files
+
 ## [1.1.1] - 2025-10-07
 
 * [PR-16](https://github.com/itk-dev/hoeringsportal-getorganized/pull/16)
@@ -24,7 +29,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.9.0] - 2024-01-09
 
-[Unreleased]: https://github.com/itk-dev/hoeringsportal-getorganized/compare/1.1.1...HEAD
+[Unreleased]: https://github.com/itk-dev/hoeringsportal-getorganized/compare/1.1.2...HEAD
+[1.1.2]: https://github.com/itk-dev/hoeringsportal-getorganized/compare/1.1.1...1.1.2
 [1.1.1]: https://github.com/itk-dev/hoeringsportal-getorganized/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/itk-dev/hoeringsportal-getorganized/compare/1.0.0...1.1.0
 [1.0.0]: https://github.com/itk-dev/hoeringsportal-getorganized/compare/0.9.0...1.0.0
