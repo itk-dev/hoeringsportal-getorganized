@@ -423,6 +423,10 @@ class PdfHelper
 
                     $mpdf->useTemplate($tplId);
                 }
+
+                // We cannot clean up here. The underlying stream is used by the
+                // mpdf object and read during the call to `Output`.
+                // $reader->cleanUp();
             }
         }
 
