@@ -16,7 +16,7 @@
         "itk-dev/getorganized-api-client-php": "dev-feature/symfony-7",
         "kapersoft/sharefile-api": "dev-deltag.aarhus.dk",
         "mpdf/mpdf": "^8.2.5",
-        "phpoffice/phpspreadsheet": "^3.8",
+        "phpoffice/phpspreadsheet": "^3.10.5",
         "stof/doctrine-extensions-bundle": "^1.13",
         "symfony/asset": "~7.4.8",
         "symfony/asset-mapper": "~7.4.11",
