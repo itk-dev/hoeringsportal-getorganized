@@ -4,7 +4,7 @@
     "license": "proprietary",
     "type": "project",
     "require": {
-        "php": "^8.3",
+        "php": "^8.4",
         "ext-ctype": "*",
         "ext-iconv": "*",
         "cweagans/composer-patches": "^1.7.3",
@@ -36,7 +36,7 @@
     },
     "require-dev": {
         "ergebnis/composer-normalize": "^2.45",
-        "friendsofphp/php-cs-fixer": "^3.68.0",
+        "friendsofphp/php-cs-fixer": "^3.95.2",
         "rector/rector": "^2.0.6",
         "symfony/maker-bundle": ">=1.67.0",
         "symfony/stopwatch": "~7.4.8",

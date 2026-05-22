@@ -121,18 +121,17 @@ class ArchiveHelper implements LoggerAwareInterface
                             // $getOrganizedHearing = $this->getOrganized->getHearing($shareFileHearing, true, $metadata);
                             // if (null === $getOrganizedHearing) {
                             throw new RuntimeException(sprintf('Error creating hearing: %s', $shareFileHearing->name));
-                        // }
-                        } else {
-                            $this->info(sprintf('Getting hearing for response %s', $shareFileResponse->name));
-                            $getOrganizedCaseId = $shareFileResponse->metadata['ticket_data'][self::GET_ORGANIZED_CASE_ID_TICKET_KEY] ?? null;
+                            // }
+                        }
+                        $this->info(sprintf('Getting hearing for response %s', $shareFileResponse->name));
+                        $getOrganizedCaseId = $shareFileResponse->metadata['ticket_data'][self::GET_ORGANIZED_CASE_ID_TICKET_KEY] ?? null;
 
-                            if (null === $getOrganizedCaseId) {
-                                throw new RuntimeException(sprintf('Cannot get GetOrganized case id from item %s (%s)', $shareFileResponse->name, $shareFileResponse->id));
-                            }
-                            $getOrganizedHearing = $this->getOrganized->getCaseById($getOrganizedCaseId);
-                            if (null === $getOrganizedHearing) {
-                                throw new RuntimeException(sprintf('Cannot get GetOrganized case %s', $getOrganizedCaseId));
-                            }
+                        if (null === $getOrganizedCaseId) {
+                            throw new RuntimeException(sprintf('Cannot get GetOrganized case id from item %s (%s)', $shareFileResponse->name, $shareFileResponse->id));
+                        }
+                        $getOrganizedHearing = $this->getOrganized->getCaseById($getOrganizedCaseId);
+                        if (null === $getOrganizedHearing) {
+                            throw new RuntimeException(sprintf('Cannot get GetOrganized case %s', $getOrganizedCaseId));
                         }
                     }
 
@@ -212,25 +211,24 @@ class ArchiveHelper implements LoggerAwareInterface
                     // $getOrganizedHearing = $this->getOrganized->getHearing($shareFileHearing);
                     // if (null === $getOrganizedHearing) {
                     throw new RuntimeException(sprintf('Cannot get GetOrganized case %s', $shareFileHearing->id));
-                // }
-                } else {
-                    $getOrganizedCaseId = null;
-                    foreach ($shareFileResponses as $shareFileResponse) {
-                        if (!empty($shareFileResponse->metadata['ticket_data'][self::GET_ORGANIZED_CASE_ID_TICKET_KEY])) {
-                            $getOrganizedCaseId = $shareFileResponse->metadata['ticket_data'][self::GET_ORGANIZED_CASE_ID_TICKET_KEY];
+                    // }
+                }
+                $getOrganizedCaseId = null;
+                foreach ($shareFileResponses as $shareFileResponse) {
+                    if (!empty($shareFileResponse->metadata['ticket_data'][self::GET_ORGANIZED_CASE_ID_TICKET_KEY])) {
+                        $getOrganizedCaseId = $shareFileResponse->metadata['ticket_data'][self::GET_ORGANIZED_CASE_ID_TICKET_KEY];
 
-                            break;
-                        }
+                        break;
                     }
+                }
 
-                    if (null === $getOrganizedCaseId) {
-                        throw new RuntimeException(sprintf('Cannot get GetOrganized case id from item %s (%s)', $shareFileHearing->name, $shareFileHearing->id));
-                    }
+                if (null === $getOrganizedCaseId) {
+                    throw new RuntimeException(sprintf('Cannot get GetOrganized case id from item %s (%s)', $shareFileHearing->name, $shareFileHearing->id));
+                }
 
-                    $getOrganizedHearing = $this->getOrganized->getCaseById($getOrganizedCaseId);
-                    if (null === $getOrganizedHearing) {
-                        throw new RuntimeException(sprintf('Cannot get GetOrganized case %s', $getOrganizedCaseId));
-                    }
+                $getOrganizedHearing = $this->getOrganized->getCaseById($getOrganizedCaseId);
+                if (null === $getOrganizedHearing) {
+                    throw new RuntimeException(sprintf('Cannot get GetOrganized case %s', $getOrganizedCaseId));
                 }
 
                 foreach ($overviews as $overview) {
