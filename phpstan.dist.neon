@@ -7,6 +7,9 @@ parameters:
         - src/
         # - tests/
 
+    excludePaths:
+        - config/reference.php
+
     ignoreErrors:
         -
             # @todo Clean up.

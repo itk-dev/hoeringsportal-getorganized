@@ -129,11 +129,10 @@ class GetOrganizedService implements LoggerAwareInterface
             $this->logger->debug(sprintf('%s; finalize document; response: %s', __METHOD__, json_encode($response)));
 
             return $response;
-        } else {
-            $this->logger->error(sprintf('%s; finalize document; unexpected response: %s', __METHOD__, json_encode($response)));
-
-            return null;
         }
+        $this->logger->error(sprintf('%s; finalize document; unexpected response: %s', __METHOD__, json_encode($response)));
+
+        return null;
     }
 
     private function writeFile(string $content, Item $item): string
