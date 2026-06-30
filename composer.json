@@ -59,19 +59,19 @@
     },
     "repositories": [
         {
-            "name": "setasign/fpdi_pdf-parser",
             "type": "composer",
-            "url": "https://www.setasign.com/downloads/"
+            "url": "https://www.setasign.com/downloads/",
+            "name": "setasign/fpdi_pdf-parser"
         },
         {
-            "name": "deskpro/deskpro-api-client-php",
             "type": "vcs",
-            "url": "https://github.com/itk-dev/deskpro-api-client-php"
+            "url": "https://github.com/itk-dev/deskpro-api-client-php",
+            "name": "deskpro/deskpro-api-client-php"
         },
         {
-            "name": "kapersoft/sharefile-api",
             "type": "git",
-            "url": "https://github.com/rimi-itk/sharefile-api"
+            "url": "https://github.com/rimi-itk/sharefile-api",
+            "name": "kapersoft/sharefile-api"
         }
     ],
     "minimum-stability": "stable",

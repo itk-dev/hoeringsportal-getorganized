@@ -1,13 +1,13 @@
-version: "3"
-
-# https://taskfile.dev/usage/#env-files
-dotenv: [".env.local", ".env"]
+version: '3'
 
 vars:
   # https://taskfile.dev/reference/templating/
   BASE_URL: 'https://{{.TASK_BASE_URL | default .COMPOSE_SERVER_DOMAIN | default .COMPOSE_DOMAIN | default "sharefile2go.local.itkdev.dk"}}'
   DOCKER_COMPOSE: '{{.TASK_DOCKER_COMPOSE | default "docker compose"}}'
   COMPOSER_INSTALL_ARGUMENTS: '{{.TASK_COMPOSER_INSTALL_ARGUMENTS | default ""}}'
+
+# https://taskfile.dev/usage/#env-files
+dotenv: ['.env.local', '.env']
 
 tasks:
   default:
@@ -16,7 +16,7 @@ tasks:
     silent: true
 
   site-install:
-    prompt: "This will reset your setup. Continue?"
+    prompt: 'This will reset your setup. Continue?'
     cmds:
       - task compose -- down
       - task: site-update
@@ -44,7 +44,7 @@ tasks:
 
   compose:
     cmds:
-      - "{{.DOCKER_COMPOSE}} {{.CLI_ARGS}}"
+      - '{{.DOCKER_COMPOSE}} {{.CLI_ARGS}}'
 
   compose-up:
     cmds:
@@ -74,7 +74,7 @@ tasks:
     silent: true
 
   coding-standards:apply:
-    desc: "Apply coding standards"
+    desc: 'Apply coding standards'
     cmds:
       - task: coding-standards:apply:assets
       - task: coding-standards:apply:composer
@@ -84,7 +84,7 @@ tasks:
     silent: true
 
   coding-standards:check:
-    desc: "Apply coding standards"
+    desc: 'Apply coding standards'
     cmds:
       - task: coding-standards:check:assets
       - task: coding-standards:check:composer
@@ -94,7 +94,7 @@ tasks:
     silent: true
 
   coding-standards:apply:assets:
-    desc: "Apply coding standards for assets"
+    desc: 'Apply coding standards for assets'
     cmds:
       # Prettier does not (yet, fcf.
       # https://github.com/prettier/prettier/issues/15206) have an official
@@ -103,56 +103,56 @@ tasks:
       - docker run --rm --volume "$PWD:/work" jauderho/prettier --write assets
 
   coding-standards:check:assets:
-    desc: "Apply and check coding standards for assets"
+    desc: 'Apply and check coding standards for assets'
     cmds:
       - task: coding-standards:apply:assets
       - docker run --rm --volume "$PWD:/work" jauderho/prettier --check assets
 
   coding-standards:apply:composer:
-    desc: "Apply coding standards for Composer"
+    desc: 'Apply coding standards for Composer'
     cmds:
       - task composer -- normalize
     silent: true
 
   coding-standards:check:composer:
-    desc: "Apply and check coding standards for Composer"
+    desc: 'Apply and check coding standards for Composer'
     cmds:
       - task: coding-standards:apply:composer
       - task composer -- normalize --dry-run
     silent: true
 
   coding-standards:apply:markdown:
-    desc: "Apply coding standards for Markdown"
+    desc: 'Apply coding standards for Markdown'
     cmds:
       - docker run --rm --volume "$PWD:/md" itkdev/markdownlint '**.md' --fix
 
   coding-standards:check:markdown:
-    desc: "Apply and check coding standards for Markdown"
+    desc: 'Apply and check coding standards for Markdown'
     cmds:
       - task: coding-standards:apply:markdown
       - docker run --rm --volume "$PWD:/md" itkdev/markdownlint '**.md'
 
   coding-standards:apply:php:
-    desc: "Apply coding standards for PHP"
+    desc: 'Apply coding standards for PHP'
     cmds:
       - task composer -- coding-standards-apply/php
     silent: true
 
   coding-standards:check:php:
-    desc: "Apply and check coding standards for PHP"
+    desc: 'Apply and check coding standards for PHP'
     cmds:
       - task: coding-standards:apply:php
       - task composer -- coding-standards-check/php
     silent: true
 
   coding-standards:apply:twig:
-    desc: "Apply coding standards for Twig"
+    desc: 'Apply coding standards for Twig'
     cmds:
       - task composer -- coding-standards-apply/twig
     silent: true
 
   coding-standards:check:twig:
-    desc: "Apply and check coding standards for Twig"
+    desc: 'Apply and check coding standards for Twig'
     cmds:
       - task: coding-standards:apply:twig
       - task composer -- coding-standards-check/twig
@@ -163,7 +163,7 @@ tasks:
       - task composer -- code-analysis {{.CLI_ARGS}}
 
   docker-pull:
-    desc: "Pull all development docker images"
+    desc: 'Pull all development docker images'
     cmds:
       - docker pull jauderho/prettier
       - docker pull itkdev/markdownlint
