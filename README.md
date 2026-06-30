@@ -2,6 +2,12 @@
 
 ## Production
 
+> [!IMPORTANT]
+> We need a commercial add-on, [FPDI PDF-Parser](https://www.setasign.com/products/fpdi-pdf-parser), to
+> [FPDI](https://www.setasign.com/products/fpdi/) to parse new(er) PDF files.
+>
+> Find details on how to install the add-on in 1Password (Hint: Search for “FPDI“).
+
 ``` shell
 docker compose pull
 docker compose up --detach

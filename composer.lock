@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4339ac2573669ec061b7fd103c95894a",
+    "content-hash": "a1e2eae5422d728e7c31c36cd874a4b8",
     "packages": [
         {
             "name": "behat/transliterator",
@@ -3471,6 +3471,30 @@
                 }
             ],
             "time": "2026-05-13T10:16:22+00:00"
+        },
+        {
+            "name": "setasign/fpdi_pdf-parser",
+            "version": "2.1.6",
+            "dist": {
+                "type": "zip",
+                "url": "https://www.setasign.com/downloads/7082320/FPDI_PDF-Parser-2.1.6.zip"
+            },
+            "require": {
+                "setasign/fpdi": "^2.6.6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "setasign\\FpdiPdfParser\\": "src/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "support": {
+                "email": "support@setasign.com"
+            },
+            "time": "2026-03-13T00:00:00+00:00"
         },
         {
             "name": "stof/doctrine-extensions-bundle",
