@@ -17,6 +17,7 @@
         "kapersoft/sharefile-api": "dev-deltag.aarhus.dk",
         "mpdf/mpdf": "^8.2.5",
         "phpoffice/phpspreadsheet": "^3.10.5",
+        "setasign/fpdi_pdf-parser": "^2.0",
         "stof/doctrine-extensions-bundle": "^1.13",
         "symfony/asset": "~7.4.8",
         "symfony/asset-mapper": "~7.4.11",
@@ -56,16 +57,23 @@
     "conflict": {
         "symfony/symfony": "*"
     },
-    "repositories": {
-        "deskpro/deskpro-api-client-php": {
-            "type": "vcs",
-            "url": "https://github.com/itk-dev/deskpro-api-client-php"
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://www.setasign.com/downloads/",
+            "name": "setasign/fpdi_pdf-parser"
         },
-        "kapersoft/sharefile-api": {
+        {
+            "type": "vcs",
+            "url": "https://github.com/itk-dev/deskpro-api-client-php",
+            "name": "deskpro/deskpro-api-client-php"
+        },
+        {
             "type": "git",
-            "url": "https://github.com/rimi-itk/sharefile-api"
+            "url": "https://github.com/rimi-itk/sharefile-api",
+            "name": "kapersoft/sharefile-api"
         }
-    },
+    ],
     "minimum-stability": "stable",
     "prefer-stable": true,
     "autoload": {

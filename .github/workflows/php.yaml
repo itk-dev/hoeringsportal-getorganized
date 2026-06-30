@@ -35,20 +35,33 @@ name: Symfony PHP
 
 env:
   COMPOSE_USER: runner
+  # https://getcomposer.org/doc/03-cli.md#composer-auth
+  COMPOSER_AUTH: >-
+    {
+        "bearer": {
+            "www.setasign.com": "${{ secrets.COMPOSER_AUTH_SETASIGN_BEARER }}"
+        }
+    }
 
 on:
   pull_request:
+    paths: &paths
+      - "**/*.php"
+      - "composer.json"
+      - "composer.lock"
+      - "docker-compose.yml"
   push:
     branches:
       - main
       - develop
+    paths: *paths
 
 jobs:
   coding-standards:
     name: PHP - Check Coding Standards
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Create docker network
         run: |

@@ -27,21 +27,31 @@ name: Composer
 
 env:
   COMPOSE_USER: runner
+  # https://getcomposer.org/doc/03-cli.md#composer-auth
+  COMPOSER_AUTH: >-
+    {
+        "bearer": {
+            "www.setasign.com": "${{ secrets.COMPOSER_AUTH_SETASIGN_BEARER }}"
+        }
+    }
 
 on:
   pull_request:
+    paths: &paths
+      - "composer.json"
+      - "composer.lock"
+      - "docker-compose.yml"
   push:
     branches:
       - main
       - develop
+    paths: *paths
 
 jobs:
   composer-validate:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Create docker network
         run: |
@@ -52,10 +62,8 @@ jobs:
 
   composer-normalized:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Create docker network
         run: |
@@ -67,14 +75,12 @@ jobs:
 
   composer-audit:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Create docker network
         run: |
           docker network create frontend
 
       - run: |
-          docker compose run --rm phpfpm composer audit
+          docker compose run --rm phpfpm composer audit --locked

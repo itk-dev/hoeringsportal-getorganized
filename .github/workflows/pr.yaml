@@ -5,48 +5,15 @@ name: Review
 # (cf. services.phpfpm.user in ../../docker-compose.override.yml)
 env:
   COMPOSE_USER: root
+  # https://getcomposer.org/doc/03-cli.md#composer-auth
+  COMPOSER_AUTH: >-
+    {
+        "bearer": {
+            "www.setasign.com": "${{ secrets.COMPOSER_AUTH_SETASIGN_BEARER }}"
+        }
+    }
 
 jobs:
-  changelog:
-    runs-on: ubuntu-latest
-    name: Changelog should be updated
-    strategy:
-      fail-fast: false
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-
-      - run: git fetch
-      - name: Check that changelog has been updated.
-        run: git diff --exit-code origin/${{ github.base_ref }} -- CHANGELOG.md && exit 1 || exit 0
-
-  coding-standards:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        script:
-          - validate
-          - normalize --dry-run
-          - code-analysis
-          - coding-standards-check/php
-          - coding-standards-check/twig
-    steps:
-      - uses: actions/checkout@v4
-      - run: |
-          docker network create frontend
-          docker compose run --rm phpfpm composer install
-      - run: |
-          docker compose run --rm phpfpm composer ${{ matrix.script }}
-
-  coding-standards-markdown:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: |
-          docker run --rm --volume "$PWD:/md" itkdev/markdownlint '**.md'
-
   site-update:
     name: Check that site can be updated
     runs-on: ubuntu-latest

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+* [PR-20](https://github.com/itk-dev/hoeringsportal-getorganized/pull/20)
+  Added FPDI PDF-Parser add-on
+
 ## [1.1.3] - 2026-05-22
 
 * [PR-19](https://github.com/itk-dev/hoeringsportal-getorganized/pull/19)

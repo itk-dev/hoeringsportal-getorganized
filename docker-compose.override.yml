@@ -8,3 +8,6 @@ services:
     environment:
       - PHP_MAX_EXECUTION_TIME=300
       - PHP_MEMORY_LIMIT=1024M
+      # COMPOSER_AUTH is set in actions
+      # https://getcomposer.org/doc/03-cli.md#composer-auth
+      - COMPOSER_AUTH
