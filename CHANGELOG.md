@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-10-27
+
+* [PR-21](https://github.com/itk-dev/hoeringsportal-getorganized/pull/21)
+  Switched to maintained nginx/nginx-unprivileged image
+
+## [1.2.0] - 2026-06-30
+
 * [PR-20](https://github.com/itk-dev/hoeringsportal-getorganized/pull/20)
   Added FPDI PDF-Parser add-on
 
@@ -37,7 +44,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.9.0] - 2024-01-09
 
-[Unreleased]: https://github.com/itk-dev/hoeringsportal-getorganized/compare/1.1.3...HEAD
+[Unreleased]: https://github.com/itk-dev/hoeringsportal-getorganized/compare/1.2.1...HEAD
+[1.2.1]: https://github.com/itk-dev/hoeringsportal-getorganized/compare/1.2.0...1.2.1
+[1.2.0]: https://github.com/itk-dev/hoeringsportal-getorganized/compare/1.1.3...1.2.0
 [1.1.3]: https://github.com/itk-dev/hoeringsportal-getorganized/compare/1.1.2...1.1.3
 [1.1.2]: https://github.com/itk-dev/hoeringsportal-getorganized/compare/1.1.1...1.1.2
 [1.1.1]: https://github.com/itk-dev/hoeringsportal-getorganized/compare/1.1.0...1.1.1
